@@ -15,6 +15,12 @@
   --font-sans: var(--font-noto-sans-kr), sans-serif;
   --font-en: var(--font-montserrat), sans-serif;
   --font-sign: var(--font-nanum-pen-script), cursive;
+  --canvas-width: min(100vw, 1440px);
+  --canvas-left: calc((100vw - var(--canvas-width)) / 2);
+  --home-inner-gutter: clamp(24px, 5.5556vw, 80px);
+  --column-inner-gutter: clamp(24px, 8.3333vw, 120px);
+  --home-gutter: calc(var(--canvas-left) + var(--home-inner-gutter));
+  --column-gutter: calc(var(--canvas-left) + var(--column-inner-gutter));
 }
 
 * {
@@ -75,9 +81,8 @@ svg {
 }
 
 .pageFrame {
-  width: min(100%, 1440px);
-  margin: 0 auto;
-  overflow: hidden;
+  width: 100%;
+  min-width: 0;
   background: var(--white);
 }
 

@@ -9,6 +9,7 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns";
 import { clinic, columnExcerpts, doctor, homeContent } from "@/content/site";
 import { getCategory, getTreatment, homeEquipmentOrder } from "@/content/treatments";
+import { nanumPenScript } from "./fonts";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -39,7 +40,7 @@ export default function HomePage() {
   return (
     <main className="pageFrame">
       <section className={styles.hero}>
-        <ImageSlot className={styles.heroMedia} label={homeContent.hero.media} alt="글로리의원 브랜딩 영상" variant="dark" />
+        <ImageSlot className={styles.heroMedia} label={homeContent.hero.media} alt="글로리의원 브랜딩 영상" variant="dark" align="end" />
         <div className={styles.heroShade} />
         <header className={styles.header}>
           <Link className={styles.logo} href="/"><span>G</span><span><b>글로리의원</b><small>GLORY CLINIC</small></span></Link>
@@ -65,7 +66,7 @@ export default function HomePage() {
 
       <section className={styles.vision}>
         <div className="outlineWord" aria-hidden="true">VISION</div>
-        <div><span>{homeContent.vision.eyebrow}</span><h2>{homeContent.vision.title}<br /><b>{homeContent.vision.titleStrong}</b></h2><p>{homeContent.vision.description}<br />{homeContent.vision.description2}</p><div className={styles.signature}><span>글로리의원 대표원장</span><b>이 호</b><small>[실제 서명 이미지로 교체]</small></div></div>
+        <div><span>{homeContent.vision.eyebrow}</span><h2>{homeContent.vision.title}<br /><b>{homeContent.vision.titleStrong}</b></h2><p>{homeContent.vision.description}<br />{homeContent.vision.description2}</p><div className={styles.signature}><span>글로리의원 대표원장</span><b className={nanumPenScript.className}>이 호</b><small>[실제 서명 이미지로 교체]</small></div></div>
       </section>
 
       <EquipmentCarousel items={equipment} eyebrow={homeContent.equipment.eyebrow} title={homeContent.equipment.title} titleStrong={homeContent.equipment.titleStrong} guide={homeContent.equipment.guide} />

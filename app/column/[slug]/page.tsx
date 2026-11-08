@@ -275,6 +275,11 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           </div>
         </aside>
       </div>
+
+      <footer className={styles.footer}>
+        <div><b>G 글로리의원</b><p>본 칼럼은 의료법을 준수하여 작성되었으며, 시술 결과는 개인에 따라 다를 수 있습니다.</p><p>[사업자 정보] · 대표원장 이호</p></div>
+        <div><p>홈페이지 · 블로그 · 인스타그램 · 유튜브</p><p>RSS · 사이트맵</p></div>
+      </footer>
     </main>
   );
 }

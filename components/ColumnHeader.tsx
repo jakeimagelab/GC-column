@@ -7,9 +7,10 @@ import styles from "./ColumnHeader.module.css";
 
 type ColumnHeaderProps = {
   variant?: "taupe" | "overlay";
+  page?: "main" | "detail";
 };
 
-export function ColumnHeader({ variant = "taupe" }: ColumnHeaderProps) {
+export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileCategory, setMobileCategory] = useState<string>(categories[0].slug);
@@ -62,8 +63,17 @@ export function ColumnHeader({ variant = "taupe" }: ColumnHeaderProps) {
         </nav>
 
         <div className={styles.actions}>
-          <Link href="/column#search">칼럼 검색</Link>
-          <Link href="/">홈페이지 →</Link>
+          {page === "main" ? (
+            <>
+              <Link href="/">홈페이지 →</Link>
+              <span>EN · 中 · 日</span>
+            </>
+          ) : (
+            <>
+              <Link href="/column#search">칼럼 검색</Link>
+              <Link href="/">홈페이지 →</Link>
+            </>
+          )}
         </div>
 
         <button
@@ -131,8 +141,11 @@ export function ColumnHeader({ variant = "taupe" }: ColumnHeaderProps) {
             );
           })}
           <div className={styles.mobileLinks}>
-            <Link href="/column#search">칼럼 검색</Link>
-            <Link href="/">홈페이지 →</Link>
+            {page === "main" ? (
+              <><Link href="/">홈페이지 →</Link><span>EN · 中 · 日</span></>
+            ) : (
+              <><Link href="/column#search">칼럼 검색</Link><Link href="/">홈페이지 →</Link></>
+            )}
           </div>
         </div>
       ) : null}

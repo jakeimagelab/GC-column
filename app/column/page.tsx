@@ -6,9 +6,9 @@ import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
 import { FaqList } from "@/components/FaqList";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
-import { getColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
+import { getColumns, mainSearchSlugs } from "@/content/columns";
 import { clinic, columnExcerpts, columnMainContent, doctor } from "@/content/site";
-import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/content/treatments";
+import { categories, getCategory } from "@/content/treatments";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -24,11 +24,8 @@ export default function ColumnMainPage() {
     answer: columnExcerpts.main[column.slug] ?? column.summary,
     keywords: column.keywords,
   }));
-  const cards = getColumns(mainCardSlugs);
-  const treatmentCards = mainTreatmentOrder.flatMap((slug) => {
-    const treatment = getTreatment(slug);
-    return treatment ? [treatment] : [];
-  });
+  const cards = columnMainContent.cards;
+  const treatmentCards = columnMainContent.treatments;
   const mainFaqs = columnMainContent.mainFaqs.map((q) => ({ q, a: "[본문]" }));
 
   return (
@@ -42,7 +39,7 @@ export default function ColumnMainPage() {
           align="end"
         />
         <div className={styles.heroShade} />
-        <ColumnHeader variant="overlay" />
+        <ColumnHeader variant="overlay" page="main" />
         <div className={styles.heroContent}>
           <h1><strong>{columnMainContent.hero.title}</strong> <span>{columnMainContent.hero.titleSub}</span></h1>
           <p>{columnMainContent.hero.description}</p>
@@ -84,10 +81,10 @@ export default function ColumnMainPage() {
           {cards.map((column) => (
             <Link href={`/column/${column.slug}`} className={styles.columnCard} key={column.slug}>
               <ImageSlot className={styles.cardPhoto} label="[원장님 사진]" alt={`${column.title} 대표 사진`} />
-              <span>{getCategory(column.categorySlug)?.name}</span>
+              <span>{column.category}</span>
               <b>{column.title}</b>
-              <p>{column.summary}</p>
-              <small>{column.author} · [발행일]</small>
+              <p>{column.answer}</p>
+              <small>대표원장 이호 · [발행일]</small>
             </Link>
           ))}
         </div>
@@ -106,8 +103,8 @@ export default function ColumnMainPage() {
         <h2>시술별로 읽어보기</h2>
         <div className={styles.treatmentGrid}>
           {treatmentCards.map((treatment) => (
-            <div key={treatment.slug}>
-              <b>{treatment.name}</b>
+            <div key={treatment}>
+              <b>{treatment}</b>
               <span>한 줄 설명 · 이런 분께</span>
               <small>관련 칼럼 [N] · 시술 안내 →</small>
             </div>

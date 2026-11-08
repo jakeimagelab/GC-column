@@ -117,6 +117,15 @@ export const columnMainContent = {
   faqTitle: "진료실에서\n가장 많이 받는 질문",
   faqDescription: "각 답변 끝에 자세한 칼럼으로 연결됩니다.",
   mainFaqs: ["[대표 질문 1]", "[대표 질문 2]", "[대표 질문 3]", "[대표 질문 4]", "[대표 질문 5]"],
+  cards: [
+    { slug: "ulthera-prime-shots", category: "리프팅", title: "울쎄라 프라임, 샷 수가 많을수록 좋을까요?", answer: "핵심 답변 한 줄 미리보기" },
+    { slug: "thermage-vs-ulthera", category: "리프팅", title: "써마지와 울쎄라, 어떻게 다르고 무엇이 맞을까요?", answer: "핵심 답변 한 줄 미리보기" },
+    { slug: "pigment-question", category: "색소·모공", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
+    { slug: "rejuran-count", category: "주사시술", title: "리쥬란, 몇 번 맞아야 하나요?", answer: "핵심 답변 한 줄 미리보기" },
+    { slug: "filler-question", category: "스페셜필러", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
+    { slug: "injection-question", category: "주사시술", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
+  ],
+  treatments: ["울쎄라 프라임", "써마지 FLX", "티타늄", "온다", "튠페이스", "슈링크", "리쥬란", "스페셜필러"],
   principles: [
     { no: "01", title: "대표원장 1:1 상담", desc: "상담부터 시술까지 같은 의사가 진행합니다." },
     { no: "02", title: "필요한 시술만 제안", desc: "[진료 원칙 문장]" },

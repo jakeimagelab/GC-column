@@ -1,4 +1,4 @@
-.panel { position: relative; z-index: 10; margin: -110px 80px 0; padding: 40px 56px 36px; background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14); display: flex; flex-direction: column; gap: 18px; }
+.panel { position: relative; z-index: 10; margin: -110px var(--home-gutter) 0; padding: 40px clamp(32px, 3.8889vw, 56px) 36px; background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14); display: flex; flex-direction: column; gap: 18px; }
 .heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
 .heading > div { display: flex; align-items: baseline; gap: 16px; }
 .heading span { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 4px; }
@@ -31,7 +31,7 @@
 .empty button { padding: 12px 18px; border: 0; background: var(--taupe); color: #fff; font-size: 14px; white-space: nowrap; }
 
 @media (max-width: 1024px) {
-  .panel { margin-inline: 40px; padding-inline: 36px; }
+  .panel { padding-inline: 36px; }
   .heading { align-items: flex-start; flex-direction: column; gap: 4px; }
 }
 @media (max-width: 640px) {

@@ -1,6 +1,6 @@
 .titleArea {
   background: var(--paper);
-  padding: 40px 120px 48px;
+  padding: 40px var(--column-gutter) 48px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -62,14 +62,15 @@
 }
 
 .bodyLayout {
-  padding: 48px 120px 100px;
+  padding: 48px var(--column-gutter) 100px;
   display: grid;
-  grid-template-columns: 760px 320px;
-  gap: 80px;
+  grid-template-columns: minmax(0, 760px) minmax(240px, 320px);
+  gap: clamp(48px, 5.5556vw, 80px);
   align-items: start;
 }
 
 .article {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 36px;
@@ -404,7 +405,7 @@
 }
 
 .sidebar {
-  width: 320px;
+  width: 100%;
 }
 
 .stickySidebar {
@@ -441,25 +442,42 @@
   color: var(--muted);
 }
 
-@media (max-width: 1200px) {
-  .bodyLayout {
-    padding-inline: 60px;
-    grid-template-columns: minmax(0, 1fr) 280px;
-    gap: 48px;
-  }
+.footer {
+  padding: 48px var(--column-gutter);
+  background: var(--ink);
+  color: #cfc8bf;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  font-size: 13px;
+  line-height: 1.8;
+}
 
-  .sidebar {
-    width: 280px;
-  }
+.footer b {
+  color: #fff;
+  font-size: 18px;
+  letter-spacing: 3px;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer > div:last-child {
+  text-align: right;
+}
+
+@media (max-width: 1200px) {
+  .bodyLayout { gap: 48px; }
 }
 
 @media (max-width: 1024px) {
   .titleArea {
-    padding: 36px 40px 42px;
+    padding: 36px var(--column-inner-gutter) 42px;
   }
 
   .bodyLayout {
-    padding: 40px;
+    padding: 40px var(--column-inner-gutter);
     grid-template-columns: 1fr;
   }
 
@@ -474,7 +492,7 @@
 
 @media (max-width: 640px) {
   .titleArea {
-    padding: 30px 20px 34px;
+    padding: 30px 24px 34px;
   }
 
   .titleArea h1 {
@@ -482,7 +500,7 @@
   }
 
   .bodyLayout {
-    padding: 28px 20px 70px;
+    padding: 28px 24px 70px;
   }
 
   .article {
@@ -518,5 +536,16 @@
 
   .ctaButtons a {
     flex: 1;
+  }
+
+  .footer {
+    padding: 48px 24px 90px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footer > div:last-child {
+    text-align: left;
   }
 }

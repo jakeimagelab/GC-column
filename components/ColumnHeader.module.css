@@ -12,7 +12,7 @@
 .header {
   width: 100%;
   height: 96px;
-  padding: 0 120px;
+  padding: 0 var(--column-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,21 +25,21 @@
 .brand > span:first-child { font-size: 22px; font-weight: 300; letter-spacing: 4px; }
 .badge { padding: 3px 10px; border: 1px solid currentColor; border-radius: 999px; font-size: 13px; }
 
-.nav { height: 96px; display: flex; align-items: center; gap: 56px; font-size: 16px; }
+.nav { height: 96px; display: flex; align-items: center; gap: clamp(32px, 3.8889vw, 56px); font-size: 16px; }
 .shell a { color: inherit; }
-.actions { display: flex; gap: 20px; font-size: 14px; }
+.actions { display: flex; align-items: center; gap: 20px; white-space: nowrap; font-size: 14px; }
 
 .megaMenu {
   position: absolute;
   top: 96px;
   left: 0;
   width: 100%;
-  padding: 44px 120px 48px;
+  padding: 44px var(--column-gutter) 48px;
   background: #fff;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 56px;
+  gap: clamp(24px, 3.8889vw, 56px);
   color: var(--ink);
 }
 
@@ -57,7 +57,6 @@
 .menuButton, .mobileMenu { display: none; }
 
 @media (max-width: 1180px) {
-  .header, .megaMenu { padding-inline: 60px; }
   .nav { gap: 32px; }
 }
 
