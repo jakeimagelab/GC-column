@@ -1,0 +1,38 @@
+.slot {
+  min-width: 0;
+  background: var(--slot);
+  color: #4a433b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  white-space: pre-line;
+}
+
+.light {
+  background: var(--line);
+}
+
+.dark {
+  background: #a89a8b;
+  color: #fff;
+}
+
+.diagram {
+  background: #f6efe6;
+  border: 2px dashed var(--taupe);
+  color: var(--brown);
+}
+
+.end {
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+}
