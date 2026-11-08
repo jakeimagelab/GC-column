@@ -1,0 +1,29 @@
+.list {
+  border-bottom: 1px solid var(--slot);
+}
+
+.item {
+  border-top: 1px solid var(--slot);
+}
+
+.question {
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 0;
+  background: none;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.answer {
+  padding: 0 0 18px;
+  color: #444;
+  font-size: 15px;
+}
