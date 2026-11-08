@@ -4,6 +4,7 @@ import {
   Nanum_Pen_Script,
   Noto_Sans_KR,
 } from "next/font/google";
+import { SITE_URL } from "@/content/site";
 import "./globals.css";
 
 const notoSansKr = Noto_Sans_KR({
@@ -26,6 +27,7 @@ const nanumPenScript = Nanum_Pen_Script({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "글로리의원",
   description: "언주역 글로리의원",
 };

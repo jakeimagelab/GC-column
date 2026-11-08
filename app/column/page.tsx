@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
@@ -9,6 +10,11 @@ import { getColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
 import { clinic, columnMainContent, doctor } from "@/content/site";
 import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/content/treatments";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "원장 칼럼 | 언주역 글로리의원",
+  description: "원장 칼럼 | 언주역 글로리의원",
+};
 
 export default function ColumnMainPage() {
   const searchColumns: SearchColumn[] = getColumns(mainSearchSlugs).map((column) => ({

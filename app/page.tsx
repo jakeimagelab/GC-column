@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
 import { EquipmentCarousel } from "@/components/EquipmentCarousel";
@@ -9,6 +10,11 @@ import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns"
 import { clinic, doctor, homeContent } from "@/content/site";
 import { getCategory, getTreatment, homeEquipmentOrder } from "@/content/treatments";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "글로리의원 | 언주역 글로리의원",
+  description: homeContent.hero.description,
+};
 
 function Flag({ locale }: { locale: "KR" | "EN" | "CN" }) {
   if (locale === "KR") return <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#fff" /><path d="M6.5 7a3.5 3.5 0 0 1 7 0z" fill="#CD2E3A" /><path d="M6.5 7a3.5 3.5 0 0 0 7 0z" fill="#0047A0" /></svg>;

@@ -7,7 +7,7 @@ import { ColumnHeader } from "@/components/ColumnHeader";
 import { FaqList } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { columns, getColumn } from "@/content/columns";
-import { detailContent, doctor } from "@/content/site";
+import { detailContent, doctor, SITE_URL } from "@/content/site";
 import { getCategory } from "@/content/treatments";
 import styles from "./page.module.css";
 
@@ -43,9 +43,55 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     { id: "judgement", label: "03 권하는 경우 · 아닌 경우" },
     { id: "precautions", label: "04 시술 전 확인 · FAQ" },
   ];
+  const pageUrl = `${SITE_URL}/column/${column.slug}`;
+  const medicalPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    headline: column.title,
+    description: column.summary,
+    url: pageUrl,
+    datePublished: column.publishedAt,
+    dateModified: column.updatedAt,
+    author: {
+      "@type": "Person",
+      name: column.author,
+      jobTitle: "대표원장",
+      worksFor: { "@type": "MedicalClinic", name: "글로리의원" },
+    },
+    reviewedBy: {
+      "@type": "Person",
+      name: column.author,
+      jobTitle: "대표원장",
+    },
+    about: column.keywords,
+    mainEntityOfPage: pageUrl,
+  };
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: column.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: detailContent.breadcrumb.map((name, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name,
+      item: index === 0 ? SITE_URL : index === 1 ? `${SITE_URL}/column` : index === detailContent.breadcrumb.length - 1 ? pageUrl : `${SITE_URL}/column?category=${column.categorySlug}`,
+    })),
+  };
+  const json = (value: object) => JSON.stringify(value).replace(/</g, "\\u003c");
 
   return (
     <main className="pageFrame">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(medicalPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(breadcrumbJsonLd) }} />
       <ColumnHeader />
 
       <section className={styles.titleArea}>
