@@ -97,6 +97,13 @@ export const mainTreatmentOrder = [
   "filler-1",
 ];
 
+export const megaMenuTreatmentOrder: Record<Category["slug"], string[]> = {
+  lifting: ["ulthera-prime", "thermage-flx", "titanium", "onda", "tuneface", "shurink", "oligio"],
+  pigment: ["pigment-1", "pigment-2", "pigment-3"],
+  injection: ["rejuran", "lituo", "botox", "stem-cell"],
+  filler: ["filler-1", "filler-2"],
+};
+
 export function getCategory(slug: Category["slug"]) {
   return categories.find((category) => category.slug === slug);
 }

@@ -46,7 +46,7 @@
 .megaGroup { min-width: 0; display: flex; flex-direction: column; }
 .groupTitle { padding-bottom: 14px; border-bottom: 2px solid var(--ink); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 19px; font-weight: 700; }
 .groupTitle small { color: var(--muted-2); font-size: 12px; font-weight: 400; }
-.groupItems { max-height: 374px; overflow: hidden; padding-top: 22px; display: flex; flex-direction: column; gap: 18px; }
+.groupItems { padding-top: 22px; display: flex; flex-direction: column; gap: 18px; }
 .groupItems > a { display: flex; align-items: flex-start; gap: 16px; }
 .itemSlot { width: 72px; height: 72px; flex: none; border-radius: 8px; background: #eef0f0; display: flex; align-items: center; justify-content: center; color: var(--muted-2); font-size: 11px; }
 .itemCopy { min-width: 0; display: flex; flex-direction: column; gap: 3px; }

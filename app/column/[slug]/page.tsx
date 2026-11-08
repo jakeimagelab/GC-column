@@ -184,11 +184,11 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             <div className={styles.judgementGrid}>
               <div>
                 <b>권하는 경우</b>
-                <ul>{column.judgement.recommend.map((item) => <li key={item}>{item}</li>)}</ul>
+                <ul>{column.judgement.recommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
               </div>
               <div>
                 <b>권하지 않거나 다른 시술을 먼저 보는 경우</b>
-                <ul>{column.judgement.notRecommend.map((item) => <li key={item}>{item}</li>)}</ul>
+                <ul>{column.judgement.notRecommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
               </div>
             </div>
           </section>

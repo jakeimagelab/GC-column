@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>글로리의원 칼럼 메인 구조</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2B2B2B;text-decoration:none}a:hover{color:#6E6052}
+</style>
+</helmet>
+<div style="width: 1440px; height: 4780px; position: relative; background: #FFFFFF; color: #2B2B2B; font-family: 'Noto Sans KR', sans-serif; font-size: 15px; line-height: 1.6; overflow: hidden">
+
+<!-- 1-2 HERO: header + search first -->
+<section style="position: relative; height: 700px; background: #3A342E; color: #FFFFFF; z-index: 5">
+<div style="position: absolute; inset: 0; background: #5B524A; display: flex; align-items: flex-end; justify-content: flex-end; padding: 24px 120px; box-sizing: border-box; color: #D9D1C7; font-size: 13px">[사진] 원장님 상담·시술 장면 또는 라운지 (포토클리닉 촬영본, 한 장 고정)</div>
+<div style="position: absolute; inset: 0; background: rgba(30,26,22,0.5)"></div>
+<header style="position: relative; height: 96px; padding: 0 120px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 16px">
+<div style="font-size: 22px; font-weight: 300; letter-spacing: 4px">G 글로리의원</div>
+<div style="font-size: 13px; padding: 3px 10px; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px">원장 칼럼</div>
+</div>
+<nav aria-label="칼럼 카테고리" style="display: flex; gap: 56px; font-size: 16px">
+<a href="#" style="color: #FFFFFF">리프팅</a>
+<a href="#" style="color: #FFFFFF">색소·모공</a>
+<a href="#" style="color: #FFFFFF">주사시술</a>
+<a href="#" style="color: #FFFFFF">스페셜필러</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 20px; font-size: 14px">
+<a href="#" style="color: #FFFFFF">홈페이지 →</a>
+<span>EN · 中 · 日</span>
+</div>
+</header>
+
+<div style="position: relative; padding: 64px 0 0 300px; width: 840px; display: flex; flex-direction: column; gap: 18px">
+<div style="align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">① 헤더 · ② 칼럼 검색 (맨 위 · 입력하면 바로 관련 내용)</div>
+<div style="font-family: Montserrat, sans-serif; line-height: 1.1">
+<span style="font-size: 40px; font-weight: 700">Doctor's Column</span>
+<span style="font-size: 40px; font-weight: 300; color: #CFC8BF"> by Glory Clinic</span>
+</div>
+<div style="font-size: 17px; font-weight: 300; color: #EDE7E0">궁금한 시술이나 고민을 입력하세요. 대표원장이 쓴 답을 바로 찾아드립니다.</div>
+
+<div style="position: relative">
+<div style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; color: #2B2B2B; padding: 0 12px 0 24px; height: 68px; box-shadow: 0 16px 40px rgba(0,0,0,0.25)">
+<label for="column-search" style="font-size: 14px; font-weight: 700; color: #6E6052; white-space: nowrap">칼럼 검색</label>
+<input id="column-search" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="예: 울쎄라, 세르프, 붓기, 리쥬란" style="flex: 1; min-width: 0; border: none; outline: none; font-family: inherit; font-size: 19px; color: #2B2B2B; background: transparent">
+<button type="button" onClick="{{clear}}" aria-label="검색어 지우기" style="background: none; border: none; color: #6B6B6B; font-family: inherit; font-size: 14px; padding: 10px 12px">지우기</button>
+<button type="button" style="background: #2B2B2B; color: #FFFFFF; border: none; font-family: inherit; font-size: 15px; padding: 14px 22px">검색</button>
+</div>
+
+<sc-if value="{{showResults}}" hint-placeholder-val="{{ true }}">
+<div style="position: absolute; left: 0; top: 76px; width: 840px; background: #FFFFFF; color: #2B2B2B; box-shadow: 0 24px 48px rgba(0,0,0,0.25); display: grid; grid-template-columns: 240px minmax(0, 1fr); z-index: 30">
+<div style="background: #F3F0EB; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<b style="font-size: 14px">관련 키워드</b>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{related}}" as="k" hint-placeholder-count="6">
+<button type="button" onClick="{{k.pick}}" style="background: #FFFFFF; border: 1px solid #DDD5CB; border-radius: 999px; padding: 6px 12px; font-family: inherit; font-size: 13px; color: #2B2B2B">{{k.label}}</button>
+</sc-for>
+</div>
+<div style="font-size: 12px; color: #5E5E5E; margin-top: 6px">누르면 그 키워드로 다시 찾습니다</div>
+</div>
+<div style="padding: 24px 28px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<b style="font-size: 14px">관련 칼럼 {{colCount}}</b>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="3">
+<a href="Column.dc.html" style="display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid #EEE8E1">
+<span style="font-size: 12px; color: #6E6052">{{c.cat}}</span>
+<span style="font-size: 16px; font-weight: 700">{{c.title}}</span>
+<span style="font-size: 13px; color: #5E5E5E">{{c.answer}}</span>
+</a>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<b style="font-size: 14px">관련 질문 {{faqCount}}</b>
+<sc-for list="{{faqs}}" as="f" hint-placeholder-count="2">
+<a href="Column.dc.html" style="font-size: 14px">Q. {{f.q}}</a>
+</sc-for>
+</div>
+<div style="font-size: 13px; color: #5E5E5E; border-top: 1px solid #EEE8E1; padding-top: 12px">시술 안내 바로가기: <b style="color: #2B2B2B">{{treatLine}}</b></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showEmpty}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 76px; width: 840px; box-sizing: border-box; background: #FFFFFF; color: #2B2B2B; box-shadow: 0 24px 48px rgba(0,0,0,0.25); padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; z-index: 30">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<b style="font-size: 16px">아직 '{{q}}'에 대한 칼럼이 없습니다</b>
+<span style="font-size: 14px; color: #5E5E5E">질문을 남겨주시면 대표원장이 칼럼으로 답합니다.</span>
+</div>
+<button type="button" style="background: #B5A595; color: #FFFFFF; border: none; font-family: inherit; font-size: 14px; padding: 12px 18px; white-space: nowrap">질문 남기기</button>
+</div>
+</sc-if>
+</div>
+
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px">
+<span style="color: #EDE7E0">많이 찾는 키워드</span>
+<sc-for list="{{popular}}" as="p" hint-placeholder-count="5">
+<button type="button" onClick="{{p.pick}}" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.5); color: #FFFFFF; border-radius: 999px; padding: 6px 12px; font-family: inherit; font-size: 13px">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="position: absolute; right: 60px; top: 150px; width: 300px; background: #FFFFFF; color: #2B2B2B; border: 2px solid #2F6FED; padding: 16px 18px; font-size: 13px; line-height: 1.6; z-index: 2">
+<b style="color: #2F6FED">검색 동작</b><br>
+글자를 입력하는 즉시 아래가 보입니다.<br>
+· 관련 키워드 (눌러서 다시 찾기)<br>
+· 관련 칼럼 (제목 + 핵심 답 한 줄)<br>
+· 관련 질문 (FAQ)<br>
+· 시술 안내 바로가기<br>
+결과가 없으면 '질문 남기기' → 스튜디오 질문 보관함으로 들어가 다음 칼럼 주제가 됩니다.<br>
+<span style="color: #5E5E5E">입력창에서 직접 시험해 보세요. 목록은 예시입니다.</span>
+</div>
+</section>
+
+<!-- 3 DOCTOR -->
+<section style="position: relative; height: 600px; padding: 80px 120px; box-sizing: border-box">
+<div aria-hidden="true" style="position: absolute; left: 60px; top: 20px; font-family: Montserrat, sans-serif; font-size: 180px; font-weight: 700; color: transparent; -webkit-text-stroke: 1px #ECE7E1; letter-spacing: 8px">COLUMN</div>
+<div style="position: absolute; left: 0; top: 260px; width: 720px; height: 300px; background: #F3F0EB"></div>
+<div style="position: relative; display: flex; gap: 80px; align-items: flex-start">
+<div style="width: 460px; height: 440px; background: #CFC5B8; color: #4A433B; display: flex; align-items: center; justify-content: center; font-size: 13px; box-shadow: 0 20px 40px rgba(0,0,0,0.12)">[사진] 대표원장 프로필 (시술 중 또는 상담 장면)</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 18px; padding-top: 20px">
+<div style="display: inline-flex; align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">③ 원장 소개 · 의사 구조화 데이터</div>
+<h2 style="margin: 0; font-size: 32px; font-weight: 700; line-height: 1.4">이 칼럼은 대표원장 이호가<br>직접 씁니다.</h2>
+<p style="margin: 0; font-size: 16px; color: #5E5E5E; font-weight: 300">피부과 시술 경력 [10]년. 자연스럽고 부드러운 변화를 추구하며,<br>가족에게 권하지 못하는 시술이라면 고객에게도 권하지 않습니다.</p>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; color: #5E5E5E">
+<span style="border: 1px solid #DDD5CB; padding: 4px 12px; border-radius: 999px">[전문 분야]</span>
+<span style="border: 1px solid #DDD5CB; padding: 4px 12px; border-radius: 999px">[학회·자격]</span>
+<span style="border: 1px solid #DDD5CB; padding: 4px 12px; border-radius: 999px">[주요 경력]</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px">
+<a href="#" style="font-size: 15px; border-bottom: 1px solid #2B2B2B; padding-bottom: 2px">의료진 소개 자세히 →</a>
+<div style="font-size: 14px; color: #5E5E5E">대표원장 <span style="font-size: 30px; font-weight: 700; color: #2B2B2B; font-style: italic">[서명]</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 4 CATEGORY -->
+<section style="padding: 40px 120px 60px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: baseline; gap: 16px">
+<div style="background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">④ 고민별 찾기</div>
+<h2 style="margin: 0; font-size: 26px">어떤 고민이 있으신가요?</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<a href="#" style="background: #F3F0EB; padding: 28px; display: flex; flex-direction: column; gap: 8px"><span style="font-family: Montserrat, sans-serif; font-size: 13px; letter-spacing: 2px; color: #6E6052">LIFTING</span><span style="font-size: 20px; font-weight: 700">리프팅</span><span style="font-size: 13px; color: #5E5E5E">칼럼 [N]편</span></a>
+<a href="#" style="background: #F3F0EB; padding: 28px; display: flex; flex-direction: column; gap: 8px"><span style="font-family: Montserrat, sans-serif; font-size: 13px; letter-spacing: 2px; color: #6E6052">PIGMENT · PORE</span><span style="font-size: 20px; font-weight: 700">색소·모공</span><span style="font-size: 13px; color: #5E5E5E">칼럼 [N]편</span></a>
+<a href="#" style="background: #F3F0EB; padding: 28px; display: flex; flex-direction: column; gap: 8px"><span style="font-family: Montserrat, sans-serif; font-size: 13px; letter-spacing: 2px; color: #6E6052">INJECTION</span><span style="font-size: 20px; font-weight: 700">주사시술</span><span style="font-size: 13px; color: #5E5E5E">칼럼 [N]편</span></a>
+<a href="#" style="background: #F3F0EB; padding: 28px; display: flex; flex-direction: column; gap: 8px"><span style="font-family: Montserrat, sans-serif; font-size: 13px; letter-spacing: 2px; color: #6E6052">SPECIAL FILLER</span><span style="font-size: 20px; font-weight: 700">스페셜필러</span><span style="font-size: 13px; color: #5E5E5E">칼럼 [N]편</span></a>
+</div>
+</section>
+
+<!-- 5 LATEST -->
+<section id="latest" style="padding: 60px 120px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">⑤ 최신 칼럼 · 페이지 나눔</div>
+<h2 style="margin: 0; font-size: 26px">최신 칼럼</h2>
+</div>
+<a href="#" style="font-size: 14px; border-bottom: 1px solid #2B2B2B; padding-bottom: 2px">전체 칼럼 보기 →</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 28px">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="6">
+<a href="Column.dc.html" style="display: flex; flex-direction: column; gap: 12px">
+<div style="height: 230px; background: #CFC5B8; color: #4A433B; display: flex; align-items: center; justify-content: center; font-size: 13px">[원장님 사진]</div>
+<div style="font-size: 13px; color: #6E6052; font-weight: 500">{{c.cat}}</div>
+<div style="font-size: 19px; font-weight: 700; line-height: 1.45">{{c.title}}</div>
+<div style="font-size: 14px; color: #5E5E5E">{{c.answer}}</div>
+<div style="font-size: 13px; color: #6B6B6B">대표원장 이호 · [발행일]</div>
+</a>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: center; gap: 18px; font-size: 14px; color: #6B6B6B"><span style="color: #2B2B2B; font-weight: 700">1</span><span>2</span><span>3</span><span>다음 →</span></div>
+</section>
+
+<!-- 6 FAQ -->
+<section style="background: #F3F0EB; padding: 64px 120px; display: grid; grid-template-columns: 380px 1fr; gap: 60px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">⑥ 자주 묻는 질문 · FAQ 구조화 데이터</div>
+<h2 style="margin: 0; font-size: 26px">진료실에서<br>가장 많이 받는 질문</h2>
+<p style="margin: 0; font-size: 14px; color: #5E5E5E">각 답변 끝에 자세한 칼럼으로 연결됩니다.</p>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="border-top: 1px solid #CFC5B8; padding: 20px 0; font-size: 17px; font-weight: 500; display: flex; justify-content: space-between">Q. [대표 질문 1] <span>+</span></div>
+<div style="border-top: 1px solid #CFC5B8; padding: 20px 0; font-size: 17px; font-weight: 500; display: flex; justify-content: space-between">Q. [대표 질문 2] <span>+</span></div>
+<div style="border-top: 1px solid #CFC5B8; padding: 20px 0; font-size: 17px; font-weight: 500; display: flex; justify-content: space-between">Q. [대표 질문 3] <span>+</span></div>
+<div style="border-top: 1px solid #CFC5B8; padding: 20px 0; font-size: 17px; font-weight: 500; display: flex; justify-content: space-between">Q. [대표 질문 4] <span>+</span></div>
+<div style="border-top: 1px solid #CFC5B8; border-bottom: 1px solid #CFC5B8; padding: 20px 0; font-size: 17px; font-weight: 500; display: flex; justify-content: space-between">Q. [대표 질문 5] <span>+</span></div>
+</div>
+</section>
+
+<!-- 7 TREATMENTS -->
+<section style="padding: 72px 120px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: baseline; gap: 16px">
+<div style="background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">⑦ 주요 시술</div>
+<h2 style="margin: 0; font-size: 26px">시술별로 읽어보기</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{treatments}}" as="t" hint-placeholder-count="8">
+<div style="border: 1px solid #E3DCD3; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 17px; font-weight: 700">{{t}}</div>
+<div style="font-size: 13px; color: #5E5E5E">한 줄 설명 · 이런 분께</div>
+<div style="font-size: 13px; color: #6E6052">관련 칼럼 [N] · 시술 안내 →</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<!-- 8 PRINCIPLES -->
+<section style="padding: 40px 120px 72px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center">
+<div style="height: 380px; background: #CFC5B8; color: #4A433B; display: flex; align-items: center; justify-content: center; font-size: 13px">[사진] 호텔식 라운지·상담실</div>
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">⑧ 진료 원칙 (결과 약속 없이 진료 방식만)</div>
+<h2 style="margin: 0; font-size: 26px">글로리의원은 이렇게 진료합니다</h2>
+<div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px">
+<div><b>01 대표원장 1:1 상담</b><br><span style="color: #5E5E5E">상담부터 시술까지 같은 의사가 진행합니다.</span></div>
+<div><b>02 필요한 시술만 제안</b><br><span style="color: #5E5E5E">[진료 원칙 문장]</span></div>
+<div><b>03 시술 후 관리</b><br><span style="color: #5E5E5E">[사후 관리 방식]</span></div>
+</div>
+</div>
+</section>
+
+<!-- 9 INFO -->
+<section style="background: #F3F0EB; padding: 64px 120px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px">
+<div style="height: 300px; background: #DDD5CB; color: #4A433B; display: flex; align-items: center; justify-content: center; font-size: 13px">[지도] 봉은사로 207 KJ빌딩 3층</div>
+<div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px">
+<div style="align-self: flex-start; background: #2F6FED; color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 6px">⑨ 병원 정보 · 병원 구조화 데이터</div>
+<h2 style="margin: 0; font-size: 26px">오시는 길</h2>
+<div>서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동)</div>
+<div>진료 시간 [확인 필요] · 발레 주차</div>
+<a href="#" style="font-size: 22px; font-weight: 700">02-6958-7525</a>
+<div style="display: flex; gap: 10px; margin-top: 6px">
+<a href="#" style="background: #B5A595; color: #FFFFFF; padding: 12px 20px; font-size: 14px">예약·상담</a>
+<a href="#" style="border: 1px solid #2B2B2B; padding: 12px 20px; font-size: 14px">카카오톡 상담</a>
+</div>
+</div>
+</section>
+
+<!-- 10 FOOTER -->
+<footer style="background: #2B2B2B; color: #CFC8BF; padding: 48px 120px; display: flex; justify-content: space-between; font-size: 13px; line-height: 1.8">
+<div>
+<div style="font-size: 18px; letter-spacing: 3px; color: #FFFFFF; margin-bottom: 8px">G 글로리의원</div>
+<div>본 칼럼은 의료법을 준수하여 작성되었으며, 시술 결과는 개인에 따라 다를 수 있습니다.</div>
+<div>[사업자 정보] · 대표원장 이호</div>
+</div>
+<div style="text-align: right">
+<div style="display: inline-block; background: #2F6FED; color: #FFFFFF; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-bottom: 8px">⑩ 푸터</div>
+<div>홈페이지 · 블로그 · 인스타그램 · 유튜브</div>
+<div>RSS · 사이트맵</div>
+</div>
+</footer>
+
+<!-- floating quick menu -->
+<div style="position: absolute; right: 0; top: 300px; width: 104px; background: #FFFFFF; box-shadow: 0 10px 30px rgba(0,0,0,0.12); text-align: center; font-size: 12px">
+<div style="background: #B5A595; color: #FFFFFF; padding: 14px 6px"><b>예약·상담</b><br>02.6958.7525</div>
+<div style="padding: 14px 6px; border-bottom: 1px solid #EEE">카톡상담</div>
+<div style="padding: 14px 6px; border-bottom: 1px solid #EEE">블로그</div>
+<div style="padding: 14px 6px; border-bottom: 1px solid #EEE">오시는길</div>
+<div style="padding: 14px 6px">홈페이지</div>
+</div>
+<div style="position: absolute; right: 112px; top: 300px; background: #2F6FED; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px">고정 상담 메뉴 (홈페이지와 동일)</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4780}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { q: '세르프' };
+}
+searchVals() {
+const index = [
+{ cat: '리프팅', title: '세르프와 써마지, 무엇이 다르고 누구에게 맞나요?', answer: '써마지처럼 진피층에 에너지를 넣고, DEEP 모드로 더 깊은 층까지 전달하는 고주파 장비입니다.', kw: ['세르프', 'XERF', '써마지', '고주파', '리프팅'] },
+{ cat: '리프팅', title: '울쎄라만 받으면 세르프는 필요 없나요?', answer: '[핵심 답변 한 줄]', kw: ['울쎄라', '세르프', '병행', '리프팅'] },
+{ cat: '리프팅', title: '리프팅 시술 후 냉찜질, 꼭 해야 하나요?', answer: '[핵심 답변 한 줄]', kw: ['냉찜질', '붓기', '시술 후 관리', '리프팅', '울쎄라', '써마지'] },
+{ cat: '리프팅', title: '울쎄라 프라임, 샷 수가 많을수록 좋을까요?', answer: '[핵심 답변 한 줄]', kw: ['울쎄라', '울쎄라 프라임', '샷 수', '리프팅'] },
+{ cat: '주사시술', title: '리쥬란, 몇 번 맞아야 하나요?', answer: '[핵심 답변 한 줄]', kw: ['리쥬란', '스킨부스터', '주사', '붓기'] }
+];
+const faqIndex = [
+{ q: '세르프가 좋은가요, 써마지가 좋은가요?', kw: ['세르프', '써마지'] },
+{ q: '세르프와 써마지는 보통 어느 연령대가 선택하나요?', kw: ['세르프', '써마지'] },
+{ q: '리프팅 후 붓기는 며칠 가나요?', kw: ['붓기', '리프팅', '울쎄라', '냉찜질'] },
+{ q: '리쥬란 맞고 바로 세안해도 되나요?', kw: ['리쥬란', '스킨부스터'] }
+];
+const treats = ['울쎄라 프라임', '써마지 FLX', '세르프', '슈링크', '온다', '리쥬란', '보톡스'];
+const q = (this.state.q || '').trim().toLowerCase();
+const hit = (kws, title) => q.length > 0 && (kws.some((k) => k.toLowerCase().includes(q) || q.includes(k.toLowerCase())) || (title || '').toLowerCase().includes(q));
+const cols = index.filter((e) => hit(e.kw, e.title));
+const faqs = faqIndex.filter((f) => hit(f.kw, f.q));
+const tm = treats.filter((t) => t.toLowerCase().includes(q) || (q.length > 1 && cols.some((c) => c.kw.some((k) => t.includes(k)))));
+const seen = {};
+const related = [];
+cols.forEach((c) => c.kw.forEach((k) => { if (!seen[k] && k.toLowerCase() !== q && related.length < 8) { seen[k] = true; related.push(k); } }));
+const pick = (k) => () => this.setState({ q: k });
+const hasQ = q.length > 0;
+const none = cols.length === 0 && faqs.length === 0;
+return {
+q: this.state.q,
+onQ: (e) => this.setState({ q: e.target.value }),
+clear: () => this.setState({ q: '' }),
+showResults: hasQ && !none,
+showEmpty: hasQ && none,
+related: related.map((k) => ({ label: k, pick: pick(k) })),
+cols: cols.slice(0, 3),
+colCount: cols.length,
+faqs: faqs.slice(0, 3),
+faqCount: faqs.length,
+treatLine: tm.length ? tm.join(' · ') : '전체 시술 안내',
+popular: ['울쎄라', '세르프', '써마지', '붓기', '리쥬란'].map((k) => ({ label: k, pick: pick(k) }))
+};
+}
+renderVals() {
+return {
+...this.searchVals(),
+cards: [
+{ cat: '리프팅', title: '울쎄라 프라임, 샷 수가 많을수록 좋을까요?', answer: '핵심 답변 한 줄 미리보기' },
+{ cat: '리프팅', title: '써마지와 울쎄라, 어떻게 다르고 무엇이 맞을까요?', answer: '핵심 답변 한 줄 미리보기' },
+{ cat: '색소·모공', title: '[질문형 칼럼 제목]', answer: '핵심 답변 한 줄 미리보기' },
+{ cat: '주사시술', title: '리쥬란, 몇 번 맞아야 하나요?', answer: '핵심 답변 한 줄 미리보기' },
+{ cat: '스페셜필러', title: '[질문형 칼럼 제목]', answer: '핵심 답변 한 줄 미리보기' },
+{ cat: '주사시술', title: '[질문형 칼럼 제목]', answer: '핵심 답변 한 줄 미리보기' }
+],
+treatments: ['울쎄라 프라임', '써마지 FLX', '티타늄', '온다', '튠페이스', '슈링크', '리쥬란', '스페셜필러']
+};
+}
+}
+</script>
+</body>
+</html>

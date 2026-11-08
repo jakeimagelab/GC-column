@@ -27,6 +27,23 @@ export const doctor: Doctor = {
 
 export const columnNav = ["리프팅", "색소·모공", "주사시술", "스페셜필러"];
 
+export const columnExcerpts: Record<"home" | "main", Record<string, string>> = {
+  home: {
+    "xerf-vs-thermage": "세르프는 써마지처럼 진피층에 에너지를 넣고, DEEP 모드로 더 깊은 층까지 전달하는 고주파 장비입니다.",
+    "ulthera-with-xerf": "[핵심 답변 2~3줄]",
+    "lifting-cold-compress": "[핵심 답변 2~3줄]",
+    "ulthera-low-volume-face": "[핵심 답변 2~3줄]",
+    "rejuran-count": "[핵심 답변 2~3줄]",
+  },
+  main: {
+    "xerf-vs-thermage": "써마지처럼 진피층에 에너지를 넣고, DEEP 모드로 더 깊은 층까지 전달하는 고주파 장비입니다.",
+    "ulthera-with-xerf": "[핵심 답변 한 줄]",
+    "lifting-cold-compress": "[핵심 답변 한 줄]",
+    "ulthera-prime-shots": "[핵심 답변 한 줄]",
+    "rejuran-count": "[핵심 답변 한 줄]",
+  },
+};
+
 export const homeContent = {
   hero: {
     eyebrow: "NATURAL · PERSONAL · BY THE DIRECTOR",

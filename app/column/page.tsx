@@ -7,7 +7,7 @@ import { FaqList } from "@/components/FaqList";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
 import { getColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
-import { clinic, columnMainContent, doctor } from "@/content/site";
+import { clinic, columnExcerpts, columnMainContent, doctor } from "@/content/site";
 import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/content/treatments";
 import styles from "./page.module.css";
 
@@ -21,7 +21,7 @@ export default function ColumnMainPage() {
     slug: column.slug,
     category: getCategory(column.categorySlug)?.name ?? "",
     title: column.title,
-    answer: column.summary,
+    answer: columnExcerpts.main[column.slug] ?? column.summary,
     keywords: column.keywords,
   }));
   const cards = getColumns(mainCardSlugs);

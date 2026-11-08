@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { categories, treatments } from "@/content/treatments";
+import { categories, megaMenuTreatmentOrder, treatments } from "@/content/treatments";
 import styles from "./ColumnHeader.module.css";
 
 type ColumnHeaderProps = {
@@ -27,7 +27,10 @@ export function ColumnHeader({ variant = "taupe" }: ColumnHeaderProps) {
 
   const groups = categories.map((category) => ({
     ...category,
-    items: treatments.filter((treatment) => treatment.categorySlug === category.slug),
+    items: megaMenuTreatmentOrder[category.slug].flatMap((slug) => {
+      const treatment = treatments.find((item) => item.slug === slug);
+      return treatment ? [treatment] : [];
+    }),
   }));
 
   return (

@@ -7,7 +7,7 @@ import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { HomeQuestionSearch, type HomeSearchColumn } from "@/components/HomeQuestionSearch";
 import { ImageSlot } from "@/components/ImageSlot";
 import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns";
-import { clinic, doctor, homeContent } from "@/content/site";
+import { clinic, columnExcerpts, doctor, homeContent } from "@/content/site";
 import { getCategory, getTreatment, homeEquipmentOrder } from "@/content/treatments";
 import styles from "./page.module.css";
 
@@ -27,13 +27,13 @@ export default function HomePage() {
     slug: column.slug,
     category: getCategory(column.categorySlug)?.name ?? "",
     title: column.title,
-    answer: column.summary.split(". ")[0] + (column.summary.includes(". ") ? "." : ""),
+    answer: columnExcerpts.home[column.slug] ?? column.summary,
     keywords: column.keywords,
   }));
   const latestColumns = getColumns(homeLatestSlugs);
   const equipment = homeEquipmentOrder.flatMap((slug) => {
     const item = getTreatment(slug);
-    return item ? [{ slug: item.slug, name: item.name.replace("울쎄라 프라임", "울쎄라피 프라임").replace("티타늄", "소프라노 티타늄"), desc: item.equipmentType ?? item.desc }] : [];
+    return item ? [{ slug: item.slug, name: item.name.replace("울쎄라 프라임", "울쎄라피 프라임").replace("써마지 FLX", "써마지FLX").replace("티타늄", "소프라노 티타늄"), desc: item.equipmentType ?? item.desc }] : [];
   });
 
   return (
@@ -73,7 +73,7 @@ export default function HomePage() {
       <section className={styles.latestSection}>
         <div className={`${styles.columnOutline} outlineWord`} aria-hidden="true">COLUMN</div>
         <div className={styles.latestHeading}><div><span>{homeContent.latest.eyebrow}</span><h2>{homeContent.latest.title} <b>{homeContent.latest.titleStrong}</b></h2></div><Link href="/column">전체 칼럼 보기 →</Link></div>
-        <div className={styles.latestGrid}>{latestColumns.map((column) => <Link href={`/column/${column.slug}`} key={column.slug}><ImageSlot className={styles.latestPhoto} label="[사진] 원장 실제 사진" alt={`${column.title} 원장 사진`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{column.summary.split(". ")[0]}{column.summary.includes(". ") ? "." : ""}</p><small>{column.author} · [게시일]</small></Link>)}</div>
+        <div className={styles.latestGrid}>{latestColumns.map((column) => <Link href={`/column/${column.slug}`} key={column.slug}><ImageSlot className={styles.latestPhoto} label="[사진] 원장 실제 사진" alt={`${column.title} 원장 사진`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{columnExcerpts.home[column.slug] ?? column.summary}</p><small>{column.author} · [게시일]</small></Link>)}</div>
       </section>
 
       <FacilityGallery rooms={homeContent.rooms} />
