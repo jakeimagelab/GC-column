@@ -1,0 +1,35 @@
+.section { position: relative; height: 780px; margin-top: 40px; }
+.band { position: absolute; inset: 380px 0 0; background: var(--taupe-band); }
+.heading { position: relative; padding: 0 80px; display: flex; align-items: flex-end; justify-content: space-between; }
+.heading > div:first-child { display: flex; flex-direction: column; gap: 10px; }
+.heading > div:first-child > span { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 4px; }
+.heading h2 { margin: 0; font-size: 34px; font-weight: 300; }
+.heading h2 b { font-weight: 700; }
+.heading > div:last-child { display: flex; align-items: center; gap: 16px; }
+.heading > div:last-child > span { color: var(--muted); font-size: 13px; }
+.heading button { width: 36px; height: 36px; border: 1px solid var(--line); background: #fff; color: var(--muted-2); font-size: 14px; cursor: pointer; }
+.grid { position: absolute; top: 150px; left: 80px; right: 80px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px; }
+.grid a { color: #fff; display: flex; flex-direction: column; gap: 12px; }
+.imageWrap { height: 330px; display: flex; align-items: flex-end; justify-content: center; }
+.equipmentSlot { width: 150px !important; height: 310px; border: 1px dashed #b9b1a7; border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, 0.55); color: var(--brown); font-size: 12px; }
+.grid a > b { margin-top: 12px; font-size: 20px; }
+.grid a > span { min-height: 48px; color: #fbf8f4; font-size: 14px; line-height: 1.7; white-space: pre-line; }
+.grid a > small { align-self: flex-start; border-bottom: 1px solid #f3eee8; color: #f3eee8; font-size: 12px; }
+.page { position: absolute; right: 80px; bottom: 32px; color: #fff; font-family: var(--font-en); font-size: 13px; }
+
+@media (max-width: 1024px) {
+  .section { height: auto; padding-bottom: 70px; background: linear-gradient(to bottom, #fff 280px, var(--taupe-band) 280px); }
+  .band { display: none; }
+  .heading { padding: 0 40px; }
+  .heading > div:last-child > span { display: none; }
+  .grid { position: relative; inset: auto; margin: 40px 40px 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid a:nth-child(n + 4) { display: none; }
+}
+@media (max-width: 640px) {
+  .heading { padding: 0 20px; align-items: flex-start; flex-direction: column; gap: 20px; }
+  .heading h2 { font-size: 28px; }
+  .grid { margin-inline: 20px; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid a:nth-child(3) { display: none; }
+  .equipmentSlot { width: 100% !important; }
+  .page { right: 20px; }
+}
