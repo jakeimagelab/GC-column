@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { columnMainContent } from "@/content/site";
+import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import styles from "./ColumnSearch.module.css";
 
 export type SearchColumn = {
@@ -13,10 +13,12 @@ export type SearchColumn = {
   keywords: string[];
 };
 
-type ColumnSearchProps = { columns: SearchColumn[] };
+type SearchFaq = { q: string; keywords: string[] };
+type ColumnSearchProps = { columns: SearchColumn[]; content: SiteContent; faqIndex: SearchFaq[]; treatments: string[] };
 
-export function ColumnSearch({ columns }: ColumnSearchProps) {
-  const [query, setQuery] = useState(columnMainContent.hero.initialQuery);
+export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnSearchProps) {
+  const [query, setQuery] = useState(getText(content, "column.search.initialQuery"));
+  const popular = [0, 1, 2, 3, 4].map((index) => ({ id: `column.search.popular.${index}`, value: getText(content, `column.search.popular.${index}`) }));
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -25,8 +27,8 @@ export function ColumnSearch({ columns }: ColumnSearchProps) {
       title.toLowerCase().includes(q)
     );
     const matchedColumns = columns.filter((column) => hit(column.keywords, column.title));
-    const faqs = columnMainContent.faqIndex.filter((faq) => hit(faq.keywords, faq.q));
-    const matchedTreatments = columnMainContent.treatSearch.filter((treatment) =>
+    const faqs = faqIndex.filter((faq) => hit(faq.keywords, faq.q));
+    const matchedTreatments = treatments.filter((treatment) =>
       treatment.toLowerCase().includes(q) ||
       (q.length > 1 && matchedColumns.some((column) => column.keywords.some((keyword) => treatment.includes(keyword)))),
     );
@@ -39,7 +41,7 @@ export function ColumnSearch({ columns }: ColumnSearchProps) {
       }
     }));
     return { q, matchedColumns, faqs, matchedTreatments, related };
-  }, [columns, query]);
+  }, [columns, faqIndex, query, treatments]);
 
   const hasQuery = results.q.length > 0;
   const isEmpty = results.matchedColumns.length === 0 && results.faqs.length === 0;
@@ -47,22 +49,22 @@ export function ColumnSearch({ columns }: ColumnSearchProps) {
   return (
     <div className={styles.search} id="search">
       <div className={styles.inputRow}>
-        <label htmlFor="column-search">칼럼 검색</label>
-        <input id="column-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="예: 울쎄라, 세르프, 붓기, 리쥬란" />
-        <button type="button" className={styles.clear} aria-label="검색어 지우기" onClick={() => setQuery("")}>지우기</button>
-        <button type="button" className={styles.submit}>검색</button>
+        <label htmlFor="column-search" {...textEditProps("column.search.label")}>{getText(content, "column.search.label")}</label>
+        <input id="column-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={getText(content, "column.search.placeholder")} data-edit-id="column.search.initialQuery" data-edit-type="text" />
+        <button type="button" className={styles.clear} aria-label="검색어 지우기" onClick={() => setQuery("")} {...textEditProps("column.search.clear")}>{getText(content, "column.search.clear")}</button>
+        <button type="button" className={styles.submit} {...textEditProps("column.search.submit")}>{getText(content, "column.search.submit")}</button>
       </div>
 
       {hasQuery && !isEmpty ? (
         <div className={styles.results}>
           <div className={styles.related}>
-            <b>관련 키워드</b>
+            <b {...textEditProps("column.search.relatedKeywords")}>{getText(content, "column.search.relatedKeywords")}</b>
             <div>{results.related.map((keyword) => <button type="button" onClick={() => setQuery(keyword)} key={keyword}>{keyword}</button>)}</div>
-            <small>누르면 그 키워드로 다시 찾습니다</small>
+            <small {...textEditProps("column.search.relatedGuide")}>{getText(content, "column.search.relatedGuide")}</small>
           </div>
           <div className={styles.resultContent}>
             <div className={styles.columnResults}>
-              <b>관련 칼럼 {results.matchedColumns.length}</b>
+              <b><span {...textEditProps("column.search.relatedColumns")}>{getText(content, "column.search.relatedColumns")}</span> {results.matchedColumns.length}</b>
               {results.matchedColumns.slice(0, 3).map((column) => (
                 <Link href={`/column/${column.slug}`} key={column.slug}>
                   <small>{column.category}</small><strong>{column.title}</strong><span>{column.answer}</span>
@@ -70,24 +72,24 @@ export function ColumnSearch({ columns }: ColumnSearchProps) {
               ))}
             </div>
             <div className={styles.faqResults}>
-              <b>관련 질문 {results.faqs.length}</b>
+              <b><span {...textEditProps("column.search.relatedQuestions")}>{getText(content, "column.search.relatedQuestions")}</span> {results.faqs.length}</b>
               {results.faqs.slice(0, 3).map((faq) => <Link href="/column/xerf-vs-thermage#precautions" key={faq.q}>Q. {faq.q}</Link>)}
             </div>
-            <div className={styles.treatmentLine}>시술 안내 바로가기: <b>{results.matchedTreatments.length ? results.matchedTreatments.join(" · ") : "전체 시술 안내"}</b></div>
+            <div className={styles.treatmentLine}><span {...textEditProps("column.search.treatmentLink")}>{getText(content, "column.search.treatmentLink")}</span> <b>{results.matchedTreatments.length ? results.matchedTreatments.join(" · ") : getText(content, "column.search.allTreatments")}</b></div>
           </div>
         </div>
       ) : null}
 
       {hasQuery && isEmpty ? (
         <div className={styles.empty}>
-          <div><b>아직 &apos;{query}&apos;에 대한 칼럼이 없습니다</b><span>질문을 남겨주시면 대표원장이 칼럼으로 답합니다.</span></div>
-          <button type="button">질문 남기기</button>
+          <div><b><span {...textEditProps("column.search.emptyPrefix")}>{getText(content, "column.search.emptyPrefix")}</span> &apos;{query}&apos;<span {...textEditProps("column.search.emptySuffix")}>{getText(content, "column.search.emptySuffix")}</span></b><span {...textEditProps("column.search.emptyDescription")}>{getText(content, "column.search.emptyDescription")}</span></div>
+          <button type="button" {...textEditProps("column.search.emptyAction")}>{getText(content, "column.search.emptyAction")}</button>
         </div>
       ) : null}
 
       <div className={styles.popular}>
-        <span>많이 찾는 키워드</span>
-        {columnMainContent.hero.popular.map((keyword) => <button type="button" onClick={() => setQuery(keyword)} key={keyword}>{keyword}</button>)}
+        <span {...textEditProps("column.search.popularLabel")}>{getText(content, "column.search.popularLabel")}</span>
+        {popular.map((keyword) => <button type="button" onClick={() => setQuery(keyword.value)} key={keyword.id} {...textEditProps(keyword.id)}>{keyword.value}</button>)}
       </div>
     </div>
   );

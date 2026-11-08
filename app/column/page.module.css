@@ -19,7 +19,8 @@
 .doctorTags span { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; }
 .doctorLinks { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 14px; }
 .doctorLinks a { padding-bottom: 2px; border-bottom: 1px solid var(--ink); font-size: 15px; }
-.doctorLinks b { color: var(--ink); font-size: 30px; font-style: italic; }
+.doctorSignature { display: flex; align-items: center; gap: 5px; }
+.doctorSignatureImage { width: 90px; height: 38px; padding: 0; background: transparent; color: var(--ink); font-size: 30px; font-style: italic; font-weight: 700; }
 
 .categorySection { padding: 40px var(--column-gutter) 60px; }
 .categorySection h2, .latestSection h2, .treatmentsSection h2, .principlesSection h2, .infoSection h2 { margin: 0; font-size: 26px; }
@@ -59,6 +60,7 @@
 .principlesSection ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .principlesSection li { display: flex; flex-direction: column; font-size: 15px; }
 .principlesSection li span { color: var(--muted); }
+.principlesSection li .principleTitle { color: inherit; }
 
 .infoSection { padding: 64px var(--column-gutter); background: var(--paper); display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(32px, 3.3333vw, 48px); }
 .map { width: 100% !important; height: 300px; }

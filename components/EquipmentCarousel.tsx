@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./EquipmentCarousel.module.css";
 
 type EquipmentItem = { slug: string; name: string; desc: string };
-type EquipmentCarouselProps = { items: EquipmentItem[]; eyebrow: string; title: string; titleStrong: string; guide: string };
+type EquipmentCarouselProps = { items: EquipmentItem[]; content: SiteContent };
 
-export function EquipmentCarousel({ items, eyebrow, title, titleStrong, guide }: EquipmentCarouselProps) {
+export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const [start, setStart] = useState(0);
   const visible = [0, 1, 2, 3, 4].map((offset) => items[(start + offset) % items.length]);
   const move = (delta: number) => setStart((index) => (index + delta + items.length) % items.length);
@@ -17,14 +18,14 @@ export function EquipmentCarousel({ items, eyebrow, title, titleStrong, guide }:
     <section className={styles.section}>
       <div className={styles.band} />
       <div className={styles.heading}>
-        <div><span>{eyebrow}</span><h2>{title} <b>{titleStrong}</b></h2></div>
-        <div><span>{guide}</span><button type="button" onClick={() => move(-1)} aria-label="이전 장비">‹</button><button type="button" onClick={() => move(1)} aria-label="다음 장비">›</button></div>
+        <div><span {...textEditProps("home.equipment.eyebrow")}>{getText(content, "home.equipment.eyebrow")}</span><h2><span {...textEditProps("home.equipment.title")}>{getText(content, "home.equipment.title")}</span> <b {...textEditProps("home.equipment.titleStrong")}>{getText(content, "home.equipment.titleStrong")}</b></h2></div>
+        <div><span {...textEditProps("home.equipment.guide")}>{getText(content, "home.equipment.guide")}</span><button type="button" data-edit-control onClick={() => move(-1)} aria-label="이전 장비">‹</button><button type="button" data-edit-control onClick={() => move(1)} aria-label="다음 장비">›</button></div>
       </div>
       <div className={styles.grid}>
         {visible.map((item, index) => (
           <Link href={`/column?category=lifting&treatment=${item.slug}`} key={`${item.slug}-${index}`}>
-            <div className={styles.imageWrap}><ImageSlot className={styles.equipmentSlot} label={`[장비 누끼 사진]\n${item.name}`} alt={`${item.name} 장비 누끼 사진`} /></div>
-            <b>{item.name}</b><span>{item.desc}</span><small>관련 칼럼 →</small>
+            <div className={styles.imageWrap}><ImageSlot className={styles.equipmentSlot} label="" alt="" editId={`home.equipment.${item.slug}`} image={getImage(content, `home.equipment.${item.slug}`)} /></div>
+            <b>{item.name}</b><span>{item.desc}</span><small {...textEditProps("home.equipment.related")}>{getText(content, "home.equipment.related")}</small>
           </Link>
         ))}
       </div>

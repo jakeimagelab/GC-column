@@ -80,6 +80,41 @@ svg {
   border: 0;
 }
 
+.devEditActive {
+  padding-bottom: 130px;
+}
+
+.devEditActive [data-edit-id] {
+  cursor: text !important;
+  outline: 1px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color 120ms ease;
+}
+
+.devEditActive [data-edit-id]:hover,
+.devEditActive [data-edit-id]:focus {
+  outline-color: #2f6fed;
+}
+
+.devEditActive [data-edit-type="image"],
+.devEditActive [data-edit-type="bgImage"] {
+  cursor: pointer !important;
+}
+
+.devEditActive [data-bg-edit-hint] {
+  position: absolute;
+  z-index: 5;
+  top: 10px;
+  right: 10px;
+  display: block;
+  padding: 6px 9px;
+  border-radius: 4px;
+  background: rgba(43, 43, 43, 0.86);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+}
+
 .pageFrame {
   width: 100%;
   min-width: 0;

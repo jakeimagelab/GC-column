@@ -147,7 +147,7 @@ export const columns: Column[] = [
     categorySlug: "injection",
     treatmentSlugs: ["rejuran"],
     title: "리쥬란, 몇 번 맞아야 하나요?",
-    summary: "[핵심 답변 한 줄]",
+    summary: "핵심 답변 한 줄 미리보기",
     keywords: ["리쥬란", "스킨부스터", "주사", "붓기"],
   }),
   placeholderColumn({

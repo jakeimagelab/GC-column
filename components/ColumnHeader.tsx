@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandMark } from "./BrandMark";
+import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { categories, megaMenuTreatmentOrder, treatments } from "@/content/treatments";
 import styles from "./ColumnHeader.module.css";
 
 type ColumnHeaderProps = {
   variant?: "taupe" | "overlay";
   page?: "main" | "detail";
+  content: SiteContent;
 };
 
-export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeaderProps) {
+export function ColumnHeader({ content, variant = "taupe", page = "detail" }: ColumnHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileCategory, setMobileCategory] = useState<string>(categories[0].slug);
@@ -42,8 +45,8 @@ export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeade
     >
       <header className={styles.header}>
         <Link className={styles.brand} href="/column">
-          <span>G 글로리의원</span>
-          <span className={styles.badge}>원장 칼럼</span>
+          <BrandMark image={getImage(content, "common.header.logo")} name={getText(content, "common.brand.name")} compact plain />
+          <span className={styles.badge} {...textEditProps("common.header.columnBadge")}>{getText(content, "common.header.columnBadge")}</span>
         </Link>
 
         <nav
@@ -65,13 +68,13 @@ export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeade
         <div className={styles.actions}>
           {page === "main" ? (
             <>
-              <Link href="/">홈페이지 →</Link>
-              <span>EN · 中 · 日</span>
+              <Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link>
+              <span {...textEditProps("common.header.locales")}>{getText(content, "common.header.locales")}</span>
             </>
           ) : (
             <>
-              <Link href="/column#search">칼럼 검색</Link>
-              <Link href="/">홈페이지 →</Link>
+              <Link href="/column#search" {...textEditProps("common.header.search")}>{getText(content, "common.header.search")}</Link>
+              <Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link>
             </>
           )}
         </div>
@@ -95,16 +98,16 @@ export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeade
             <section className={styles.megaGroup} key={group.slug}>
               <Link className={styles.groupTitle} href={`/column?category=${group.slug}`}>
                 <span>{group.name}</span>
-                <small>칼럼 [N]</small>
+                <small {...textEditProps("common.header.columnCount")}>{getText(content, "common.header.columnCount")}</small>
               </Link>
               <div className={styles.groupItems}>
                 {group.items.map((item) => (
                   <Link href={`/column?category=${group.slug}&treatment=${item.slug}`} key={item.slug}>
-                    <span className={styles.itemSlot}>[장비·제품]</span>
+                    <span className={styles.itemSlot} {...textEditProps("common.header.equipmentLabel")}>{getText(content, "common.header.equipmentLabel")}</span>
                     <span className={styles.itemCopy}>
                       <b>{item.name}</b>
                       <span>{item.desc}</span>
-                      <small>관련 칼럼 [N]편 →</small>
+                      <small {...textEditProps("common.header.relatedCount")}>{getText(content, "common.header.relatedCount")}</small>
                     </span>
                   </Link>
                 ))}
@@ -142,9 +145,9 @@ export function ColumnHeader({ variant = "taupe", page = "detail" }: ColumnHeade
           })}
           <div className={styles.mobileLinks}>
             {page === "main" ? (
-              <><Link href="/">홈페이지 →</Link><span>EN · 中 · 日</span></>
+              <><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link><span {...textEditProps("common.header.locales")}>{getText(content, "common.header.locales")}</span></>
             ) : (
-              <><Link href="/column#search">칼럼 검색</Link><Link href="/">홈페이지 →</Link></>
+              <><Link href="/column#search" {...textEditProps("common.header.search")}>{getText(content, "common.header.search")}</Link><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link></>
             )}
           </div>
         </div>

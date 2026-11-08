@@ -1,0 +1,117 @@
+.toolbar {
+  position: fixed;
+  z-index: 1000;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  min-height: 72px;
+  padding: 12px 14px;
+  border: 1px solid #c8beb2;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.97);
+  color: #2b2b2b;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.24);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+.inlineEditor {
+  position: fixed;
+  z-index: 1100;
+  min-height: 34px;
+  padding: 2px 5px;
+  border: 1px solid #2f6fed;
+  border-radius: 3px;
+  outline: 3px solid rgba(47, 111, 237, 0.18);
+  background: rgba(255, 255, 255, 0.96);
+  resize: none;
+}
+
+.topline, .imageTools, .topline nav, .imageTools label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.topline nav {
+  margin-right: 8px;
+}
+
+.topline a, .topline button, .imageTools button {
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid #d8d0c8;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.topline a:hover, .topline button:hover, .imageTools button:hover {
+  border-color: #6e6052;
+  color: #2b2b2b;
+}
+
+.topline button:disabled {
+  opacity: 0.4;
+}
+
+.status {
+  margin-left: auto;
+  color: #496948;
+}
+
+.error {
+  color: #b42318;
+}
+
+.exit {
+  border-color: #2b2b2b !important;
+  background: #2b2b2b !important;
+  color: #fff !important;
+}
+
+.imageTools {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee8e1;
+  flex-wrap: wrap;
+}
+
+.selected {
+  max-width: 210px;
+  overflow: hidden;
+  font-family: var(--font-en);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imageTools input[type="range"] {
+  width: 104px;
+}
+
+.imageTools output {
+  width: 34px;
+  font-size: 11px;
+}
+
+.alt input {
+  width: 210px;
+  padding: 7px 8px;
+  border: 1px solid #d8d0c8;
+  border-radius: 4px;
+}
+
+.remove {
+  color: #b42318;
+}
+
+.imageTools small, .help {
+  margin: 0;
+  color: #6b6b6b;
+}
+
+@media (max-width: 760px) {
+  .toolbar { right: 8px; bottom: 8px; left: 8px; max-height: 46vh; overflow: auto; }
+  .topline { flex-wrap: wrap; }
+  .status { margin-left: 0; }
+  .imageTools { align-items: flex-start; flex-direction: column; }
+}

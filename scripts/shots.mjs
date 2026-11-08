@@ -101,7 +101,7 @@ function captureWithCodexCli() {
       cli("goto", `${baseUrl}/`);
     }
 
-    const batchCode = `
+    const batchCode = `async (page) => {
       const widths = ${JSON.stringify(widths)};
       const targets = ${JSON.stringify(pages)};
       const results = [];
@@ -117,7 +117,7 @@ function captureWithCodexCli() {
         }
       }
       await page.evaluate((value) => { window.__gloryShotResults = value; }, results);
-    `;
+    }`;
     cli("run-code", batchCode);
     results.push(...parseCliResult(cli("eval", "window.__gloryShotResults")));
   } finally {

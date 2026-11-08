@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import Image from "next/image";
+import type { ImageContentEntry } from "@/content/site-content-types";
 import styles from "./ImageSlot.module.css";
 
 type ImageSlotProps = {
@@ -10,6 +12,8 @@ type ImageSlotProps = {
   className?: string;
   variant?: "default" | "light" | "dark" | "diagram";
   align?: "center" | "end";
+  editId?: string;
+  image?: ImageContentEntry;
 };
 
 export function ImageSlot({
@@ -21,21 +25,36 @@ export function ImageSlot({
   className = "",
   variant = "default",
   align = "center",
+  editId,
+  image,
 }: ImageSlotProps) {
-  const style: CSSProperties = {
+  const style = {
     width,
     height,
     aspectRatio: ratio,
-  };
+    "--image-scale": (image?.zoom ?? 100) / 100,
+    "--image-focus-x": `${image?.focusX ?? 50}%`,
+    "--image-focus-y": `${image?.focusY ?? 50}%`,
+  } as CSSProperties;
+
+  const resolvedLabel = image?.label ?? label;
+  const resolvedAlt = image?.alt || alt;
 
   return (
     <div
-      className={`${styles.slot} ${styles[variant]} ${styles[align]} ${className}`}
+      className={`${styles.slot} ${image?.src ? styles.hasImage : ""} ${styles[variant]} ${styles[align]} ${className}`}
       style={style}
       role="img"
-      aria-label={alt}
+      aria-label={resolvedAlt}
+      data-edit-id={editId}
+      data-edit-type={image?.type}
     >
-      {label}
+      {image?.src ? (
+        <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes="100vw" unoptimized />
+      ) : resolvedLabel}
+      {process.env.NODE_ENV === "development" && image?.type === "bgImage" ? (
+        <span className={styles.bgEditHint} data-bg-edit-hint>배경 이미지 변경</span>
+      ) : null}
     </div>
   );
 }

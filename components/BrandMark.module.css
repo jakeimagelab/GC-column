@@ -1,0 +1,75 @@
+.mark {
+  position: relative;
+  width: 160px;
+  height: 44px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  color: inherit;
+}
+
+.symbol {
+  width: 40px;
+  height: 40px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-en);
+  font-size: 20px;
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.words b {
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 3px;
+}
+
+.words small {
+  font-family: var(--font-en);
+  font-size: 10px;
+  letter-spacing: 4px;
+}
+
+.compact {
+  width: 104px;
+}
+
+.plainMark {
+  width: auto;
+  min-width: 130px;
+  height: 44px;
+}
+
+.plain {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  white-space: nowrap;
+}
+
+.plain b {
+  font-weight: inherit;
+}
+
+.compact .symbol {
+  width: 25px;
+  height: 25px;
+}
+
+.image {
+  inset: 0 !important;
+  object-fit: cover;
+  object-position: var(--image-focus-x) var(--image-focus-y);
+  transform: scale(var(--image-scale));
+  transform-origin: var(--image-focus-x) var(--image-focus-y);
+}

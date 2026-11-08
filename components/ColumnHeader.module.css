@@ -22,7 +22,6 @@
 .open .header { border-color: var(--line-soft); }
 
 .brand { display: flex; align-items: center; gap: 16px; color: inherit; }
-.brand > span:first-child { font-size: 22px; font-weight: 300; letter-spacing: 4px; }
 .badge { padding: 3px 10px; border: 1px solid currentColor; border-radius: 999px; font-size: 13px; }
 
 .nav { height: 96px; display: flex; align-items: center; gap: clamp(32px, 3.8889vw, 56px); font-size: 16px; }
@@ -63,7 +62,6 @@
 @media (max-width: 1024px) {
   .shell, .overlay { background: var(--taupe); }
   .header { height: 76px; padding: 0 28px; }
-  .brand > span:first-child { font-size: 18px; }
   .nav, .actions, .megaMenu { display: none; }
   .menuButton { width: 42px; height: 42px; padding: 10px; border: 0; background: transparent; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
   .menuButton span { width: 100%; height: 1px; background: currentColor; }

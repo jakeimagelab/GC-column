@@ -1,4 +1,6 @@
 .slot {
+  position: relative;
+  overflow: hidden;
   min-width: 0;
   background: var(--slot);
   color: #4a433b;
@@ -9,6 +11,22 @@
   text-align: center;
   font-size: 13px;
   white-space: pre-line;
+}
+
+.hasImage {
+  padding: 0;
+}
+
+.image {
+  inset: 0 !important;
+  object-fit: cover;
+  object-position: var(--image-focus-x) var(--image-focus-y);
+  transform: scale(var(--image-scale));
+  transform-origin: var(--image-focus-x) var(--image-focus-y);
+}
+
+.bgEditHint {
+  display: none;
 }
 
 .light {

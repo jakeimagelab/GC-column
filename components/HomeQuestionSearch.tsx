@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { homeContent } from "@/content/site";
+import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import styles from "./HomeQuestionSearch.module.css";
 
 export type HomeSearchColumn = {
@@ -13,10 +13,11 @@ export type HomeSearchColumn = {
   keywords: string[];
 };
 
-type HomeQuestionSearchProps = { columns: HomeSearchColumn[] };
+type HomeQuestionSearchProps = { columns: HomeSearchColumn[]; content: SiteContent };
 
-export function HomeQuestionSearch({ columns }: HomeQuestionSearchProps) {
-  const [query, setQuery] = useState(homeContent.question.initialQuery);
+export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps) {
+  const [query, setQuery] = useState(getText(content, "home.question.initialQuery"));
+  const popular = [0, 1, 2, 3].map((index) => ({ id: `home.question.popular.${index}`, value: getText(content, `home.question.popular.${index}`) }));
 
   const hits = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -38,31 +39,31 @@ export function HomeQuestionSearch({ columns }: HomeQuestionSearchProps) {
   return (
     <section className={styles.panel} aria-labelledby="home-question-title">
       <div className={styles.heading}>
-        <div><span>{homeContent.question.eyebrow}</span><h2 id="home-question-title">{homeContent.question.title}</h2></div>
-        <p>{homeContent.question.description}</p>
+        <div><span {...textEditProps("home.question.eyebrow")}>{getText(content, "home.question.eyebrow")}</span><h2 id="home-question-title" {...textEditProps("home.question.title")}>{getText(content, "home.question.title")}</h2></div>
+        <p {...textEditProps("home.question.description")}>{getText(content, "home.question.description")}</p>
       </div>
       <div className={styles.inputRow}>
-        <label htmlFor="ask">질문 입력</label>
-        <input id="ask" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={homeContent.question.placeholder} />
-        <button type="button" className={styles.clear} onClick={() => setQuery("")}>지우기</button>
-        <button type="button" className={styles.ask}>질문하기</button>
+        <label htmlFor="ask" {...textEditProps("home.question.inputLabel")}>{getText(content, "home.question.inputLabel")}</label>
+        <input id="ask" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={getText(content, "home.question.placeholder")} data-edit-id="home.question.initialQuery" data-edit-type="text" />
+        <button type="button" className={styles.clear} onClick={() => setQuery("")} {...textEditProps("home.question.clear")}>{getText(content, "home.question.clear")}</button>
+        <button type="button" className={styles.ask} {...textEditProps("home.question.ask")}>{getText(content, "home.question.ask")}</button>
       </div>
       <div className={styles.popular}>
-        <span>많이 묻는 질문</span>
-        {homeContent.question.popular.map((question) => <button type="button" key={question} onClick={() => setQuery(question)}>{question}</button>)}
+        <span {...textEditProps("home.question.popularLabel")}>{getText(content, "home.question.popularLabel")}</span>
+        {popular.map((question) => <button type="button" key={question.id} onClick={() => setQuery(question.value)} {...textEditProps(question.id)}>{question.value}</button>)}
       </div>
 
       {top ? (
         <div className={styles.results}>
           <Link className={styles.topResult} href={`/column/${top.slug}`}>
-            <small>가장 가까운 답 · {top.category}</small>
+            <small><span {...textEditProps("home.question.closest")}>{getText(content, "home.question.closest")}</span> · {top.category}</small>
             <b>{top.title}</b>
             <p>{top.answer}</p>
-            <span>대표원장 이호 · 검토 [날짜]</span>
-            <strong>칼럼 전체 읽기 →</strong>
+            <span {...textEditProps("home.question.reviewed")}>{getText(content, "home.question.reviewed")}</span>
+            <strong {...textEditProps("home.question.read")}>{getText(content, "home.question.read")}</strong>
           </Link>
           <div className={styles.otherResults}>
-            <b>관련 칼럼 {Math.max(hits.length - 1, 0)}</b>
+            <b><span {...textEditProps("home.question.related")}>{getText(content, "home.question.related")}</span> {Math.max(hits.length - 1, 0)}</b>
             {hits.slice(1, 4).map((column) => (
               <Link href={`/column/${column.slug}`} key={column.slug}><small>{column.category}</small><span>{column.title}</span></Link>
             ))}
@@ -72,8 +73,8 @@ export function HomeQuestionSearch({ columns }: HomeQuestionSearchProps) {
 
       {hasQuery && hits.length === 0 ? (
         <div className={styles.empty}>
-          <div><b>아직 이 질문에 대한 칼럼이 없습니다</b><span>질문을 남겨주시면 대표원장이 칼럼으로 답합니다.</span></div>
-          <button type="button">원장님께 질문 남기기</button>
+          <div><b {...textEditProps("home.question.noResult")}>{getText(content, "home.question.noResult")}</b><span {...textEditProps("home.question.emptyDescription")}>{getText(content, "home.question.emptyDescription")}</span></div>
+          <button type="button" {...textEditProps("home.question.emptyAction")}>{getText(content, "home.question.emptyAction")}</button>
         </div>
       ) : null}
     </section>

@@ -4,10 +4,6 @@
 .header { position: relative; height: 96px; padding: 0 var(--home-gutter); border-bottom: 1px solid rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: space-between; }
 .header a { color: #fff; }
 .logo { display: flex; align-items: center; gap: 12px; }
-.logo > span:first-child { width: 40px; height: 40px; border: 1px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-en); font-size: 20px; font-weight: 300; }
-.logo > span:last-child { display: flex; flex-direction: column; line-height: 1.2; }
-.logo b { font-size: 19px; font-weight: 400; letter-spacing: 3px; }
-.logo small { color: #e3dcd3; font-family: var(--font-en); font-size: 10px; letter-spacing: 4px; }
 .header nav { display: flex; gap: clamp(24px, 3.0556vw, 44px); font-size: 16px; }
 .locales { display: flex; align-items: center; gap: 10px; }
 .locales a { padding: 6px 8px; border: 1px solid rgba(255, 255, 255, 0.35); display: flex; align-items: center; gap: 6px; font-size: 12px; }
@@ -34,7 +30,7 @@
 .doctorCopy h2 b { font-weight: 700; }
 .years { display: flex; align-items: baseline; gap: 14px; }
 .years strong { color: var(--taupe); font-family: var(--font-en); font-size: 88px; font-weight: 300; line-height: 1; }
-.years span { font-size: 18px; line-height: 1.5; }
+.years span { font-size: 18px; line-height: 1.5; white-space: pre-line; }
 .careers { border-top: 1px solid var(--ink); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; font-size: 15px; }
 .careers span { padding: 14px 0; border-bottom: 1px solid #e3dcd3; }
 .doctorButtons { display: flex; gap: 14px; }
@@ -50,6 +46,7 @@
 .signature span { color: var(--muted); font-size: 14px; }
 .signature b { font-family: var(--font-sign); font-size: 48px; font-weight: 400; line-height: 1; }
 .signature small { color: var(--muted-2); font-size: 12px; }
+.signatureImage { width: 160px; height: 48px; padding: 0; background: transparent; color: var(--muted-2); font-size: 12px; }
 
 .latestSection { position: relative; padding: 120px var(--home-gutter); display: flex; flex-direction: column; gap: 44px; }
 .columnOutline { position: absolute; top: 50px; left: calc(var(--canvas-left) + clamp(24px, 2.7778vw, 40px)); font-size: clamp(96px, 10.4167vw, 150px); letter-spacing: 6px; line-height: 1; -webkit-text-stroke-color: #ece7e1; }

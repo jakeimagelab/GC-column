@@ -2,25 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./FacilityGallery.module.css";
 
-type FacilityGalleryProps = { rooms: string[] };
+type FacilityGalleryProps = { content: SiteContent };
 
-export function FacilityGallery({ rooms }: FacilityGalleryProps) {
+const roomKeys = ["lounge", "laser", "consult", "powder", "treatment"] as const;
+
+export function FacilityGallery({ content }: FacilityGalleryProps) {
   const [index, setIndex] = useState(1);
-  const previous = rooms[(index - 1 + rooms.length) % rooms.length];
-  const next = rooms[(index + 1) % rooms.length];
+  const previousIndex = (index - 1 + roomKeys.length) % roomKeys.length;
+  const nextIndex = (index + 1) % roomKeys.length;
+  const roomName = (roomIndex: number) => getText(content, `home.gallery.room.${roomKeys[roomIndex]}`);
+  const roomImage = (roomIndex: number) => getImage(content, `home.gallery.${roomKeys[roomIndex]}`);
 
   return (
     <section className={styles.gallery}>
       <div className={styles.leftBand} />
-      <div className={styles.blurLabel}>[흐린 배경 이미지]</div>
-      <div className={styles.heading}><span>Facility</span><h2>쾌적한 시술 환경을 위한<br /><b>시설과 장비</b></h2><Link href="#">더 살펴보기 <i /></Link></div>
-      <ImageSlot className={styles.previous} label={`[사진] ${previous}`} alt={`${previous} 사진`} align="end" />
-      <ImageSlot className={styles.next} label={`[사진] ${next}`} alt={`${next} 사진`} variant="light" align="end" />
-      <div className={styles.current}><ImageSlot label={`[사진] ${rooms[index]}`} alt={`${rooms[index]} 사진`} variant="dark" /><b>{rooms[index]}</b></div>
-      <div className={styles.pages}>{rooms.map((room, roomIndex) => <button type="button" className={roomIndex === index ? styles.active : ""} aria-label={room} onClick={() => setIndex(roomIndex)} key={room}>{String(roomIndex + 1).padStart(2, "0")}</button>)}</div>
+      <ImageSlot className={styles.blurBackground} label="" alt="" editId="home.gallery.background" image={getImage(content, "home.gallery.background")} />
+      <div className={styles.heading}><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><span {...textEditProps("home.gallery.title")}>{getText(content, "home.gallery.title")}</span><br /><b {...textEditProps("home.gallery.titleStrong")}>{getText(content, "home.gallery.titleStrong")}</b></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
+      <ImageSlot className={styles.previous} label="" alt="" align="end" editId={`home.gallery.${roomKeys[previousIndex]}`} image={roomImage(previousIndex)} />
+      <ImageSlot className={styles.next} label="" alt="" variant="light" align="end" editId={`home.gallery.${roomKeys[nextIndex]}`} image={roomImage(nextIndex)} />
+      <div className={styles.current}><ImageSlot label="" alt="" variant="dark" editId={`home.gallery.${roomKeys[index]}`} image={roomImage(index)} /><b {...textEditProps(`home.gallery.room.${roomKeys[index]}`)}>{roomName(index)}</b></div>
+      <div className={styles.pages}>{roomKeys.map((room, roomIndex) => <button type="button" data-edit-control className={roomIndex === index ? styles.active : ""} aria-label={roomName(roomIndex)} onClick={() => setIndex(roomIndex)} key={room}>{String(roomIndex + 1).padStart(2, "0")}</button>)}</div>
     </section>
   );
 }

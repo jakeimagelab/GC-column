@@ -7,8 +7,10 @@ import { ColumnHeader } from "@/components/ColumnHeader";
 import { FaqList } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { columns, getColumn } from "@/content/columns";
+import { getText } from "@/content/site-content-types";
 import { detailContent, doctor, SITE_URL } from "@/content/site";
 import { getCategory } from "@/content/treatments";
+import { readSiteContent } from "@/lib/contentStore";
 import styles from "./page.module.css";
 
 type ColumnDetailPageProps = {
@@ -35,6 +37,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const { slug } = await params;
   const column = getColumn(slug);
   if (!column) notFound();
+  const siteContent = await readSiteContent();
 
   const category = getCategory(column.categorySlug);
   const tocItems: TocItem[] = [
@@ -92,7 +95,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(medicalPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(breadcrumbJsonLd) }} />
-      <ColumnHeader />
+      <ColumnHeader content={siteContent} />
 
       <section className={styles.titleArea}>
         <div className={styles.breadcrumb}>{detailContent.breadcrumb.join(" > ")}</div>
@@ -277,8 +280,8 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       </div>
 
       <footer className={styles.footer}>
-        <div><b>G 글로리의원</b><p>본 칼럼은 의료법을 준수하여 작성되었으며, 시술 결과는 개인에 따라 다를 수 있습니다.</p><p>[사업자 정보] · 대표원장 이호</p></div>
-        <div><p>홈페이지 · 블로그 · 인스타그램 · 유튜브</p><p>RSS · 사이트맵</p></div>
+        <div><b>{getText(siteContent, "column.footer.brand")}</b><p>{getText(siteContent, "column.footer.notice")}</p><p>{getText(siteContent, "column.footer.business")}</p></div>
+        <div><p>{getText(siteContent, "column.footer.links")}</p><p>{getText(siteContent, "column.footer.sitemap")}</p></div>
       </footer>
     </main>
   );

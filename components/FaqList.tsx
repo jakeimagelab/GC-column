@@ -5,7 +5,7 @@ import type { ColumnFaq } from "@/content/types";
 import styles from "./FaqList.module.css";
 
 type FaqListProps = {
-  items: ColumnFaq[];
+  items: (ColumnFaq & { editId?: string })[];
 };
 
 export function FaqList({ items }: FaqListProps) {
@@ -25,7 +25,9 @@ export function FaqList({ items }: FaqListProps) {
               aria-controls={answerId}
               onClick={() => setOpenIndex(isOpen ? null : index)}
             >
-              <span>Q. {item.q}</span>
+              <span>
+                Q. {item.editId ? <span data-edit-id={item.editId} data-edit-type="text">{item.q}</span> : item.q}
+              </span>
               <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
             </button>
             <div id={answerId} className={styles.answer} hidden={!isOpen}>

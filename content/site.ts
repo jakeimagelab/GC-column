@@ -2,15 +2,6 @@ import type { Doctor } from "./types";
 
 export const SITE_URL = "https://blog.gloryclinic.co.kr";
 
-export const clinic = {
-  name: "글로리의원",
-  nameEn: "GLORY CLINIC",
-  address: "서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동)",
-  mapLabel: "[지도] 봉은사로 207 KJ빌딩 3층",
-  phone: "02-6958-7525",
-  businessNumber: "[사업자등록번호]",
-};
-
 export const doctor: Doctor = {
   name: "이호",
   title: "대표원장",
@@ -24,8 +15,6 @@ export const doctor: Doctor = {
     "[학회·자격]",
   ],
 };
-
-export const columnNav = ["리프팅", "색소·모공", "주사시술", "스페셜필러"];
 
 export const columnExcerpts: Record<"home" | "main", Record<string, string>> = {
   home: {
@@ -44,94 +33,14 @@ export const columnExcerpts: Record<"home" | "main", Record<string, string>> = {
   },
 };
 
-export const homeContent = {
-  hero: {
-    eyebrow: "NATURAL · PERSONAL · BY THE DIRECTOR",
-    title: "자연스러운 아름다움,",
-    titleStrong: "대표원장이 직접 진행합니다",
-    description: "개개인의 얼굴에 맞춘 시술을 추구합니다.",
-    media: "[브랜딩 영상] 자동 재생 · 소리 없음 · 반복",
-  },
-  question: {
-    eyebrow: "ASK THE DIRECTOR",
-    title: "궁금한 것을 그대로 물어보세요",
-    description: "대표원장이 쓴 칼럼에서 답을 찾아드립니다",
-    placeholder: "예: 볼륨이 적은 얼굴도 울쎄라 받아도 되나요?",
-    initialQuery: "세르프랑 써마지 중에 뭐가 맞나요?",
-    popular: [
-      "볼륨이 적은 얼굴도 울쎄라 괜찮나요?",
-      "세르프랑 써마지 중에 뭐가 맞나요?",
-      "리프팅 후 붓기는 며칠 가나요?",
-      "리쥬란 몇 번 맞아야 하나요?",
-    ],
-  },
-  vision: {
-    eyebrow: "OUR VISION",
-    title: "가족에게 할 수 있는 시술만",
-    titleStrong: "권해드립니다",
-    description:
-      "자연스러운 아름다움을 지향하고, 개개인의 얼굴에 맞춘 시술을 추구합니다.",
-    description2: "상담부터 시술까지, 글로리의원의 모든 시술은 대표원장이 직접 진행합니다.",
-  },
-  equipment: {
-    eyebrow: "EQUIPMENT",
-    title: "글로리의원",
-    titleStrong: "보유 장비",
-    guide: "장비를 누르면 관련 시술 안내 · 원장 칼럼으로",
-  },
-  latest: {
-    eyebrow: "DOCTOR'S COLUMN",
-    title: "진료실 질문에",
-    titleStrong: "원장이 직접 답합니다",
-  },
-  rooms: ["라운지", "레이저실", "1:1 상담실", "파우더룸", "시술실"],
-  location: {
-    subway: "언주역 [출구 번호] 도보 [N]분",
-    hours: "[요일별 진료시간 확인 필요]",
-    parking: "[주차 안내 확인 필요]",
-  },
-};
+export const columnSearchFaqIndex = [
+  { q: "세르프가 좋은가요, 써마지가 좋은가요?", keywords: ["세르프", "써마지"] },
+  { q: "세르프와 써마지는 보통 어느 연령대가 선택하나요?", keywords: ["세르프", "써마지"] },
+  { q: "리프팅 후 붓기는 며칠 가나요?", keywords: ["붓기", "리프팅", "울쎄라", "냉찜질"] },
+  { q: "리쥬란 맞고 바로 세안해도 되나요?", keywords: ["리쥬란", "스킨부스터"] },
+];
 
-export const columnMainContent = {
-  hero: {
-    title: "Doctor's Column",
-    titleSub: "by Glory Clinic",
-    description: "궁금한 시술이나 고민을 입력하세요. 대표원장이 쓴 답을 바로 찾아드립니다.",
-    image: "[사진] 원장님 상담·시술 장면 또는 라운지 (포토클리닉 촬영본, 한 장 고정)",
-    initialQuery: "세르프",
-    popular: ["울쎄라", "세르프", "써마지", "붓기", "리쥬란"],
-  },
-  faqIndex: [
-    { q: "세르프가 좋은가요, 써마지가 좋은가요?", keywords: ["세르프", "써마지"] },
-    { q: "세르프와 써마지는 보통 어느 연령대가 선택하나요?", keywords: ["세르프", "써마지"] },
-    { q: "리프팅 후 붓기는 며칠 가나요?", keywords: ["붓기", "리프팅", "울쎄라", "냉찜질"] },
-    { q: "리쥬란 맞고 바로 세안해도 되나요?", keywords: ["리쥬란", "스킨부스터"] },
-  ],
-  treatSearch: ["울쎄라 프라임", "써마지 FLX", "세르프", "슈링크", "온다", "리쥬란", "보톡스"],
-  doctor: {
-    title: "이 칼럼은 대표원장 이호가\n직접 씁니다.",
-    description:
-      "피부과 시술 경력 [10]년. 자연스럽고 부드러운 변화를 추구하며,\n가족에게 권하지 못하는 시술이라면 고객에게도 권하지 않습니다.",
-  },
-  categoryTitle: "어떤 고민이 있으신가요?",
-  faqTitle: "진료실에서\n가장 많이 받는 질문",
-  faqDescription: "각 답변 끝에 자세한 칼럼으로 연결됩니다.",
-  mainFaqs: ["[대표 질문 1]", "[대표 질문 2]", "[대표 질문 3]", "[대표 질문 4]", "[대표 질문 5]"],
-  cards: [
-    { slug: "ulthera-prime-shots", category: "리프팅", title: "울쎄라 프라임, 샷 수가 많을수록 좋을까요?", answer: "핵심 답변 한 줄 미리보기" },
-    { slug: "thermage-vs-ulthera", category: "리프팅", title: "써마지와 울쎄라, 어떻게 다르고 무엇이 맞을까요?", answer: "핵심 답변 한 줄 미리보기" },
-    { slug: "pigment-question", category: "색소·모공", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
-    { slug: "rejuran-count", category: "주사시술", title: "리쥬란, 몇 번 맞아야 하나요?", answer: "핵심 답변 한 줄 미리보기" },
-    { slug: "filler-question", category: "스페셜필러", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
-    { slug: "injection-question", category: "주사시술", title: "[질문형 칼럼 제목]", answer: "핵심 답변 한 줄 미리보기" },
-  ],
-  treatments: ["울쎄라 프라임", "써마지 FLX", "티타늄", "온다", "튠페이스", "슈링크", "리쥬란", "스페셜필러"],
-  principles: [
-    { no: "01", title: "대표원장 1:1 상담", desc: "상담부터 시술까지 같은 의사가 진행합니다." },
-    { no: "02", title: "필요한 시술만 제안", desc: "[진료 원칙 문장]" },
-    { no: "03", title: "시술 후 관리", desc: "[사후 관리 방식]" },
-  ],
-};
+export const columnTreatmentSearchNames = ["울쎄라 프라임", "써마지 FLX", "세르프", "슈링크", "온다", "리쥬란", "보톡스"];
 
 export const detailContent = {
   breadcrumb: ["글로리의원", "원장 칼럼", "리프팅", "세르프"],
