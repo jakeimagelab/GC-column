@@ -5,7 +5,7 @@ import type { ColumnFaq } from "@/content/types";
 import styles from "./FaqList.module.css";
 
 type FaqListProps = {
-  items: (ColumnFaq & { editId?: string })[];
+  items: (ColumnFaq & { editId?: string; id?: string })[];
 };
 
 export function FaqList({ items }: FaqListProps) {
@@ -15,11 +15,13 @@ export function FaqList({ items }: FaqListProps) {
     <div className={styles.list}>
       {items.map((item, index) => {
         const isOpen = openIndex === index;
-        const answerId = `faq-answer-${index}`;
+        const questionId = item.id ?? `faq-${index + 1}`;
+        const answerId = `${questionId}-answer`;
         return (
           <div className={styles.item} key={item.q}>
             <button
               type="button"
+              id={questionId}
               className={styles.question}
               aria-expanded={isOpen}
               aria-controls={answerId}

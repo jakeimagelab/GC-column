@@ -14,6 +14,8 @@ type ImageSlotProps = {
   align?: "center" | "end";
   editId?: string;
   image?: ImageContentEntry;
+  priority?: boolean;
+  sizes?: string;
 };
 
 export function ImageSlot({
@@ -27,6 +29,8 @@ export function ImageSlot({
   align = "center",
   editId,
   image,
+  priority = false,
+  sizes = "(max-width: 768px) 100vw, 50vw",
 }: ImageSlotProps) {
   const style = {
     width,
@@ -50,7 +54,7 @@ export function ImageSlot({
       data-edit-type={image?.type}
     >
       {image?.src ? (
-        <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes="100vw" unoptimized />
+        <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} />
       ) : resolvedLabel}
       {process.env.NODE_ENV === "development" && image?.type === "bgImage" ? (
         <span className={styles.bgEditHint} data-bg-edit-hint>배경 이미지 변경</span>

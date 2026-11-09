@@ -33,7 +33,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
     ...category,
     items: megaMenuTreatmentOrder[category.slug].flatMap((slug) => {
       const treatment = treatments.find((item) => item.slug === slug);
-      return treatment ? [treatment] : [];
+      return treatment && ![treatment.name, treatment.desc, treatment.equipmentType].some((value) => value?.trim().startsWith("[")) ? [treatment] : [];
     }),
   }));
 
@@ -57,7 +57,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
           {groups.map((group) => (
             <Link
               key={group.slug}
-              href={`/column?category=${group.slug}`}
+              href={`/column/category/${group.slug}`}
               onFocus={() => setIsOpen(true)}
             >
               {group.name}
@@ -96,13 +96,13 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
         <div className={styles.megaMenu}>
           {groups.map((group) => (
             <section className={styles.megaGroup} key={group.slug}>
-              <Link className={styles.groupTitle} href={`/column?category=${group.slug}`}>
+              <Link className={styles.groupTitle} href={`/column/category/${group.slug}`}>
                 <span>{group.name}</span>
                 <small {...textEditProps("common.header.columnCount")}>{getText(content, "common.header.columnCount")}</small>
               </Link>
               <div className={styles.groupItems}>
                 {group.items.map((item) => (
-                  <Link href={`/column?category=${group.slug}&treatment=${item.slug}`} key={item.slug}>
+                  <Link href={`/column/category/${group.slug}?treatment=${item.slug}`} key={item.slug}>
                     <span className={styles.itemSlot} {...textEditProps("common.header.equipmentLabel")}>{getText(content, "common.header.equipmentLabel")}</span>
                     <span className={styles.itemCopy}>
                       <b>{item.name}</b>
@@ -134,7 +134,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
                 {expanded ? (
                   <div>
                     {group.items.map((item) => (
-                      <Link href={`/column?category=${group.slug}&treatment=${item.slug}`} key={item.slug}>
+                      <Link href={`/column/category/${group.slug}?treatment=${item.slug}`} key={item.slug}>
                         <b>{item.name}</b><span>{item.desc}</span>
                       </Link>
                     ))}

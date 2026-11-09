@@ -56,12 +56,13 @@
 .latestHeading h2 strong { font-weight: 700; }
 .latestHeading > a { padding-bottom: 2px; border-bottom: 1px solid var(--ink); font-size: 14px; }
 .latestGrid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
-.latestGrid > a { display: flex; flex-direction: column; gap: 12px; }
+.latestGrid > article, .latestCardLink { display: flex; flex-direction: column; gap: 12px; }
 .latestPhoto { width: 100% !important; height: 250px; }
-.latestGrid > a > span { color: var(--brown); font-size: 13px; font-weight: 500; }
-.latestGrid > a > b { font-size: 18px; line-height: 1.45; }
+.latestCardLink > span { color: var(--brown); font-size: 13px; font-weight: 500; }
+.latestCardLink > b { font-size: 18px; line-height: 1.45; }
 .latestGrid p { margin: 0; color: var(--muted); font-size: 14px; }
 .latestGrid small { padding-top: 10px; border-top: 1px solid var(--line-soft); color: var(--muted-2); font-size: 12px; }
+.latestGrid small a { text-decoration: underline; text-underline-offset: 2px; }
 
 .location { padding: 100px var(--home-gutter); background: var(--paper); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(36px, 4.1667vw, 60px); }
 .map { width: 100% !important; height: 440px; }

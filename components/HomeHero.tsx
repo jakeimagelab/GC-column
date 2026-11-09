@@ -94,6 +94,8 @@ export function HomeHero({ slides }: HomeHeroProps) {
           align="end"
           editId={`home.hero.slides.${slide.id}.bgImage`}
           image={slide.bgImage}
+          priority={slideIndex === 0}
+          sizes="100vw"
         />
       ))}
       <div className={styles.heroShade} />
@@ -106,14 +108,14 @@ export function HomeHero({ slides }: HomeHeroProps) {
         <p {...textEditProps(`home.hero.slides.${current.id}.description`)}>{current.description}</p>
       </div>
       <div className={styles.heroPager} aria-label="히어로 슬라이드">
-        <button type="button" onClick={() => setIndex(index)} aria-label={`${index + 1}번 슬라이드`}>{String(index + 1).padStart(2, "0")}</button>
+        <button type="button" onClick={() => setIndex(index)} aria-label={`${String(index + 1).padStart(2, "0")} · ${index + 1}번 슬라이드`}>{String(index + 1).padStart(2, "0")}</button>
         <span>
           <i style={{ width: `${((index + 1) / slides.length) * 100}%` }} />
           <span className={styles.slideTargets}>
             {slides.map((slide, slideIndex) => <button type="button" aria-label={`${slideIndex + 1}번 슬라이드로 이동`} onClick={() => setIndex(slideIndex)} key={slide.id} />)}
           </span>
         </span>
-        <button type="button" onClick={() => setIndex(slides.length - 1)} aria-label={`${slides.length}번 슬라이드`}>{String(slides.length).padStart(2, "0")}</button>
+        <button type="button" onClick={() => setIndex(slides.length - 1)} aria-label={`${String(slides.length).padStart(2, "0")} · ${slides.length}번 슬라이드`}>{String(slides.length).padStart(2, "0")}</button>
       </div>
     </div>
   );

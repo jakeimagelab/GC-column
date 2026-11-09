@@ -1,0 +1,6 @@
+.footer { padding: 56px var(--column-gutter); background: var(--ink); color: #cfc8bf; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; font-size: 13px; line-height: 1.9; }
+.footer > div:first-child { display: flex; flex-direction: column; gap: 8px; }
+.footer b { color: #fff; font-size: 16px; letter-spacing: 2px; }
+.footer p { margin: 0; }
+.footer > div:last-child { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+@media (max-width: 640px) { .footer { padding: 48px 24px 90px; grid-template-columns: 1fr; } .footer > div:last-child { align-items: flex-start; } }

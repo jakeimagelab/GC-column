@@ -1,0 +1,13 @@
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px 26px; }
+.card { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.imageLink { display: block; }
+.image { width: 100% !important; }
+.category { align-self: flex-start; color: var(--brown); font-size: 13px; font-weight: 500; }
+.card h2 { margin: 0; font-size: 20px; line-height: 1.45; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.card small { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line-soft); color: var(--muted-2); font-size: 12px; }
+.card small a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.draft { position: absolute; z-index: 2; top: 10px; left: 10px; padding: 5px 8px; background: #5b524a; color: #fff; font-size: 11px; }
+.empty { margin: 0; padding: 44px; background: var(--paper); color: var(--muted); text-align: center; }
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }

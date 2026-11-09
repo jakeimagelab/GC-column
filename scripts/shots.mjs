@@ -4,14 +4,18 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright";
 
-const baseUrl = "http://127.0.0.1:3000";
+const baseUrl = process.env.SHOTS_BASE_URL || "http://127.0.0.1:3000";
 const outputDir = "docs/compare/widths";
-const reportPath = "docs/compare/report-1-1.md";
+const reportPath = process.env.SHOTS_REPORT || "docs/compare/report-1-1.md";
 const widths = [390, 1024, 1280, 1366, 1440, 1728, 1920];
 const pages = [
   { name: "home", path: "/" },
   { name: "column-main", path: "/column" },
   { name: "column-detail", path: "/column/xerf-vs-thermage" },
+  { name: "doctor", path: "/doctor/lee-ho" },
+  { name: "column-category", path: "/column/category/lifting" },
+  { name: "column-all", path: "/column/all" },
+  { name: "not-found", path: "/seo-check-not-found" },
 ];
 
 async function openBrowser() {
@@ -148,7 +152,7 @@ function createReport(results) {
 ## 결과
 
 - 전체 가로 스크롤 검사: **${allPass ? "PASS" : "FAIL"}**
-- 캡처: \`docs/compare/widths/{폭}/{home|column-main|column-detail}.png\`
+- 캡처: \`docs/compare/widths/{폭}/{home|column-main|column-detail|doctor|column-category|column-all|not-found}.png\`
 - 판정식: \`document.documentElement.scrollWidth > window.innerWidth\`
 
 ## 폭별 자동 검사

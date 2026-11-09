@@ -38,6 +38,14 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
   };
 
   useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("q")?.trim();
+    if (initial) {
+      setQuery(initial);
+      runSearch(initial);
+    }
+  }, []);
+
+  useEffect(() => {
     if (composing.current) return;
     const timer = setTimeout(() => runSearch(query), 100);
     return () => clearTimeout(timer);

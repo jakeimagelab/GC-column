@@ -25,15 +25,15 @@
   },
   "common.header.columnCount": {
     "type": "text",
-    "value": "칼럼 [N]"
+    "value": "칼럼 보기"
   },
   "common.header.equipmentLabel": {
     "type": "text",
-    "value": "[장비·제품]"
+    "value": "장비·제품"
   },
   "common.header.relatedCount": {
     "type": "text",
-    "value": "관련 칼럼 [N]편 →"
+    "value": "관련 칼럼 보기 →"
   },
   "common.clinic.address": {
     "type": "text",
@@ -45,7 +45,7 @@
   },
   "common.clinic.businessNumber": {
     "type": "text",
-    "value": "[사업자등록번호]"
+    "value": ""
   },
   "common.quick.title": {
     "type": "text",
@@ -81,7 +81,7 @@
   },
   "column.footer.business": {
     "type": "text",
-    "value": "[사업자 정보] · 대표원장 이호"
+    "value": "대표원장 이호 · 02-6958-7525"
   },
   "column.footer.links": {
     "type": "text",
@@ -97,7 +97,7 @@
       "bgImage": {
         "type": "bgImage",
         "src": null,
-        "label": "[브랜딩 영상] 자동 재생 · 소리 없음 · 반복",
+        "label": "글로리의원 브랜딩 이미지",
         "alt": "글로리의원 브랜딩 영상",
         "zoom": 100,
         "focusX": 50,
@@ -114,7 +114,7 @@
       "bgImage": {
         "type": "bgImage",
         "src": null,
-        "label": "[브랜딩 영상] 자동 재생 · 소리 없음 · 반복",
+        "label": "글로리의원 브랜딩 이미지",
         "alt": "글로리의원 브랜딩 영상",
         "zoom": 100,
         "focusX": 50,
@@ -131,7 +131,7 @@
       "bgImage": {
         "type": "bgImage",
         "src": null,
-        "label": "[브랜딩 영상] 자동 재생 · 소리 없음 · 반복",
+        "label": "글로리의원 브랜딩 이미지",
         "alt": "글로리의원 브랜딩 영상",
         "zoom": 100,
         "focusX": 50,
@@ -218,7 +218,7 @@
   },
   "home.question.reviewed": {
     "type": "text",
-    "value": "대표원장 이호 · 검토 [날짜]"
+    "value": "대표원장 이호 검토"
   },
   "home.question.read": {
     "type": "text",
@@ -274,7 +274,7 @@
   },
   "home.doctor.career.5": {
     "type": "text",
-    "value": "[학회·자격]"
+    "value": "자연스러운 변화를 지향하는 1:1 진료"
   },
   "home.doctor.profileAction": {
     "type": "text",
@@ -282,7 +282,7 @@
   },
   "home.doctor.columnAction": {
     "type": "text",
-    "value": "원장이 쓴 칼럼 [N]편 →"
+    "value": "원장이 쓴 칼럼 보기 →"
   },
   "home.vision.eyebrow": {
     "type": "text",
@@ -307,7 +307,7 @@
   "home.vision.signatureImage": {
     "type": "image",
     "src": null,
-    "label": "[실제 서명 이미지로 교체]",
+    "label": "대표원장 이호 서명 이미지",
     "alt": "글로리의원 대표원장 이호 서명",
     "zoom": 100,
     "focusX": 50,
@@ -335,7 +335,7 @@
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n온다",
+        "label": "온다 장비 이미지",
         "alt": "온다 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -343,14 +343,14 @@
       },
       "name": "온다",
       "desc": "지방 세포 파괴로\n리프팅 효과와 지방감소",
-      "link": "/column?category=lifting&treatment=onda"
+      "link": "/column/category/lifting?treatment=onda"
     },
     {
       "id": "thermage-flx",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n써마지FLX",
+        "label": "써마지 FLX 장비 이미지",
         "alt": "써마지FLX 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -358,14 +358,14 @@
       },
       "name": "써마지FLX",
       "desc": "핵심 쿨링 기술로\n피부 데미지 최소화",
-      "link": "/column?category=lifting&treatment=thermage-flx"
+      "link": "/column/category/lifting?treatment=thermage-flx"
     },
     {
       "id": "ulthera-prime",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n울쎄라피 프라임",
+        "label": "울쎄라피 프라임 장비 이미지",
         "alt": "울쎄라피 프라임 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -373,14 +373,14 @@
       },
       "name": "울쎄라피 프라임",
       "desc": "더 정밀해진 초음파 리프팅\n미국 FDA 승인",
-      "link": "/column?category=lifting&treatment=ulthera-prime"
+      "link": "/column/category/lifting?treatment=ulthera-prime"
     },
     {
       "id": "titanium",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n소프라노 티타늄",
+        "label": "소프라노 티타늄 장비 이미지",
         "alt": "소프라노 티타늄 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -388,14 +388,14 @@
       },
       "name": "소프라노 티타늄",
       "desc": "3파장 리프팅",
-      "link": "/column?category=lifting&treatment=titanium"
+      "link": "/column/category/lifting?treatment=titanium"
     },
     {
       "id": "tuneface",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n튠페이스",
+        "label": "튠페이스 장비 이미지",
         "alt": "튠페이스 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -403,14 +403,14 @@
       },
       "name": "튠페이스",
       "desc": "고주파와 입체초음파로\n리프팅",
-      "link": "/column?category=lifting&treatment=tuneface"
+      "link": "/column/category/lifting?treatment=tuneface"
     },
     {
       "id": "xerf",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n세르프",
+        "label": "세르프 장비 이미지",
         "alt": "세르프 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
@@ -418,37 +418,37 @@
       },
       "name": "세르프",
       "desc": "고주파에 더 깊은 층\n모드를 더한 리프팅",
-      "link": "/column?category=lifting&treatment=xerf"
+      "link": "/column/category/lifting?treatment=xerf"
     },
     {
       "id": "shurink",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n슈링크",
+        "label": "슈링크 장비 이미지",
         "alt": "슈링크 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
         "focusY": 50
       },
       "name": "슈링크",
-      "desc": "[한 줄 설명]",
-      "link": "/column?category=lifting&treatment=shurink"
+      "desc": "초음파 리프팅",
+      "link": "/column/category/lifting?treatment=shurink"
     },
     {
       "id": "oligio",
       "image": {
         "type": "image",
         "src": null,
-        "label": "[장비 누끼 사진]\n올리지오",
+        "label": "올리지오 장비 이미지",
         "alt": "올리지오 장비 누끼 사진",
         "zoom": 100,
         "focusX": 50,
         "focusY": 50
       },
       "name": "올리지오",
-      "desc": "[한 줄 설명]",
-      "link": "/column?category=lifting&treatment=oligio"
+      "desc": "고주파 리프팅",
+      "link": "/column/category/lifting?treatment=oligio"
     }
   ],
   "home.latest.eyebrow": {
@@ -513,7 +513,7 @@
   },
   "home.location.subway": {
     "type": "text",
-    "value": "언주역 [출구 번호] 도보 [N]분"
+    "value": "언주역 인근"
   },
   "home.location.hoursLabel": {
     "type": "text",
@@ -521,7 +521,7 @@
   },
   "home.location.hours": {
     "type": "text",
-    "value": "[요일별 진료시간 확인 필요]"
+    "value": "진료시간은 병원으로 문의해 주세요"
   },
   "home.location.parkingLabel": {
     "type": "text",
@@ -529,7 +529,7 @@
   },
   "home.location.parking": {
     "type": "text",
-    "value": "[주차 안내 확인 필요]"
+    "value": "주차 안내는 병원으로 문의해 주세요"
   },
   "home.location.phoneLabel": {
     "type": "text",
@@ -569,7 +569,7 @@
   },
   "home.footer.businessInfo": {
     "type": "text",
-    "value": "서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동) · 대표원장 이호 · [사업자등록번호] · 02-6958-7525"
+    "value": "서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동) · 대표원장 이호 · 02-6958-7525"
   },
   "home.footer.policy": {
     "type": "text",
@@ -681,19 +681,19 @@
   },
   "column.doctor.description": {
     "type": "text",
-    "value": "피부과 시술 경력 [10]년. 자연스럽고 부드러운 변화를 추구하며,\n가족에게 권하지 못하는 시술이라면 고객에게도 권하지 않습니다."
+    "value": "13년 피부 진료 경험을 바탕으로 자연스럽고 부드러운 변화를 추구하며,\n가족에게 권하지 못하는 시술이라면 고객에게도 권하지 않습니다."
   },
   "column.doctor.tag.0": {
     "type": "text",
-    "value": "[전문 분야]"
+    "value": "리프팅"
   },
   "column.doctor.tag.1": {
     "type": "text",
-    "value": "[학회·자격]"
+    "value": "한양대학교 의과대학 졸업"
   },
   "column.doctor.tag.2": {
     "type": "text",
-    "value": "[주요 경력]"
+    "value": "대표원장 1:1 진료"
   },
   "column.doctor.more": {
     "type": "text",
@@ -706,7 +706,7 @@
   "column.doctor.signatureImage": {
     "type": "image",
     "src": null,
-    "label": "[서명]",
+    "label": "대표원장 이호 서명",
     "alt": "글로리의원 대표원장 이호 서명",
     "zoom": 100,
     "focusX": 50,
@@ -718,7 +718,7 @@
   },
   "column.category.count": {
     "type": "text",
-    "value": "칼럼 [N]편"
+    "value": "칼럼 보기"
   },
   "column.latest.title": {
     "type": "text",
@@ -730,7 +730,7 @@
   },
   "column.latest.authorDate": {
     "type": "text",
-    "value": "대표원장 이호 · [발행일]"
+    "value": "대표원장 이호"
   },
   "column.latest.pageNext": {
     "type": "text",
@@ -746,23 +746,23 @@
   },
   "column.faq.question.0": {
     "type": "text",
-    "value": "[대표 질문 1]"
+    "value": "세르프가 좋은가요, 써마지가 좋은가요?"
   },
   "column.faq.question.1": {
     "type": "text",
-    "value": "[대표 질문 2]"
+    "value": "세르프와 써마지는 보통 어느 연령대가 선택하나요?"
   },
   "column.faq.question.2": {
     "type": "text",
-    "value": "[대표 질문 3]"
+    "value": "리프팅 장비는 무엇을 기준으로 선택하나요?"
   },
   "column.faq.question.3": {
     "type": "text",
-    "value": "[대표 질문 4]"
+    "value": "상담 전에 무엇을 알려야 하나요?"
   },
   "column.faq.question.4": {
     "type": "text",
-    "value": "[대표 질문 5]"
+    "value": "관련 칼럼은 어디에서 볼 수 있나요?"
   },
   "column.treatments.title": {
     "type": "text",
@@ -774,7 +774,7 @@
   },
   "column.treatments.links": {
     "type": "text",
-    "value": "관련 칼럼 [N] · 시술 안내 →"
+    "value": "관련 칼럼 · 시술 안내 →"
   },
   "column.principles.title": {
     "type": "text",
@@ -794,7 +794,7 @@
   },
   "column.principles.1.description": {
     "type": "text",
-    "value": "[진료 원칙 문장]"
+    "value": "피부 탄력과 지방량을 확인한 뒤 필요한 시술을 제안합니다."
   },
   "column.principles.2.title": {
     "type": "text",
@@ -802,7 +802,7 @@
   },
   "column.principles.2.description": {
     "type": "text",
-    "value": "[사후 관리 방식]"
+    "value": "시술 후 확인할 내용을 상담에서 안내합니다."
   },
   "column.location.title": {
     "type": "text",
@@ -810,7 +810,7 @@
   },
   "column.location.hours": {
     "type": "text",
-    "value": "진료 시간 [확인 필요] · 발레 주차"
+    "value": "진료시간은 병원으로 문의해 주세요 · 발레 주차"
   },
   "column.location.reserve": {
     "type": "text",
@@ -819,6 +819,202 @@
   "column.location.kakao": {
     "type": "text",
     "value": "카카오톡 상담"
+  },
+  "seo.home.title": {
+    "type": "text",
+    "value": "언주역 피부과 리프팅 글로리의원 | 대표원장 직접 시술"
+  },
+  "seo.home.description": {
+    "type": "text",
+    "value": "언주역 글로리의원은 대표원장 이호가 상담부터 시술까지 직접 진행하며, 리프팅과 피부 시술에 관한 진료 정보와 원장 칼럼을 제공합니다."
+  },
+  "seo.column.title": {
+    "type": "text",
+    "value": "원장 칼럼 | 언주역 글로리의원"
+  },
+  "seo.column.description": {
+    "type": "text",
+    "value": "언주역 글로리의원 대표원장 이호가 진료실에서 자주 받는 리프팅과 피부 시술 질문에 직접 답하는 원장 칼럼입니다."
+  },
+  "seo.doctor.title": {
+    "type": "text",
+    "value": "대표원장 이호 소개 | 언주역 글로리의원"
+  },
+  "seo.doctor.description": {
+    "type": "text",
+    "value": "글로리의원 대표원장 이호의 경력, 진료 철학, 전문 시술과 직접 작성한 피부 시술 칼럼을 확인할 수 있습니다."
+  },
+  "seo.all.title": {
+    "type": "text",
+    "value": "원장 칼럼 전체 보기 | 언주역 글로리의원"
+  },
+  "seo.all.description": {
+    "type": "text",
+    "value": "글로리의원 대표원장 이호가 작성하고 검토한 리프팅과 피부 시술 칼럼을 최신 발행 순서로 모아 제공합니다."
+  },
+  "seo.verification.google": {
+    "type": "text",
+    "value": ""
+  },
+  "seo.verification.naver": {
+    "type": "text",
+    "value": ""
+  },
+  "seo.verification.bing": {
+    "type": "text",
+    "value": ""
+  },
+  "seo.llms.intro.1": {
+    "type": "text",
+    "value": "글로리의원은 서울 강남구 봉은사로 207 KJ빌딩 3층에 위치합니다."
+  },
+  "seo.llms.intro.2": {
+    "type": "text",
+    "value": "대표원장 이호가 상담부터 시술까지 직접 진행합니다."
+  },
+  "seo.llms.intro.3": {
+    "type": "text",
+    "value": "원장 칼럼은 진료실에서 자주 받는 피부 시술 질문을 데이터에 근거해 설명합니다."
+  },
+  "clinic.address.street": {
+    "type": "text",
+    "value": "서울 강남구 봉은사로 207"
+  },
+  "clinic.address.detail": {
+    "type": "text",
+    "value": "KJ빌딩 3층 (논현동)"
+  },
+  "clinic.address.postalCode": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.address.locality": {
+    "type": "text",
+    "value": "강남구"
+  },
+  "clinic.address.region": {
+    "type": "text",
+    "value": "서울"
+  },
+  "clinic.address.country": {
+    "type": "text",
+    "value": "KR"
+  },
+  "clinic.showSpecialty": {
+    "type": "text",
+    "value": "true"
+  },
+  "clinic.hours.monday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.tuesday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.wednesday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.thursday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.friday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.saturday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.hours.sunday": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.naverPlace": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.kakaoMap": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.googleMap": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.website": {
+    "type": "text",
+    "value": "https://gloryclinic.co.kr"
+  },
+  "clinic.sameAs.youtube": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.instagram": {
+    "type": "text",
+    "value": ""
+  },
+  "clinic.sameAs.modoodoc": {
+    "type": "text",
+    "value": ""
+  },
+  "doctor.name": {
+    "type": "text",
+    "value": "이호"
+  },
+  "doctor.jobTitle": {
+    "type": "text",
+    "value": "대표원장"
+  },
+  "doctor.careers": {
+    "type": "text",
+    "value": "現 글로리의원 대표원장\n前 리쥬미의원 원장\n前 바오밥성형외과 원장\n前 에이스의원 원장"
+  },
+  "doctor.education": {
+    "type": "text",
+    "value": "한양대학교 의과대학 졸업"
+  },
+  "doctor.alumniOf": {
+    "type": "text",
+    "value": "한양대학교 의과대학"
+  },
+  "doctor.associations": {
+    "type": "text",
+    "value": ""
+  },
+  "doctor.licenses": {
+    "type": "text",
+    "value": ""
+  },
+  "doctor.specialties": {
+    "type": "text",
+    "value": "울쎄라 프라임\n써마지 FLX\n세르프\n리쥬란"
+  },
+  "doctor.philosophy": {
+    "type": "text",
+    "value": "자연스러운 아름다움을 지향하고, 개개인의 얼굴에 맞춘 시술을 추구합니다. 상담부터 시술까지 대표원장이 직접 진행합니다."
+  },
+  "doctor.sameAs": {
+    "type": "text",
+    "value": ""
+  },
+  "column.category.lifting.intro": {
+    "type": "text",
+    "value": "울쎄라 프라임, 써마지 FLX, 세르프 등 리프팅 시술에 관해 진료실에서 자주 받는 질문과 대표원장 답변을 모았습니다."
+  },
+  "column.category.pigment.intro": {
+    "type": "text",
+    "value": "색소와 모공에 관한 진료실 질문을 대표원장 칼럼과 관련 시술 정보로 이해하기 쉽게 정리해 제공합니다."
+  },
+  "column.category.injection.intro": {
+    "type": "text",
+    "value": "리쥬란과 보톡스 등 주사시술에 관한 질문을 대표원장 칼럼과 함께 차분히 확인할 수 있습니다."
+  },
+  "column.category.filler.intro": {
+    "type": "text",
+    "value": "스페셜필러 관련 질문과 상담 전에 확인할 내용을 대표원장 칼럼으로 알기 쉽게 정리해 제공합니다."
   },
   "common.header.logo": {
     "type": "image",
@@ -832,7 +1028,7 @@
   "home.doctor.photo": {
     "type": "image",
     "src": null,
-    "label": "[사진] 대표원장 이호 프로필 (재촬영본)",
+    "label": "대표원장 이호 프로필 사진",
     "alt": "글로리의원 대표원장 이호 프로필 사진",
     "zoom": 100,
     "focusX": 50,
@@ -841,7 +1037,7 @@
   "home.gallery.lounge": {
     "type": "image",
     "src": null,
-    "label": "[사진] 라운지",
+    "label": "글로리의원 라운지 사진",
     "alt": "라운지 사진",
     "zoom": 100,
     "focusX": 50,
@@ -850,7 +1046,7 @@
   "home.gallery.laser": {
     "type": "image",
     "src": null,
-    "label": "[사진] 레이저실",
+    "label": "글로리의원 레이저실 사진",
     "alt": "레이저실 사진",
     "zoom": 100,
     "focusX": 50,
@@ -859,7 +1055,7 @@
   "home.gallery.consult": {
     "type": "image",
     "src": null,
-    "label": "[사진] 1:1 상담실",
+    "label": "글로리의원 1:1 상담실 사진",
     "alt": "1:1 상담실 사진",
     "zoom": 100,
     "focusX": 50,
@@ -868,7 +1064,7 @@
   "home.gallery.powder": {
     "type": "image",
     "src": null,
-    "label": "[사진] 파우더룸",
+    "label": "글로리의원 파우더룸 사진",
     "alt": "파우더룸 사진",
     "zoom": 100,
     "focusX": 50,
@@ -877,7 +1073,7 @@
   "home.gallery.treatment": {
     "type": "image",
     "src": null,
-    "label": "[사진] 시술실",
+    "label": "글로리의원 시술실 사진",
     "alt": "시술실 사진",
     "zoom": 100,
     "focusX": 50,
@@ -886,7 +1082,7 @@
   "home.gallery.background": {
     "type": "bgImage",
     "src": null,
-    "label": "[흐린 배경 이미지]",
+    "label": "글로리의원 시설 배경 이미지",
     "alt": "글로리의원 시설 배경",
     "zoom": 100,
     "focusX": 50,
@@ -895,7 +1091,7 @@
   "home.location.map": {
     "type": "image",
     "src": null,
-    "label": "[지도] 봉은사로 207 KJ빌딩 3층",
+    "label": "봉은사로 207 KJ빌딩 3층 지도",
     "alt": "글로리의원 위치 지도",
     "zoom": 100,
     "focusX": 50,
@@ -904,7 +1100,7 @@
   "column.hero.background": {
     "type": "bgImage",
     "src": null,
-    "label": "[사진] 원장님 상담·시술 장면 또는 라운지 (포토클리닉 촬영본, 한 장 고정)",
+    "label": "대표원장 상담과 시술 장면",
     "alt": "글로리의원 대표원장 상담 또는 시술 장면",
     "zoom": 100,
     "focusX": 50,
@@ -913,7 +1109,7 @@
   "column.doctor.photo": {
     "type": "image",
     "src": null,
-    "label": "[사진] 대표원장 프로필 (시술 중 또는 상담 장면)",
+    "label": "대표원장 이호 프로필 사진",
     "alt": "대표원장 이호 프로필",
     "zoom": 100,
     "focusX": 50,
@@ -922,7 +1118,7 @@
   "column.principles.photo": {
     "type": "image",
     "src": null,
-    "label": "[사진] 호텔식 라운지·상담실",
+    "label": "글로리의원 라운지와 상담실 사진",
     "alt": "글로리의원 라운지와 상담실",
     "zoom": 100,
     "focusX": 50,
@@ -931,7 +1127,7 @@
   "column.location.map": {
     "type": "image",
     "src": null,
-    "label": "[지도] 봉은사로 207 KJ빌딩 3층",
+    "label": "봉은사로 207 KJ빌딩 3층 지도",
     "alt": "글로리의원 위치 지도",
     "zoom": 100,
     "focusX": 50,

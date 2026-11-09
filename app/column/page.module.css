@@ -34,12 +34,13 @@
 .sectionHeading { display: flex; align-items: flex-end; justify-content: space-between; }
 .sectionHeading a { padding-bottom: 2px; border-bottom: 1px solid var(--ink); font-size: 14px; }
 .latestGrid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 28px; }
-.columnCard { display: flex; flex-direction: column; gap: 12px; }
+.columnCard, .columnCardLink { display: flex; flex-direction: column; gap: 12px; }
 .cardPhoto { width: 100% !important; height: 230px; }
-.columnCard > span { color: var(--brown); font-size: 13px; font-weight: 500; }
-.columnCard > b { font-size: 19px; line-height: 1.45; }
+.columnCardLink > span { color: var(--brown); font-size: 13px; font-weight: 500; }
+.columnCardLink > b { font-size: 19px; line-height: 1.45; }
 .columnCard p { margin: 0; color: var(--muted); font-size: 14px; }
 .columnCard small { color: var(--muted-2); font-size: 13px; }
+.columnCard small a { text-decoration: underline; text-underline-offset: 2px; }
 .pagination { margin-top: 28px; display: flex; justify-content: center; gap: 18px; color: var(--muted-2); font-size: 14px; }
 .pagination b { color: var(--ink); }
 

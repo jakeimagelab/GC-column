@@ -26,7 +26,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
       <ImageSlot className={styles.previous} label="" alt="" align="end" editId={`home.gallery.${roomKeys[previousIndex]}`} image={roomImage(previousIndex)} />
       <ImageSlot className={styles.next} label="" alt="" variant="light" align="end" editId={`home.gallery.${roomKeys[nextIndex]}`} image={roomImage(nextIndex)} />
       <div className={styles.current}><ImageSlot label="" alt="" variant="dark" editId={`home.gallery.${roomKeys[index]}`} image={roomImage(index)} /><b {...textEditProps(`home.gallery.room.${roomKeys[index]}`)}>{roomName(index)}</b></div>
-      <div className={styles.pages}>{roomKeys.map((room, roomIndex) => <button type="button" data-edit-control className={roomIndex === index ? styles.active : ""} aria-label={roomName(roomIndex)} onClick={() => setIndex(roomIndex)} key={room}>{String(roomIndex + 1).padStart(2, "0")}</button>)}</div>
+      <div className={styles.pages}>{roomKeys.map((room, roomIndex) => <button type="button" data-edit-control className={roomIndex === index ? styles.active : ""} aria-label={`${String(roomIndex + 1).padStart(2, "0")} · ${roomName(roomIndex)}`} onClick={() => setIndex(roomIndex)} key={room}>{String(roomIndex + 1).padStart(2, "0")}</button>)}</div>
     </section>
   );
 }

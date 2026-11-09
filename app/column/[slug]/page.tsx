@@ -6,111 +6,115 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { FaqList } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
-import { columns, getColumn } from "@/content/columns";
-import { getText } from "@/content/site-content-types";
-import { detailContent, doctor, SITE_URL } from "@/content/site";
-import { getCategory } from "@/content/treatments";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  columns,
+  getColumn,
+  getPublishedColumns,
+  getVisibleColumn,
+  getVisibleColumns,
+  isPublishable,
+} from "@/content/columns";
+import { getImage, getText } from "@/content/site-content-types";
+import { detailContent, SITE_URL } from "@/content/site";
+import { getCategory, getTreatment } from "@/content/treatments";
+import type { Column } from "@/content/types";
 import { readSiteContent } from "@/lib/contentStore";
+import { articleGraph, buildMetadata, formatDateKo, graph, sentenceDescription } from "@/lib/seo";
 import styles from "./page.module.css";
 
-type ColumnDetailPageProps = {
-  params: Promise<{ slug: string }>;
-};
+type ColumnDetailPageProps = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
-  return columns.map((column) => ({ slug: column.slug }));
+  const source = process.env.NODE_ENV === "development" ? columns : getPublishedColumns();
+  return source.map((column) => ({ slug: column.slug }));
 }
 
 export async function generateMetadata({ params }: ColumnDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const column = getColumn(slug);
-  if (!column) return {};
-  return {
+  if (!column || (process.env.NODE_ENV !== "development" && !isPublishable(column))) return {};
+  const content = await readSiteContent();
+  return buildMetadata(content, {
     title: `${column.title} | 언주역 글로리의원`,
-    description: column.summary,
-  };
+    description: sentenceDescription(column.summary),
+    pathname: `/column/${column.slug}`,
+    type: "article",
+    imagePath: `/column/${column.slug}/opengraph-image`,
+    publishedAt: column.publishedAt,
+    updatedAt: column.updatedAt,
+    authorUrl: `${SITE_URL}/doctor/lee-ho`,
+    noIndex: !isPublishable(column),
+  });
+}
+
+function relatedColumns(column: Column) {
+  const source = process.env.NODE_ENV === "development" ? getVisibleColumns() : getPublishedColumns();
+  return source
+    .filter((candidate) => candidate.slug !== column.slug)
+    .map((candidate) => ({
+      column: candidate,
+      score:
+        candidate.treatmentSlugs.filter((slug) => column.treatmentSlugs.includes(slug)).length * 4 +
+        (candidate.categorySlug === column.categorySlug ? 2 : 0) +
+        candidate.keywords.filter((keyword) => column.keywords.includes(keyword)).length,
+    }))
+    .filter((item) => item.score > 0)
+    .toSorted((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.column);
 }
 
 export default async function ColumnDetailPage({ params }: ColumnDetailPageProps) {
   const { slug } = await params;
-  const column = getColumn(slug);
+  const column = getVisibleColumn(slug);
   if (!column) notFound();
-  const siteContent = await readSiteContent();
-
+  const content = await readSiteContent();
   const category = getCategory(column.categorySlug);
-  const tocItems: TocItem[] = [
-    { id: "summary", label: "이 글의 핵심" },
-    ...column.sections.map((section) => ({ id: section.id, label: `${section.no} ${section.heading}` })),
-    { id: "judgement", label: "03 권하는 경우 · 아닌 경우" },
-    { id: "precautions", label: "04 시술 전 확인 · FAQ" },
-  ];
+  if (!category) notFound();
+  const publishable = isPublishable(column);
+  const related = relatedColumns(column);
+  const visible = getVisibleColumns();
+  const currentIndex = visible.findIndex((item) => item.slug === column.slug);
+  const previous = currentIndex > 0 ? visible[currentIndex - 1] : undefined;
+  const next = currentIndex >= 0 && currentIndex < visible.length - 1 ? visible[currentIndex + 1] : undefined;
   const pageUrl = `${SITE_URL}/column/${column.slug}`;
-  const medicalPageJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "MedicalWebPage",
-    headline: column.title,
-    description: column.summary,
-    url: pageUrl,
-    datePublished: column.publishedAt,
-    dateModified: column.updatedAt,
-    author: {
-      "@type": "Person",
-      name: column.author,
-      jobTitle: "대표원장",
-      worksFor: { "@type": "MedicalClinic", name: "글로리의원" },
-    },
-    reviewedBy: {
-      "@type": "Person",
-      name: column.author,
-      jobTitle: "대표원장",
-    },
-    about: column.keywords,
-    mainEntityOfPage: pageUrl,
-  };
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: column.faqs.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
-  };
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: detailContent.breadcrumb.map((name, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name,
-      item: index === 0 ? SITE_URL : index === 1 ? `${SITE_URL}/column` : index === detailContent.breadcrumb.length - 1 ? pageUrl : `${SITE_URL}/column?category=${column.categorySlug}`,
-    })),
-  };
-  const json = (value: object) => JSON.stringify(value).replace(/</g, "\\u003c");
+  const tocItems: TocItem[] = [
+    { id: "summary", label: detailContent.coreTitle },
+    ...column.sections.map((section) => ({ id: section.id, label: `${section.no} ${section.heading}` })),
+    { id: "judgement", label: "권하는 경우 · 다른 선택을 보는 경우" },
+    { id: "precautions", label: "시술 전 확인 · FAQ" },
+  ];
+  const structured = publishable
+    ? articleGraph(content, column, category.name)
+    : graph(content, [{ "@type": "WebPage", "@id": `${pageUrl}#draft`, url: pageUrl, name: "비공개 초안", inLanguage: "ko-KR" }]);
+  const articleImage = column.photo.src ? { type: "image" as const, src: column.photo.src, label: column.photo.label, alt: column.photo.alt, zoom: 100, focusX: 50, focusY: 50 } : undefined;
 
   return (
     <main className="pageFrame">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(medicalPageJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(breadcrumbJsonLd) }} />
-      <ColumnHeader content={siteContent} />
+      <JsonLd value={structured} />
+      <ColumnHeader content={content} />
+      {!publishable ? <div className={styles.draftBanner}>비공개 초안</div> : null}
 
       <section className={styles.titleArea}>
-        <div className={styles.breadcrumb}>{detailContent.breadcrumb.join(" > ")}</div>
-        <div className={styles.category}>{category?.name}</div>
+        <nav className={styles.breadcrumb} aria-label="현재 위치">
+          <Link href="/">홈</Link><span>›</span><Link href="/column">원장 칼럼</Link><span>›</span><Link href={`/column/category/${category.slug}`}>{category.name}</Link><span>›</span><span aria-current="page">{column.title}</span>
+        </nav>
+        <Link className={styles.category} href={`/column/category/${category.slug}`}>{category.name}</Link>
         <h1>{column.title}</h1>
         <div className={styles.authorLine}>
           <span className={styles.authorAvatar} aria-hidden="true" />
           <span>
-            <b>{column.author}</b> · 게시 {column.publishedAt} · 수정 {column.updatedAt} · 읽는 시간 {column.readMinutes}분
+            <Link href="/doctor/lee-ho"><b>{column.author}</b></Link>
+            {column.publishedAt ? <> · 게시 <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}
+            {column.updatedAt ? <> · 수정 <time dateTime={column.updatedAt}>{formatDateKo(column.updatedAt)}</time></> : null}
+            <> · 읽는 시간 {column.readMinutes}분</>
           </span>
-          <span className={styles.reviewed}>대표원장 검토 완료 · {column.reviewedAt}</span>
+          {column.reviewedAt ? <span className={styles.reviewed}>마지막 검토일 <time dateTime={column.reviewedAt}>{formatDateKo(column.reviewedAt)}</time> · <Link href="/doctor/lee-ho">대표원장 이호 검토</Link></span> : null}
         </div>
-        {column.questionSource ? (
-          <div className={styles.questionSource}>{column.questionSource}</div>
-        ) : null}
+        {column.questionSource ? <div className={styles.questionSource}>{column.questionSource}</div> : null}
       </section>
 
       <div className={styles.bodyLayout}>
@@ -118,18 +122,11 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <section className={styles.summary} id="summary">
             <b>{detailContent.coreTitle}</b>
             <p>{column.summary}</p>
-            <div className={styles.keyPoints}>
-              <b>핵심 포인트</b>
-              <ul>
-                {column.keyPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-            </div>
+            <div className={styles.keyPoints}><b>핵심 포인트</b><ul>{column.keyPoints.map((point) => <li key={point}>{point}</li>)}</ul></div>
           </section>
 
           <figure className={styles.photoFigure}>
-            <ImageSlot className={styles.heroPhoto} label={column.photo.label} alt={column.photo.alt} />
+            <ImageSlot className={styles.heroPhoto} label={column.photo.label} alt={column.photo.alt} image={articleImage} sizes="(max-width: 1024px) 100vw, 760px" />
             <figcaption>{column.photo.caption}</figcaption>
           </figure>
 
@@ -137,130 +134,67 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
           {column.sections.map((section) => (
             <section className={styles.articleSection} id={section.id} key={section.id}>
-              <h2>
-                <span>{section.no}</span> {section.heading}
-              </h2>
-              {section.body.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-              {section.figure ? (
-                <figure className={styles.diagramFigure}>
-                  <ImageSlot
-                    className={styles.diagram}
-                    label={section.figure.label}
-                    alt={section.figure.label.replace("\n", " ")}
-                    variant="diagram"
-                  />
-                  <figcaption>{section.figure.caption}</figcaption>
-                </figure>
-              ) : null}
+              <h2><span>{section.no}</span> {section.heading}</h2>
+              {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              {section.figure ? <figure className={styles.diagramFigure}><ImageSlot className={styles.diagram} label={section.figure.label} alt={section.figure.label.replace("\n", " ")} variant="diagram" /><figcaption>{section.figure.caption}</figcaption></figure> : null}
               {section.table ? (
                 <div className={styles.tableScroll}>
                   <table>
-                    <thead>
-                      <tr>
-                        {section.table.head.map((cell) => (
-                          <th key={cell} scope="col">{cell}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {section.table.rows.map((row) => (
-                        <tr key={row.join("-")}>
-                          {row.map((cell, index) => index === 0 ? (
-                            <th key={cell} scope="row">{cell}</th>
-                          ) : (
-                            <td key={`${cell}-${index}`}>{cell}</td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
+                    <caption>{section.table.caption ?? section.heading}</caption>
+                    <thead><tr>{section.table.head.map((cell) => <th key={cell} scope="col">{cell}</th>)}</tr></thead>
+                    <tbody>{section.table.rows.map((row) => <tr key={row.join("-")}>{row.map((cell, index) => index === 0 ? <th key={cell} scope="row">{cell}</th> : <td key={`${cell}-${index}`}>{cell}</td>)}</tr>)}</tbody>
                   </table>
                 </div>
               ) : null}
-              {section.table ? <small>개인차 안내 문구 · 수치를 쓰면 출처를 참고 자료에 연결</small> : null}
             </section>
           ))}
 
           <section className={styles.judgement} id="judgement">
             <h2><span>03</span> {detailContent.judgementTitle}</h2>
             <div className={styles.judgementGrid}>
-              <div>
-                <b>권하는 경우</b>
-                <ul>{column.judgement.recommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
-              </div>
-              <div>
-                <b>권하지 않거나 다른 시술을 먼저 보는 경우</b>
-                <ul>{column.judgement.notRecommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
-              </div>
+              <div><b>권하는 경우</b><ul>{column.judgement.recommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></div>
+              <div><b>권하지 않거나 다른 시술을 먼저 보는 경우</b><ul>{column.judgement.notRecommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></div>
             </div>
           </section>
 
           {column.video ? (
-            <section className={styles.videoSection}>
+            <section className={styles.videoSection} id="video">
               <h2>{detailContent.videoTitle}</h2>
-              <div className={styles.videoSlot} role="img" aria-label={column.video.label}>
-                <span className={styles.playButton}>▶</span>
-                <span>{column.video.label}</span>
-              </div>
-              <div className={styles.transcript}><b>영상 대본</b> · {column.video.transcript}</div>
+              <div className={styles.videoSlot} role="img" aria-label={column.video.label}><span className={styles.playButton}>▶</span><span>{column.video.label}</span></div>
+              <details className={styles.transcript}><summary>영상 대본 전문</summary><p>{column.video.transcript}</p></details>
             </section>
           ) : null}
 
           <div id="precautions" className={styles.precautionsGroup}>
-            <section className={styles.precautions}>
-              <h2><span>04</span> {detailContent.precautionsTitle}</h2>
-              <ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul>
-            </section>
-            <section className={styles.faqSection}>
-              <h2>{detailContent.faqTitle}</h2>
-              <FaqList items={column.faqs} />
-            </section>
+            <section className={styles.precautions}><h2><span>04</span> {detailContent.precautionsTitle}</h2><ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul></section>
+            <section className={styles.faqSection}><h2>{detailContent.faqTitle}</h2><FaqList items={column.faqs.map((faq, index) => ({ ...faq, id: `faq-${index + 1}` }))} /></section>
           </div>
 
-          <section className={styles.references}>
-            <h2>{detailContent.referencesTitle}</h2>
-            <ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul>
-            <small>본문에 수치(온도·주파수 등)를 쓰면 반드시 여기에 출처 연결</small>
-          </section>
+          {column.references.length ? <section className={styles.references}><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
 
           <section className={styles.authorBox}>
-            <ImageSlot label="" alt="대표원장 이호 프로필 사진" width={120} height={140} />
+            <ImageSlot label="대표원장 이호 프로필 사진" alt="대표원장 이호 프로필 사진" width={120} height={140} image={getImage(content, "home.doctor.photo")} sizes="120px" />
             <div>
-              <h2>{detailContent.authorTitle}</h2>
+              <h2><Link href="/doctor/lee-ho">{detailContent.authorTitle}</Link></h2>
               <p>{detailContent.authorCareer}</p>
-              <p>게시 {column.publishedAt} · 수정 {column.updatedAt} · 검토 {column.reviewedAt}</p>
-              <Link href="/">원장 프로필 →</Link>
+              <p>{column.publishedAt ? <>게시 <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}{column.updatedAt ? <> · 수정 <time dateTime={column.updatedAt}>{formatDateKo(column.updatedAt)}</time></> : null}{column.reviewedAt ? <> · 검토 <time dateTime={column.reviewedAt}>{formatDateKo(column.reviewedAt)}</time></> : null}</p>
+              <Link href="/doctor/lee-ho">원장 프로필 →</Link>
             </div>
           </section>
 
           <section className={styles.treatmentCta}>
-            <div>
-              <b>{detailContent.treatmentTitle}</b>
-              <span>{detailContent.treatmentDescription}</span>
-            </div>
-            <div className={styles.ctaButtons}>
-              <ButtonLink href="#" variant="taupe">예약·상담</ButtonLink>
-              <ButtonLink href="#" variant="lightOutline">카톡 상담</ButtonLink>
-            </div>
+            <div><b>관련 시술</b><span>{detailContent.treatmentDescription}</span><div className={styles.treatmentLinks}>{column.treatmentSlugs.flatMap((slug) => { const treatment = getTreatment(slug); return treatment ? [<Link href={`/column/category/${treatment.categorySlug}`} key={slug}>{treatment.name}</Link>] : []; })}</div></div>
+            <div className={styles.ctaButtons}><ButtonLink href="tel:0269587525" variant="taupe">예약·상담</ButtonLink><ButtonLink href={getText(content, "home.location.kakaoUrl") || "/#location"} variant="lightOutline">카톡 상담</ButtonLink></div>
           </section>
 
-          <section className={styles.related}>
-            <h2>{detailContent.relatedTitle}</h2>
-            <div className={styles.relatedGrid}>
-              {detailContent.related.map((title) => (
-                <div key={title}>
-                  <ImageSlot label="" alt={`${title} 대표 이미지`} height={120} />
-                  <b>{title}</b>
-                </div>
-              ))}
-            </div>
-            <div className={styles.articleNav}>
-              <span>← 이전 글 [제목]</span>
-              <span>다음 글 [제목] →</span>
-            </div>
-          </section>
+          {related.length ? (
+            <section className={styles.related}>
+              <h2>{detailContent.relatedTitle}</h2>
+              <div className={styles.relatedGrid}>{related.map((item) => <Link href={`/column/${item.slug}`} key={item.slug}><ImageSlot label="관련 칼럼 이미지" alt={`${item.title} 대표 이미지`} height={120} /><b>{item.title}</b></Link>)}</div>
+            </section>
+          ) : null}
 
+          {previous || next ? <nav className={styles.articleNav} aria-label="이전 글과 다음 글">{previous ? <Link href={`/column/${previous.slug}`}>← 이전 글 {previous.title}</Link> : <span />}{next ? <Link href={`/column/${next.slug}`}>다음 글 {next.title} →</Link> : <span />}</nav> : null}
           <div className={styles.notice}>{detailContent.notice}</div>
         </article>
 
@@ -268,21 +202,15 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <div className={styles.stickySidebar}>
             <ArticleToc items={tocItems} title="목차" />
             <div className={styles.doctorCard}>
-              <div>
-                <span aria-hidden="true" />
-                <b>{doctor.title} {doctor.name}</b>
-              </div>
+              <Link href="/doctor/lee-ho"><span aria-hidden="true" /><b>{getText(content, "doctor.jobTitle")} {getText(content, "doctor.name")}</b></Link>
               <p>상담부터 시술까지 직접 진행합니다.</p>
-              <ButtonLink href="#" variant="taupe">예약·상담 02-6958-7525</ButtonLink>
+              <ButtonLink href="tel:0269587525" variant="taupe">예약·상담 02-6958-7525</ButtonLink>
             </div>
           </div>
         </aside>
       </div>
 
-      <footer className={styles.footer}>
-        <div><b>{getText(siteContent, "column.footer.brand")}</b><p>{getText(siteContent, "column.footer.notice")}</p><p>{getText(siteContent, "column.footer.business")}</p></div>
-        <div><p>{getText(siteContent, "column.footer.links")}</p><p>{getText(siteContent, "column.footer.sitemap")}</p></div>
-      </footer>
+      <footer className={styles.footer}><div><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div><p>{getText(content, "column.footer.links")}</p><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
     </main>
   );
 }

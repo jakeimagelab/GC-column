@@ -11,6 +11,9 @@
   color: var(--muted-2);
 }
 
+.breadcrumb a { color: inherit; }
+.breadcrumb span { margin-inline: 5px; }
+
 .category {
   color: var(--brown);
   font-size: 14px;
@@ -53,6 +56,8 @@
   color: #4a433b;
   font-size: 13px;
 }
+
+.reviewed a { text-decoration: underline; text-underline-offset: 2px; }
 
 .questionSource {
   align-self: flex-start;
@@ -183,6 +188,13 @@
   font-size: 15px;
 }
 
+.tableScroll caption {
+  padding: 0 0 10px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: left;
+}
+
 .tableScroll th,
 .tableScroll td {
   min-width: 140px;
@@ -271,6 +283,9 @@
   color: #444;
   font-size: 14px;
 }
+
+.transcript summary { cursor: pointer; font-weight: 700; }
+.transcript p { margin-top: 10px; }
 
 .transcript b {
   color: var(--ink);
@@ -363,6 +378,9 @@
   font-size: 14px;
 }
 
+.treatmentLinks { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
+.treatmentLinks a { padding: 3px 8px; border: 1px solid #8f867c; color: #fff; font-size: 12px; }
+
 .ctaButtons {
   display: flex;
   gap: 10px;
@@ -385,6 +403,8 @@
   flex-direction: column;
   gap: 8px;
 }
+
+.relatedGrid > a { display: flex; flex-direction: column; gap: 8px; }
 
 .articleNav {
   margin-top: 14px;
@@ -548,4 +568,12 @@
   .footer > div:last-child {
     text-align: left;
   }
+}
+.draftBanner {
+  padding: 10px var(--column-gutter);
+  background: #5b524a;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
 }

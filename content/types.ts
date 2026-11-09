@@ -26,11 +26,12 @@ export type ColumnSection = {
   no: string;
   heading: string;
   body: string[];
-  table?: { head: string[]; rows: string[][] };
+  table?: { caption?: string; head: string[]; rows: string[][] };
   figure?: { label: string; caption: string };
 };
 
 export type Column = {
+  status: "draft" | "published";
   slug: string;
   categorySlug: Category["slug"];
   treatmentSlugs: string[];
@@ -38,10 +39,19 @@ export type Column = {
   questionSource?: string;
   summary: string;
   keyPoints: string[];
-  photo: { label: string; caption: string; alt: string };
+  photo: { src?: string | null; label: string; caption: string; alt: string };
   sections: ColumnSection[];
   judgement: { recommend: string[]; notRecommend: string[] };
-  video?: { label: string; transcript: string };
+  video?: {
+    label: string;
+    transcript: string;
+    name?: string;
+    description?: string;
+    thumbnailUrl?: string;
+    uploadDate?: string;
+    contentUrl?: string;
+    embedUrl?: string;
+  };
   precautions: string[];
   faqs: ColumnFaq[];
   references: string[];

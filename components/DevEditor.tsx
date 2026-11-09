@@ -8,6 +8,7 @@ import {
   getEditableEntry,
   getEquipmentItems,
   getHeroSlides,
+  getText,
   HERO_SLIDES_ID,
   withEditableEntry,
   type EquipmentContentItem,
@@ -37,6 +38,88 @@ type InlineEdit = {
 };
 type HeroState = { index: number; count: number; slideId: string };
 type EquipmentCommand = { action: "add" | "delete" | "moveBefore" | "moveAfter"; itemId: string };
+
+type SiteInfoField = {
+  id: string;
+  label: string;
+  multiline?: boolean;
+  kind?: "boolean" | "number" | "url";
+};
+
+const SITE_INFO_GROUPS: Array<{ title: string; fields: SiteInfoField[] }> = [
+  {
+    title: "병원",
+    fields: [
+      { id: "common.brand.name", label: "병원명" },
+      { id: "common.brand.nameEn", label: "영문명" },
+      { id: "clinic.address.street", label: "도로명 주소" },
+      { id: "clinic.address.detail", label: "상세 주소" },
+      { id: "clinic.address.postalCode", label: "우편번호" },
+      { id: "clinic.address.locality", label: "시·구" },
+      { id: "clinic.address.region", label: "시·도" },
+      { id: "clinic.address.country", label: "국가 코드" },
+      { id: "common.clinic.phone", label: "전화" },
+      { id: "home.location.lat", label: "위도", kind: "number" },
+      { id: "home.location.lng", label: "경도", kind: "number" },
+      { id: "clinic.showSpecialty", label: "진료과목 표시", kind: "boolean" },
+    ],
+  },
+  {
+    title: "진료시간",
+    fields: [
+      { id: "clinic.hours.monday", label: "월요일" },
+      { id: "clinic.hours.tuesday", label: "화요일" },
+      { id: "clinic.hours.wednesday", label: "수요일" },
+      { id: "clinic.hours.thursday", label: "목요일" },
+      { id: "clinic.hours.friday", label: "금요일" },
+      { id: "clinic.hours.saturday", label: "토요일" },
+      { id: "clinic.hours.sunday", label: "일요일" },
+    ],
+  },
+  {
+    title: "원장",
+    fields: [
+      { id: "doctor.name", label: "이름" },
+      { id: "doctor.jobTitle", label: "직함" },
+      { id: "doctor.careers", label: "경력 (한 줄에 하나)", multiline: true },
+      { id: "doctor.education", label: "학력 (한 줄에 하나)", multiline: true },
+      { id: "doctor.alumniOf", label: "출신 학교 (한 줄에 하나)", multiline: true },
+      { id: "doctor.associations", label: "학회 (한 줄에 하나)", multiline: true },
+      { id: "doctor.licenses", label: "자격·면허 (한 줄에 하나)", multiline: true },
+      { id: "doctor.specialties", label: "전문 시술 (한 줄에 하나)", multiline: true },
+      { id: "doctor.philosophy", label: "진료 철학", multiline: true },
+      { id: "doctor.sameAs", label: "외부 프로필 (한 줄에 하나)", multiline: true },
+    ],
+  },
+  {
+    title: "외부 프로필 주소",
+    fields: [
+      { id: "clinic.sameAs.naverPlace", label: "네이버 플레이스", kind: "url" },
+      { id: "clinic.sameAs.kakaoMap", label: "카카오맵", kind: "url" },
+      { id: "clinic.sameAs.googleMap", label: "구글 지도", kind: "url" },
+      { id: "clinic.sameAs.website", label: "기존 홈페이지", kind: "url" },
+      { id: "clinic.sameAs.youtube", label: "유튜브", kind: "url" },
+      { id: "clinic.sameAs.instagram", label: "인스타그램", kind: "url" },
+      { id: "clinic.sameAs.modoodoc", label: "모두닥", kind: "url" },
+    ],
+  },
+  {
+    title: "검색·공유",
+    fields: [
+      { id: "seo.home.title", label: "홈 제목" },
+      { id: "seo.home.description", label: "홈 설명", multiline: true },
+      { id: "seo.column.title", label: "칼럼 메인 제목" },
+      { id: "seo.column.description", label: "칼럼 메인 설명", multiline: true },
+      { id: "seo.doctor.title", label: "원장 프로필 제목" },
+      { id: "seo.doctor.description", label: "원장 프로필 설명", multiline: true },
+      { id: "seo.all.title", label: "전체 칼럼 제목" },
+      { id: "seo.all.description", label: "전체 칼럼 설명", multiline: true },
+      { id: "seo.verification.google", label: "Google 확인 코드" },
+      { id: "seo.verification.naver", label: "Naver 확인 코드" },
+      { id: "seo.verification.bing", label: "Bing 확인 코드" },
+    ],
+  },
+];
 
 const cloneValue = <T,>(value: T): T => structuredClone(value);
 
@@ -111,12 +194,23 @@ export function DevEditor({ page, content }: DevEditorProps) {
   const [heroState, setHeroState] = useState<HeroState | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [error, setError] = useState("");
+  const [siteInfoOpen, setSiteInfoOpen] = useState(false);
+  const [siteDrafts, setSiteDrafts] = useState<Record<string, string>>({});
   const [undoStack, setUndoStack] = useState<HistoryItem[]>([]);
   const [redoStack, setRedoStack] = useState<HistoryItem[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
   const inlineEditor = useRef<HTMLDivElement>(null);
 
   useEffect(() => setEntries(content), [content]);
+
+  useEffect(() => {
+    if (!siteInfoOpen) return;
+    const next: Record<string, string> = {};
+    for (const group of SITE_INFO_GROUPS) {
+      for (const field of group.fields) next[field.id] = getText(entries, field.id);
+    }
+    setSiteDrafts(next);
+  }, [entries, siteInfoOpen]);
 
   useEffect(() => {
     const entry = selectedId ? getEditableEntry(entries, selectedId) : undefined;
@@ -376,6 +470,14 @@ export function DevEditor({ page, content }: DevEditorProps) {
 
   if (!active) return null;
 
+  const saveSiteInfoField = (id: string) => {
+    const before = getEditableEntry(entries, id);
+    if (!before || before.type !== "text") return;
+    void saveEntry(id, { type: "text", value: siteDrafts[id] ?? "" }, { before }).then((saved) => {
+      if (saved) router.refresh();
+    });
+  };
+
   return (
     <>
       {inlineEdit ? (
@@ -414,6 +516,57 @@ export function DevEditor({ page, content }: DevEditorProps) {
           }}
         />
       ) : null}
+      {siteInfoOpen ? (
+        <aside className={styles.sitePanel} data-dev-editor aria-label="사이트 정보 편집">
+          <div className={styles.sitePanelHeader}>
+            <div><b>사이트 정보</b><small>화면·메타·구조화 데이터에 함께 반영됩니다.</small></div>
+            <button type="button" onClick={() => setSiteInfoOpen(false)}>닫기</button>
+          </div>
+          <div className={styles.sitePanelBody}>
+            {SITE_INFO_GROUPS.map((group) => (
+              <fieldset key={group.title}>
+                <legend>{group.title}</legend>
+                {group.fields.map((field) => (
+                  <label key={field.id}>
+                    <span>{field.label}</span>
+                    {field.kind === "boolean" ? (
+                      <select
+                        value={siteDrafts[field.id] ?? "false"}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setSiteDrafts((current) => ({ ...current, [field.id]: value }));
+                          const before = getEditableEntry(entries, field.id);
+                          if (before?.type === "text") void saveEntry(field.id, { type: "text", value }, { before }).then((saved) => {
+                            if (saved) router.refresh();
+                          });
+                        }}
+                      >
+                        <option value="true">표시</option>
+                        <option value="false">숨김</option>
+                      </select>
+                    ) : field.multiline ? (
+                      <textarea
+                        value={siteDrafts[field.id] ?? ""}
+                        onChange={(event) => setSiteDrafts((current) => ({ ...current, [field.id]: event.currentTarget.value }))}
+                        onBlur={() => saveSiteInfoField(field.id)}
+                        rows={field.id.includes("philosophy") ? 4 : 3}
+                      />
+                    ) : (
+                      <input
+                        type={field.kind === "url" ? "url" : "text"}
+                        inputMode={field.kind === "number" ? "decimal" : undefined}
+                        value={siteDrafts[field.id] ?? ""}
+                        onChange={(event) => setSiteDrafts((current) => ({ ...current, [field.id]: event.currentTarget.value }))}
+                        onBlur={() => saveSiteInfoField(field.id)}
+                      />
+                    )}
+                  </label>
+                ))}
+              </fieldset>
+            ))}
+          </div>
+        </aside>
+      ) : null}
       <aside
         className={styles.toolbar}
         data-dev-editor
@@ -430,6 +583,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
           <nav><Link href="/?edit=1">홈</Link><Link href="/column?edit=1">칼럼 메인</Link></nav>
           <button type="button" onClick={() => void undo()} disabled={!undoStack.length}>되돌리기</button>
           <button type="button" onClick={() => void redo()} disabled={!redoStack.length}>다시하기</button>
+          <button type="button" onClick={() => setSiteInfoOpen((current) => !current)}>사이트 정보</button>
           <span role="status" aria-live="polite" className={`${styles.status} ${saveState === "error" ? styles.error : ""}`}>
             {saveState === "saving" ? "저장 중" : saveState === "error" ? `실패 · ${error}` : "저장됨"}
           </span>

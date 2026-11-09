@@ -9,17 +9,20 @@ import { FaqList } from "@/components/FaqList";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
-import { getColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
+import { JsonLd } from "@/components/JsonLd";
+import { containsPlaceholder, getColumns, getVisibleColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
 import { getImage, getText, textEditProps } from "@/content/site-content-types";
-import { columnExcerpts, columnSearchFaqIndex, columnTreatmentSearchNames } from "@/content/site";
+import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
 import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
+import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
+import { getClinicAddress, getDisplayedHours } from "@/lib/site-info";
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
-  title: "원장 칼럼 | 언주역 글로리의원",
-  description: "원장 칼럼 | 언주역 글로리의원",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await readSiteContent();
+  return buildMetadata(content, { title: getText(content, "seo.column.title"), description: getText(content, "seo.column.description"), pathname: "/column" });
+}
 
 export default async function ColumnMainPage() {
   const content = await readSiteContent();
@@ -33,14 +36,10 @@ export default async function ColumnMainPage() {
   const cards = getColumns(mainCardSlugs);
   const treatmentCards = mainTreatmentOrder.flatMap((slug) => {
     const treatment = getTreatment(slug);
-    if (!treatment) return [];
+    if (!treatment || containsPlaceholder(treatment)) return [];
     return [{ ...treatment, displayName: treatment.categorySlug === "filler" ? "스페셜필러" : treatment.name }];
   });
-  const mainFaqs = [0, 1, 2, 3, 4].map((index) => ({
-    q: getText(content, `column.faq.question.${index}`),
-    a: "[본문]",
-    editId: `column.faq.question.${index}`,
-  }));
+  const mainFaqs = getVisibleColumns().flatMap((column) => column.faqs.map((faq, index) => ({ ...faq, id: `faq-${column.slug}-${index + 1}` }))).slice(0, 5);
   const principles = [0, 1, 2].map((index) => ({
     no: String(index + 1).padStart(2, "0"),
     titleId: `column.principles.${index}.title`,
@@ -48,6 +47,9 @@ export default async function ColumnMainPage() {
   }));
   const locationLat = getText(content, "home.location.lat");
   const locationLng = getText(content, "home.location.lng");
+  const collectionColumns = getVisibleColumns();
+  const faqIndex = collectionColumns.flatMap((column) => column.faqs.map((faq) => ({ q: faq.q, keywords: column.keywords })));
+  const pageGraph = graph(content, collectionNodes("/column", getText(content, "seo.column.title"), getText(content, "seo.column.description"), collectionColumns));
 
   return (
     <main className="pageFrame">
@@ -58,7 +60,7 @@ export default async function ColumnMainPage() {
         <div className={styles.heroContent}>
           <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
           <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
-          <ColumnSearch columns={searchColumns} content={content} faqIndex={columnSearchFaqIndex} treatments={columnTreatmentSearchNames} />
+          <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
         </div>
       </section>
 
@@ -72,7 +74,7 @@ export default async function ColumnMainPage() {
             <p {...textEditProps("column.doctor.description")}>{getText(content, "column.doctor.description")}</p>
             <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
             <div className={styles.doctorLinks}>
-              <Link href="/" {...textEditProps("column.doctor.more")}>{getText(content, "column.doctor.more")}</Link>
+              <Link href="/doctor/lee-ho" {...textEditProps("column.doctor.more")}>{getText(content, "column.doctor.more")}</Link>
               <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><ImageSlot className={styles.doctorSignatureImage} label="" alt="" editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} /></span>
             </div>
           </div>
@@ -83,24 +85,26 @@ export default async function ColumnMainPage() {
         <h2 {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
         <div className={styles.categoryGrid}>
           {categories.map((category) => (
-            <Link href={`/column?category=${category.slug}`} key={category.slug}>
-              <span>{category.nameEn}</span><b>{category.name}</b><small {...textEditProps("column.category.count")}>{getText(content, "column.category.count")}</small>
+            <Link href={`/column/category/${category.slug}`} key={category.slug}>
+              <span>{category.nameEn}</span><b>{category.name}</b><small>{collectionColumns.filter((column) => column.categorySlug === category.slug).length ? `칼럼 ${collectionColumns.filter((column) => column.categorySlug === category.slug).length}편` : getText(content, "column.category.count")}</small>
             </Link>
           ))}
         </div>
       </section>
 
       <section className={styles.latestSection}>
-        <div className={styles.sectionHeading}><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
+        <div className={styles.sectionHeading}><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column/all" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
         <div className={styles.latestGrid}>
           {cards.map((column) => (
-            <Link href={`/column/${column.slug}`} className={styles.columnCard} key={column.slug}>
-              <ImageSlot className={styles.cardPhoto} label="[원장님 사진]" alt={`${column.title} 대표 사진`} />
-              <span>{getCategory(column.categorySlug)?.name}</span>
-              <b>{column.title}</b>
-              <p>{column.summary}</p>
-              <small {...textEditProps("column.latest.authorDate")}>{getText(content, "column.latest.authorDate")}</small>
-            </Link>
+            <article className={styles.columnCard} key={column.slug}>
+              <Link href={`/column/${column.slug}`} className={styles.columnCardLink}>
+                <ImageSlot className={styles.cardPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} />
+                <span>{getCategory(column.categorySlug)?.name}</span>
+                <b>{column.title}</b>
+                <p>{column.summary}</p>
+              </Link>
+              <small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small>
+            </article>
           ))}
         </div>
         <div className={styles.pagination}><b>1</b><span>2</span><span>3</span><span {...textEditProps("column.latest.pageNext")}>{getText(content, "column.latest.pageNext")}</span></div>
@@ -136,11 +140,11 @@ export default async function ColumnMainPage() {
       </section>
 
       <section className={styles.infoSection} id="location">
-        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address="서울 강남구 봉은사로 207" lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} />
+        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} />
         <div>
           <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
-          <p {...textEditProps("common.clinic.address")}>{getText(content, "common.clinic.address")}</p>
-          <p {...textEditProps("column.location.hours")}>{getText(content, "column.location.hours")}</p>
+          <p>{getClinicAddress(content)}</p>
+          <p>{getDisplayedHours(content)}</p>
           <a className={styles.phone} href="tel:0269587525" {...textEditProps("common.clinic.phone")}>{getText(content, "common.clinic.phone")}</a>
           <div className={styles.infoButtons}><ButtonLink href="#" variant="taupe"><span {...textEditProps("column.location.reserve")}>{getText(content, "column.location.reserve")}</span></ButtonLink><ButtonLink href="#" variant="outline"><span {...textEditProps("column.location.kakao")}>{getText(content, "column.location.kakao")}</span></ButtonLink></div>
         </div>
@@ -153,6 +157,7 @@ export default async function ColumnMainPage() {
 
       <FloatingQuickMenu content={content} compact />
       <DevEditorMount page="column" content={content} />
+      <JsonLd value={pageGraph} />
     </main>
   );
 }
