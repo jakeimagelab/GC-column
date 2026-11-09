@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import styles from "./ColumnSearch.module.css";
 
 export type SearchColumn = {
@@ -13,17 +15,26 @@ export type SearchColumn = {
   keywords: string[];
 };
 
-type SearchFaq = { q: string; keywords: string[] };
+type SearchFaq = { q: string; keywords: string[]; slug: string; id: string };
 type ColumnSearchProps = { columns: SearchColumn[]; content: SiteContent; faqIndex: SearchFaq[]; treatments: string[] };
 
 export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnSearchProps) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [resultsVisible, setResultsVisible] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const popular = [0, 1, 2, 3, 4].map((index) => ({ id: `column.search.popular.${index}`, value: getText(content, `column.search.popular.${index}`) }));
+  const suggestionIndex = useMemo<SearchSuggestion[]>(() => [
+    ...columns.map((column) => ({ id: `column-${column.slug}`, type: "column" as const, label: column.title, href: `/column/${column.slug}` })),
+    ...faqIndex.map((faq) => ({ id: `faq-${faq.slug}-${faq.id}`, type: "faq" as const, label: faq.q, href: `/column/${faq.slug}#${faq.id}` })),
+  ], [columns, faqIndex]);
+  const suggestions = useMemo(() => getSuggestions(suggestionIndex, query), [query, suggestionIndex]);
+  const suggestionsOpen = inputFocused && suggestions.length > 0;
 
   const runSearch = (nextQuery: string) => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -84,6 +95,10 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
     runSearch(value);
     inputRef.current?.focus();
   };
+  const selectSuggestion = (suggestion: SearchSuggestion) => {
+    setInputFocused(false);
+    router.push(suggestion.href);
+  };
 
   return (
     <div className={styles.search} id="search">
@@ -94,7 +109,14 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
           id="column-search"
           type="search"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={suggestionsOpen}
+          aria-controls="column-search-suggestions"
+          aria-activedescendant={suggestionsOpen && activeSuggestion >= 0 ? `column-search-suggestions-${activeSuggestion}` : undefined}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
+          onChange={(event) => { setQuery(event.target.value); setActiveSuggestion(-1); }}
           onCompositionStart={() => { composing.current = true; }}
           onCompositionEnd={(event) => {
             composing.current = false;
@@ -102,13 +124,20 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
             runSearch(event.currentTarget.value);
           }}
           onKeyDown={(event) => {
-            if (event.key === "Enter" && !composing.current) runSearch(query);
+            if (event.key === "ArrowDown" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => (value + 1) % suggestions.length); }
+            else if (event.key === "ArrowUp" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => value <= 0 ? suggestions.length - 1 : value - 1); }
+            else if (event.key === "Escape") { setInputFocused(false); }
+            else if (event.key === "Enter" && !composing.current) {
+              if (suggestionsOpen && activeSuggestion >= 0) { event.preventDefault(); selectSuggestion(suggestions[activeSuggestion]); }
+              else runSearch(query);
+            }
           }}
           placeholder={getText(content, "column.search.placeholder")}
           data-edit-control
         />
         <button type="button" className={styles.clear} aria-label="검색어 지우기" onClick={() => chooseQuery("")} data-edit-control>{getText(content, "column.search.clear")}</button>
         <button type="button" className={styles.submit} onClick={() => runSearch(query)} data-edit-control>{getText(content, "column.search.submit")}</button>
+        {suggestionsOpen ? <SearchAutocomplete id="column-search-suggestions" items={suggestions} query={query} activeIndex={activeSuggestion} onActive={setActiveSuggestion} onSelect={selectSuggestion} /> : null}
       </div>
 
       {searchQuery ? (
@@ -131,7 +160,7 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
                 </div>
                 <div className={styles.faqResults}>
                   <b><span {...textEditProps("column.search.relatedQuestions")}>{getText(content, "column.search.relatedQuestions")}</span> {results.faqs.length}</b>
-                  {results.faqs.slice(0, 3).map((faq) => <Link href="/column/xerf-vs-thermage#precautions" key={faq.q}>Q. {faq.q}</Link>)}
+                  {results.faqs.slice(0, 3).map((faq) => <Link href={`/column/${faq.slug}#${faq.id}`} key={`${faq.slug}-${faq.id}`}>Q. {faq.q}</Link>)}
                 </div>
                 <div className={styles.treatmentLine}><span {...textEditProps("column.search.treatmentLink")}>{getText(content, "column.search.treatmentLink")}</span> <b>{results.matchedTreatments.length ? results.matchedTreatments.join(" · ") : getText(content, "column.search.allTreatments")}</b></div>
               </div>

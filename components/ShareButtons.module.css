@@ -1,0 +1,8 @@
+.share { min-height: 38px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.share button { min-height: 36px; padding: 7px 13px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 12px; }
+.share button:hover { border-color: var(--taupe); }
+.share span { color: #3e6c45; font-size: 12px; opacity: 0; transition: opacity .2s ease; }
+.share .visible { opacity: 1; }
+.native { display: none; }
+@media (max-width: 640px) { .native { display: inline-block; } }
+@media (prefers-reduced-motion: reduce) { .share span { transition-duration: .01ms; } }

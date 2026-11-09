@@ -1,0 +1,22 @@
+[
+  {
+    "id": "q-xerf-001",
+    "columnSlug": "xerf-vs-thermage",
+    "question": "세르프가 좋은가요, 써마지가 좋은가요?",
+    "createdAt": "2026-11-10T09:00:00.000Z",
+    "status": "published",
+    "consentPrivacy": true,
+    "consentPublic": true,
+    "answer": "두 장비는 모두 고주파를 사용하지만 세르프는 DEEP 모드로 조금 더 깊은 층까지 에너지를 전달합니다. 피부 탄력과 지방량을 확인한 뒤 맞는 장비를 판단합니다.",
+    "answeredBy": "대표원장 이호",
+    "answeredAt": "2026-11-10",
+    "approvedByDoctor": true,
+    "sourceColumns": [
+      "xerf-vs-thermage"
+    ],
+    "tags": [
+      "세르프",
+      "써마지"
+    ]
+  }
+]

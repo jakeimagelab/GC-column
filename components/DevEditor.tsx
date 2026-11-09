@@ -94,6 +94,8 @@ const SITE_INFO_GROUPS: Array<{ title: string; fields: SiteInfoField[] }> = [
   {
     title: "외부 프로필 주소",
     fields: [
+      { id: "common.quick.kakaoUrl", label: "카카오톡 상담 링크", kind: "url" },
+      { id: "common.quick.reserveUrl", label: "예약 링크", kind: "url" },
       { id: "clinic.sameAs.naverPlace", label: "네이버 플레이스", kind: "url" },
       { id: "clinic.sameAs.kakaoMap", label: "카카오맵", kind: "url" },
       { id: "clinic.sameAs.googleMap", label: "구글 지도", kind: "url" },
@@ -101,6 +103,14 @@ const SITE_INFO_GROUPS: Array<{ title: string; fields: SiteInfoField[] }> = [
       { id: "clinic.sameAs.youtube", label: "유튜브", kind: "url" },
       { id: "clinic.sameAs.instagram", label: "인스타그램", kind: "url" },
       { id: "clinic.sameAs.modoodoc", label: "모두닥", kind: "url" },
+    ],
+  },
+  {
+    title: "질문 접수",
+    fields: [
+      { id: "qna.consentText", label: "필수 수집·이용 동의 문구", multiline: true },
+      { id: "qna.publicConsentText", label: "답변 공개 선택 동의 문구", multiline: true },
+      { id: "qna.notice", label: "개인정보·진료 안내", multiline: true },
     ],
   },
   {

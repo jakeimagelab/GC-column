@@ -35,6 +35,10 @@
     "type": "text",
     "value": "관련 칼럼 보기 →"
   },
+  "common.treatment.preparing": {
+    "type": "text",
+    "value": "시술 안내 준비 중"
+  },
   "common.clinic.address": {
     "type": "text",
     "value": "서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동)"
@@ -323,11 +327,11 @@
   },
   "home.equipment.guide": {
     "type": "text",
-    "value": "장비를 누르면 관련 시술 안내 · 원장 칼럼으로"
+    "value": "장비별 시술 안내를 확인하세요"
   },
   "home.equipment.related": {
     "type": "text",
-    "value": "관련 칼럼 →"
+    "value": "시술 안내 →"
   },
   "home.equipment.items": [
     {
@@ -1132,5 +1136,375 @@
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
+  },
+  "common.quick.phone": {
+    "type": "text",
+    "value": "전화"
+  },
+  "common.quick.reserve": {
+    "type": "text",
+    "value": "예약"
+  },
+  "common.quick.kakaoUrl": {
+    "type": "text",
+    "value": ""
+  },
+  "common.quick.reserveUrl": {
+    "type": "text",
+    "value": ""
+  },
+  "common.status.open": {
+    "type": "text",
+    "value": "지금 진료 중"
+  },
+  "common.status.lunch": {
+    "type": "text",
+    "value": "점심시간"
+  },
+  "common.status.closed": {
+    "type": "text",
+    "value": "진료 종료"
+  },
+  "common.status.holiday": {
+    "type": "text",
+    "value": "오늘 휴진"
+  },
+  "common.backToTop": {
+    "type": "text",
+    "value": "맨 위로"
+  },
+  "home.header.intro.doctor.label": {
+    "type": "text",
+    "value": "원장 소개"
+  },
+  "home.header.intro.doctor.description": {
+    "type": "text",
+    "value": "대표원장의 진료 경험과 경력"
+  },
+  "home.header.intro.doctor.href": {
+    "type": "text",
+    "value": "#doctor"
+  },
+  "home.header.intro.vision.label": {
+    "type": "text",
+    "value": "진료 원칙"
+  },
+  "home.header.intro.vision.description": {
+    "type": "text",
+    "value": "가족에게 권할 수 있는 시술"
+  },
+  "home.header.intro.vision.href": {
+    "type": "text",
+    "value": "#vision"
+  },
+  "home.header.intro.equipment.label": {
+    "type": "text",
+    "value": "보유 장비"
+  },
+  "home.header.intro.equipment.description": {
+    "type": "text",
+    "value": "글로리의원이 보유한 시술 장비"
+  },
+  "home.header.intro.equipment.href": {
+    "type": "text",
+    "value": "#equipment"
+  },
+  "home.header.intro.gallery.label": {
+    "type": "text",
+    "value": "시설 둘러보기"
+  },
+  "home.header.intro.gallery.description": {
+    "type": "text",
+    "value": "쾌적한 시술 환경과 공간"
+  },
+  "home.header.intro.gallery.href": {
+    "type": "text",
+    "value": "#gallery"
+  },
+  "home.header.intro.location.label": {
+    "type": "text",
+    "value": "오시는 길"
+  },
+  "home.header.intro.location.description": {
+    "type": "text",
+    "value": "언주역 글로리의원 위치 안내"
+  },
+  "home.header.intro.location.href": {
+    "type": "text",
+    "value": "#location"
+  },
+  "home.header.intro.doctor.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "원장 소개 썸네일",
+    "alt": "글로리의원 대표원장 소개",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.header.intro.vision.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "진료 원칙 썸네일",
+    "alt": "글로리의원 진료 원칙",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.header.intro.equipment.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "보유 장비 썸네일",
+    "alt": "글로리의원 보유 장비",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.header.intro.gallery.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "시설 썸네일",
+    "alt": "글로리의원 시설",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.header.intro.location.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "오시는 길 썸네일",
+    "alt": "글로리의원 오시는 길",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.ulthera-prime.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "울쎄라 프라임 썸네일",
+    "alt": "울쎄라 프라임",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.thermage-flx.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "써마지 FLX 썸네일",
+    "alt": "써마지 FLX",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.titanium.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "티타늄 썸네일",
+    "alt": "티타늄 리프팅",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.onda.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "온다 썸네일",
+    "alt": "온다 리프팅",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.tuneface.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "튠페이스 썸네일",
+    "alt": "튠페이스",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.shurink.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "슈링크 썸네일",
+    "alt": "슈링크",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.oligio.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "올리지오 썸네일",
+    "alt": "올리지오",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.xerf.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "세르프 썸네일",
+    "alt": "세르프",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.rejuran.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "리쥬란 썸네일",
+    "alt": "리쥬란",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.botox.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "보톡스 썸네일",
+    "alt": "보톡스",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.pigment-1.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "색소·모공 시술 썸네일 1",
+    "alt": "색소·모공 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.pigment-2.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "색소·모공 시술 썸네일 2",
+    "alt": "색소·모공 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.pigment-3.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "색소·모공 시술 썸네일 3",
+    "alt": "색소·모공 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.lituo.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "리투오 썸네일",
+    "alt": "리투오",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.stem-cell.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "줄기세포 썸네일",
+    "alt": "줄기세포 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.filler-1.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "스페셜필러 썸네일 1",
+    "alt": "스페셜필러 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.filler-2.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "스페셜필러 썸네일 2",
+    "alt": "스페셜필러 시술",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.gallery.modalPrevious": {
+    "type": "text",
+    "value": "이전"
+  },
+  "home.gallery.modalNext": {
+    "type": "text",
+    "value": "다음"
+  },
+  "home.gallery.modalClose": {
+    "type": "text",
+    "value": "닫기"
+  },
+  "column.share.kakao": {
+    "type": "text",
+    "value": "카카오톡 공유"
+  },
+  "column.share.copy": {
+    "type": "text",
+    "value": "링크 복사"
+  },
+  "column.share.native": {
+    "type": "text",
+    "value": "공유"
+  },
+  "column.share.copied": {
+    "type": "text",
+    "value": "링크를 복사했습니다"
+  },
+  "column.share.action": {
+    "type": "text",
+    "value": "칼럼 읽기"
+  },
+  "qna.title": {
+    "type": "text",
+    "value": "이 글에 대해 원장님께 질문하기"
+  },
+  "qna.description": {
+    "type": "text",
+    "value": "남겨주신 질문은 대표원장이 확인합니다. 답변은 이 칼럼의 자주 묻는 질문에 공개될 수 있습니다."
+  },
+  "qna.placeholder": {
+    "type": "text",
+    "value": "궁금한 내용을 10자 이상 입력해 주세요"
+  },
+  "qna.notice": {
+    "type": "text",
+    "value": "개인 진단·처방은 진료 상담을 통해서만 가능합니다. 이름·연락처 등 개인정보는 적지 마세요. 급한 증상은 병원으로 전화해 주세요."
+  },
+  "qna.consentText": {
+    "type": "text",
+    "value": "[개인정보 수집 동의 문구 확인 필요]"
+  },
+  "qna.publicConsentText": {
+    "type": "text",
+    "value": "답변을 칼럼에 공개하는 데 동의"
+  },
+  "qna.submit": {
+    "type": "text",
+    "value": "질문 보내기"
+  },
+  "qna.sending": {
+    "type": "text",
+    "value": "전송 중"
+  },
+  "qna.success": {
+    "type": "text",
+    "value": "질문이 원장님께 전달되었습니다."
+  },
+  "qna.preparing": {
+    "type": "text",
+    "value": "질문 접수 기능은 준비 중입니다."
+  },
+  "qna.readerTitle": {
+    "type": "text",
+    "value": "독자 질문"
   }
 }

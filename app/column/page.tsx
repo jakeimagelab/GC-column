@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
+import { ClinicOpenStatus } from "@/components/ClinicOpenStatus";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
 import { DevEditorMount } from "@/components/DevEditorMount";
@@ -17,6 +18,7 @@ import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/con
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
 import { getClinicAddress, getDisplayedHours } from "@/lib/site-info";
+import { TREATMENT_PAGES_READY } from "@/lib/config";
 import styles from "./page.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,7 +50,7 @@ export default async function ColumnMainPage() {
   const locationLat = getText(content, "home.location.lat");
   const locationLng = getText(content, "home.location.lng");
   const collectionColumns = getVisibleColumns();
-  const faqIndex = collectionColumns.flatMap((column) => column.faqs.map((faq) => ({ q: faq.q, keywords: column.keywords })));
+  const faqIndex = collectionColumns.flatMap((column) => column.faqs.map((faq, index) => ({ q: faq.q, keywords: column.keywords, slug: column.slug, id: `faq-${index + 1}` })));
   const pageGraph = graph(content, collectionNodes("/column", getText(content, "seo.column.title"), getText(content, "seo.column.description"), collectionColumns));
 
   return (
@@ -122,10 +124,10 @@ export default async function ColumnMainPage() {
         <h2 {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
         <div className={styles.treatmentGrid}>
           {treatmentCards.map((treatment) => (
-            <div key={treatment.slug}>
-              <b>{treatment.displayName}</b>
-              <span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span>
-              <small {...textEditProps("column.treatments.links")}>{getText(content, "column.treatments.links")}</small>
+            TREATMENT_PAGES_READY ? <Link href={treatment.detailPath} key={treatment.slug}>
+              <b>{treatment.displayName}</b><span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span><small {...textEditProps("column.treatments.links")}>{getText(content, "column.treatments.links")}</small>
+            </Link> : <div key={treatment.slug} role="link" aria-disabled="true">
+              <b>{treatment.displayName}</b><span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span><small>시술 안내 준비 중</small>
             </div>
           ))}
         </div>
@@ -144,7 +146,7 @@ export default async function ColumnMainPage() {
         <div>
           <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
           <p>{getClinicAddress(content)}</p>
-          <p>{getDisplayedHours(content)}</p>
+          <p>{getDisplayedHours(content)} <ClinicOpenStatus content={content} /></p>
           <a className={styles.phone} href="tel:0269587525" {...textEditProps("common.clinic.phone")}>{getText(content, "common.clinic.phone")}</a>
           <div className={styles.infoButtons}><ButtonLink href="#" variant="taupe"><span {...textEditProps("column.location.reserve")}>{getText(content, "column.location.reserve")}</span></ButtonLink><ButtonLink href="#" variant="outline"><span {...textEditProps("column.location.kakao")}>{getText(content, "column.location.kakao")}</span></ButtonLink></div>
         </div>

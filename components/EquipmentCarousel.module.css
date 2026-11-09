@@ -13,12 +13,14 @@
 .track { display: flex; gap: var(--equipment-gap); transform: translate3d(var(--equipment-x), 0, 0); }
 .moving { transition: transform 0.6s ease; }
 .card { position: relative; min-width: calc((100% - (var(--equipment-gap) * 4)) / 5); }
-.card > a { color: #fff; display: flex; flex-direction: column; gap: 12px; }
+.card > a, .disabledCard { color: #fff; display: flex; flex-direction: column; gap: 12px; }
+.disabledCard { cursor: default; }
 .imageWrap { height: 330px; display: flex; align-items: flex-end; justify-content: center; }
 .equipmentSlot { width: min(150px, 100%) !important; height: 310px; border: 1px dashed #b9b1a7; border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, 0.55); color: var(--brown); font-size: 12px; }
-.card > a > b { margin-top: 12px; font-size: 20px; }
-.card > a > span { min-height: 48px; color: #fbf8f4; font-size: 14px; line-height: 1.7; white-space: pre-line; }
-.card > a > small { align-self: flex-start; border-bottom: 1px solid #f3eee8; color: #f3eee8; font-size: 12px; }
+.card > a > b, .disabledCard > b { margin-top: 12px; font-size: 20px; }
+.card > a > span, .disabledCard > span { min-height: 48px; color: #fbf8f4; font-size: 14px; line-height: 1.7; white-space: pre-line; }
+.card > a > small, .disabledCard > small { align-self: flex-start; color: #e8e0d7; font-size: 12px; }
+.card > a > small { border-bottom: 1px solid #f3eee8; }
 .editControls { position: absolute; z-index: 8; top: 290px; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
 .editControls button { min-height: 26px; padding: 3px 7px; border: 1px solid #d8d0c8; border-radius: 3px; background: rgba(255, 255, 255, 0.96); color: var(--ink); font-size: 10px; cursor: pointer; }
 .page { position: absolute; right: var(--home-gutter); bottom: 32px; color: #fff; font-family: var(--font-en); font-size: 13px; }

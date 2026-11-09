@@ -91,7 +91,7 @@ function parseCliResult(output) {
 
 function captureWithCodexCli() {
   const wrapper = join(homedir(), ".codex/skills/playwright/scripts/playwright_cli.sh");
-  const cli = (...args) => execFileSync("bash", [wrapper, "--session", "glory-widths", ...args], {
+  const cli = (...args) => execFileSync("bash", [wrapper, ...args], {
     cwd: process.cwd(),
     encoding: "utf8",
     env: process.env,
@@ -126,13 +126,7 @@ function captureWithCodexCli() {
     }`;
     cli("run-code", batchCode);
     results.push(...parseCliResult(cli("eval", "window.__gloryShotResults")));
-  } finally {
-    try {
-      cli("close");
-    } catch {
-      // The capture results remain valid if the isolated CLI session already closed.
-    }
-  }
+  } finally {}
 
   return results;
 }

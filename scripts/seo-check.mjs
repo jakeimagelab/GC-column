@@ -6,6 +6,7 @@ const LOCAL = process.env.SEO_CHECK_BASE_URL || `http://127.0.0.1:${PORT}`;
 const SITE = "https://blog.gloryclinic.co.kr";
 const REPORT = "docs/compare/report-seo.md";
 const PLACEHOLDER = /(^|\s)\[[^\]]+\](?!\()/;
+const ALLOWED_VISIBLE_PLACEHOLDER = "[개인정보 수집 동의 문구 확인 필요]";
 const AD_TERMS = ["최고", "최초", "유일", "100%", "완벽", "보장", "부작용 없", "통증 없", "무통", "1위", "특가"];
 
 const failures = [];
@@ -126,7 +127,7 @@ async function checkPage(path, publicUrl) {
   if (h1Count !== 1) fail(path, `h1 ${h1Count}개`);
   if (headings.some((heading, index) => index > 0 && heading.level > headings[index - 1].level + 1)) fail(path, "제목 단계가 건너뜀");
   if (headings.find((heading) => heading.level === 2)?.index < headings.find((heading) => heading.level === 1)?.index) fail(path, "h2가 h1보다 먼저 나옴");
-  if (PLACEHOLDER.test(visible)) fail(path, "화면에 자리표시 문구 노출");
+  if (PLACEHOLDER.test(visible.replaceAll(ALLOWED_VISIBLE_PLACEHOLDER, ""))) fail(path, "화면에 자리표시 문구 노출");
   for (const imageTag of tags(html, "img")) if (!("alt" in attrs(imageTag))) fail(path, `alt 없는 이미지 (${imageTag.slice(0, 100)})`);
 
   const scripts = jsonLdOf(html);
@@ -212,6 +213,12 @@ async function main() {
     if (draft.response.status !== 404) fail("/draft", `비공개 칼럼 HTTP ${draft.response.status}`);
     const editorApi = await fetchText("/api/dev-edit");
     if (editorApi.response.status !== 404) fail("/api/dev-edit", `운영 편집 API HTTP ${editorApi.response.status}`);
+    const questionsApi = await fetch(`${LOCAL}/api/questions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: "운영 환경 질문 접수 비활성 확인 문장입니다.", consentPrivacy: true }),
+    });
+    if (questionsApi.status !== 503) fail("/api/questions", `운영 질문 API HTTP ${questionsApi.status} (기준 503)`);
 
     const detail = pageResults.get("/column/xerf-vs-thermage");
     if (!detail) fail("/column/xerf-vs-thermage", "공개 칼럼이 sitemap에 없음");

@@ -1,0 +1,2 @@
+.track { position: fixed; z-index: 1300; top: 0; left: 0; right: 0; height: 2px; background: transparent; pointer-events: none; }
+.track span { width: 100%; height: 100%; background: var(--taupe); display: block; transform-origin: left center; will-change: transform; }

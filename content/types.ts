@@ -10,6 +10,7 @@ export type Treatment = {
   categorySlug: Category["slug"];
   desc: string;
   equipmentType?: string;
+  detailPath: `/treatment/${string}`;
 };
 
 export type Doctor = {

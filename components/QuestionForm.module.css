@@ -1,0 +1,22 @@
+.section { padding: 28px 32px; border: 1px solid var(--line); background: #fff; display: flex; flex-direction: column; gap: 20px; }
+.heading h2 { margin: 0; font-size: 23px; }
+.heading p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.section form { position: relative; display: flex; flex-direction: column; gap: 12px; }
+.section textarea { width: 100%; min-height: 150px; padding: 16px 18px 34px; border: 1px solid var(--line); resize: vertical; color: var(--ink); line-height: 1.65; }
+.count { position: absolute; top: 118px; right: 14px; color: var(--muted-2); font-size: 12px; }
+.notice { margin: 0; padding: 11px 13px; background: var(--paper); color: var(--muted); font-size: 12px; line-height: 1.65; }
+.check { display: flex; align-items: flex-start; gap: 9px; color: #444; font-size: 13px; }
+.check input { margin-top: 4px; accent-color: var(--taupe); }
+.check b { color: var(--brown); }
+.actions { display: flex; align-items: center; gap: 14px; }
+.actions button { min-height: 46px; padding: 10px 22px; border: 0; background: var(--taupe); color: #fff; }
+.actions button:disabled { opacity: .45; }
+.actions span { font-size: 13px; }
+.success { color: #3e6c45; }
+.error { color: #a43e32; }
+.honeypot { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+.compact { padding: 22px; background: var(--paper); }
+.compact .heading h2 { font-size: 19px; }
+.compact textarea { min-height: 120px; }
+.compact .count { top: 88px; }
+@media (max-width: 640px) { .section { padding: 22px 20px; } .actions { align-items: flex-start; flex-direction: column; } .actions button { width: 100%; } }

@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import {
-  attributeEditProps,
   getText,
   type EquipmentContentItem,
   type SiteContent,
 } from "@/content/site-content-types";
+import { getTreatment } from "@/content/treatments";
+import { TREATMENT_PAGES_READY } from "@/lib/config";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./EquipmentCarousel.module.css";
@@ -88,6 +89,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   return (
     <section
+      id="equipment"
       className={styles.section}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -118,14 +120,16 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
           {renderedItems.map((item, renderedIndex) => {
             const editPrefix = `home.equipment.items.${item.id}`;
             const editableCopy = !canRotate || (renderedIndex >= items.length && renderedIndex < items.length * 2);
+            const detailPath = getTreatment(item.id)?.detailPath;
+            const cardContent = <>
+              <div className={styles.imageWrap}><ImageSlot className={styles.equipmentSlot} label="" alt="" editId={`${editPrefix}.image`} image={item.image} /></div>
+              <b><EditableRichText id={`${editPrefix}.name`} value={item.name} /></b>
+              <span><EditableRichText id={`${editPrefix}.desc`} value={item.desc} /></span>
+              <small {...(TREATMENT_PAGES_READY ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : { "data-edit-id": "common.treatment.preparing", "data-edit-type": "text" })}>{TREATMENT_PAGES_READY ? getText(content, "home.equipment.related") : getText(content, "common.treatment.preparing")}</small>
+            </>;
             return (
               <article className={styles.card} data-carousel-card key={`${renderedIndex}-${item.id}`}>
-                <Link href={item.link || "#"} {...attributeEditProps(`${editPrefix}.link`, "href")}>
-                  <div className={styles.imageWrap}><ImageSlot className={styles.equipmentSlot} label="" alt="" editId={`${editPrefix}.image`} image={item.image} /></div>
-                  <b><EditableRichText id={`${editPrefix}.name`} value={item.name} /></b>
-                  <span><EditableRichText id={`${editPrefix}.desc`} value={item.desc} /></span>
-                  <small data-edit-id="home.equipment.related" data-edit-type="text">{getText(content, "home.equipment.related")}</small>
-                </Link>
+                {TREATMENT_PAGES_READY && detailPath ? <Link href={detailPath}>{cardContent}</Link> : <div className={styles.disabledCard} role="link" aria-disabled="true">{cardContent}</div>}
                 {editMode && editableCopy ? (
                   <div className={styles.editControls} data-dev-editor>
                     <button type="button" data-edit-control onClick={() => editEquipment("add", item.id)}>+ 장비 추가</button>

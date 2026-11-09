@@ -143,4 +143,7 @@ svg {
   body {
     font-size: 14px;
   }
+  .pageFrame {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
 }

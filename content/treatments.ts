@@ -7,7 +7,7 @@ export const categories: Category[] = [
   { slug: "filler", name: "스페셜필러", nameEn: "SPECIAL FILLER" },
 ];
 
-export const treatments: Treatment[] = [
+const treatmentData: Omit<Treatment, "detailPath">[] = [
   {
     slug: "ulthera-prime",
     name: "울쎄라 프라임",
@@ -75,6 +75,11 @@ export const treatments: Treatment[] = [
   { slug: "filler-2", name: "[필러명]", categorySlug: "filler", desc: "[부위·특징 한 줄]" },
 ];
 
+export const treatments: Treatment[] = treatmentData.map((treatment) => ({
+  ...treatment,
+  detailPath: `/treatment/${treatment.slug}`,
+}));
+
 export const homeEquipmentOrder = [
   "onda",
   "thermage-flx",
@@ -98,7 +103,7 @@ export const mainTreatmentOrder = [
 ];
 
 export const megaMenuTreatmentOrder: Record<Category["slug"], string[]> = {
-  lifting: ["ulthera-prime", "thermage-flx", "titanium", "onda", "tuneface", "shurink", "oligio"],
+  lifting: ["ulthera-prime", "thermage-flx", "titanium", "onda", "tuneface", "xerf", "shurink", "oligio"],
   pigment: ["pigment-1", "pigment-2", "pigment-3"],
   injection: ["rejuran", "lituo", "botox", "stem-cell"],
   filler: ["filler-1", "filler-2"],

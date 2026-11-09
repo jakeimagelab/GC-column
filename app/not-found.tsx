@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ColumnFooter } from "@/components/ColumnFooter";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { JsonLd } from "@/components/JsonLd";
+import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { getPublishedColumns } from "@/content/columns";
 import { SITE_URL } from "@/content/site";
 import { readSiteContent } from "@/lib/contentStore";
@@ -26,6 +27,7 @@ export default async function NotFound() {
         <Link href="/">홈으로 돌아가기 →</Link>
       </section>
       <ColumnFooter content={content} />
+      <FloatingQuickMenu content={content} compact />
     </main>
   );
 }

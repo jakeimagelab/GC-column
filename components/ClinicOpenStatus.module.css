@@ -1,0 +1,6 @@
+.status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #8c837a; }
+.open { color: #3e6c45; }
+.open::before { background: #4e8b58; }
+.lunch { color: #8a6a36; }
+.lunch::before { background: #b28a4b; }

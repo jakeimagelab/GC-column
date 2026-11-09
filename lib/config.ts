@@ -1,0 +1,1 @@
+export const TREATMENT_PAGES_READY = process.env.NEXT_PUBLIC_TREATMENT_PAGES_READY === "true";

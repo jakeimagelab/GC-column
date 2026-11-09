@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Column } from "@/content/types";
+import type { ReaderQuestion } from "@/content/question-types";
 import type { SiteContent } from "@/content/site-content-types";
 import { getText } from "@/content/site-content-types";
 import { getTreatment } from "@/content/treatments";
@@ -189,7 +190,7 @@ export function graph(content: SiteContent, nodes: unknown[]) {
   return compact({ "@context": "https://schema.org", "@graph": [...commonGraph(content), ...nodes.map(compact).filter(Boolean)] });
 }
 
-export function articleGraph(content: SiteContent, column: Column, categoryName: string) {
+export function articleGraph(content: SiteContent, column: Column, categoryName: string, readerQuestions: ReaderQuestion[] = []) {
   const url = `${SITE_URL}/column/${column.slug}`;
   const categoryUrl = `${SITE_URL}/column/category/${column.categorySlug}`;
   const procedures = column.treatmentSlugs.flatMap((slug) => {
@@ -201,12 +202,20 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
   const faq = {
     "@type": "FAQPage",
     "@id": faqId,
-    mainEntity: column.faqs.map((item, index) => ({
+    mainEntity: [
+      ...column.faqs.map((item, index) => ({
       "@type": "Question",
       "@id": `${url}#faq-${index + 1}`,
       name: item.q,
       acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
+      })),
+      ...readerQuestions.flatMap((item) => item.answer ? [{
+        "@type": "Question",
+        "@id": `${url}#reader-${item.id}`,
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: item.answer },
+      }] : []),
+    ],
   };
   const video = column.video && publicText(column.video.transcript) && publicText(column.video.name) ? {
     "@type": "VideoObject",

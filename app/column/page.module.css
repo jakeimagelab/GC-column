@@ -50,7 +50,8 @@
 
 .treatmentsSection { padding: 72px var(--column-gutter); }
 .treatmentGrid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.treatmentGrid > div { padding: 22px; border: 1px solid #e3dcd3; display: flex; flex-direction: column; gap: 6px; }
+.treatmentGrid > div, .treatmentGrid > a { padding: 22px; border: 1px solid #e3dcd3; display: flex; flex-direction: column; gap: 6px; }
+.treatmentGrid > div[aria-disabled="true"] { cursor: default; }
 .treatmentGrid b { font-size: 17px; }
 .treatmentGrid span { color: var(--muted); font-size: 13px; }
 .treatmentGrid small { color: var(--brown); font-size: 13px; }

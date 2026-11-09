@@ -2,11 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleToc, type TocItem } from "@/components/ArticleToc";
+import { ArticleProgress } from "@/components/ArticleProgress";
 import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
+import { DevEditorMount } from "@/components/DevEditorMount";
 import { FaqList } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
+import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
+import { QuestionForm } from "@/components/QuestionForm";
+import { ShareButtons } from "@/components/ShareButtons";
 import {
   columns,
   getColumn,
@@ -20,6 +25,7 @@ import { detailContent, SITE_URL } from "@/content/site";
 import { getCategory, getTreatment } from "@/content/treatments";
 import type { Column } from "@/content/types";
 import { readSiteContent } from "@/lib/contentStore";
+import { readPublishedQuestions } from "@/lib/questionStore";
 import { articleGraph, buildMetadata, formatDateKo, graph, sentenceDescription } from "@/lib/seo";
 import styles from "./page.module.css";
 
@@ -72,6 +78,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const column = getVisibleColumn(slug);
   if (!column) notFound();
   const content = await readSiteContent();
+  const readerQuestions = await readPublishedQuestions(column.slug);
   const category = getCategory(column.categorySlug);
   if (!category) notFound();
   const publishable = isPublishable(column);
@@ -88,12 +95,13 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     { id: "precautions", label: "시술 전 확인 · FAQ" },
   ];
   const structured = publishable
-    ? articleGraph(content, column, category.name)
+    ? articleGraph(content, column, category.name, readerQuestions)
     : graph(content, [{ "@type": "WebPage", "@id": `${pageUrl}#draft`, url: pageUrl, name: "비공개 초안", inLanguage: "ko-KR" }]);
   const articleImage = column.photo.src ? { type: "image" as const, src: column.photo.src, label: column.photo.label, alt: column.photo.alt, zoom: 100, focusX: 50, focusY: 50 } : undefined;
 
   return (
     <main className="pageFrame">
+      <ArticleProgress />
       <JsonLd value={structured} />
       <ColumnHeader content={content} />
       {!publishable ? <div className={styles.draftBanner}>비공개 초안</div> : null}
@@ -115,10 +123,11 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           {column.reviewedAt ? <span className={styles.reviewed}>마지막 검토일 <time dateTime={column.reviewedAt}>{formatDateKo(column.reviewedAt)}</time> · <Link href="/doctor/lee-ho">대표원장 이호 검토</Link></span> : null}
         </div>
         {column.questionSource ? <div className={styles.questionSource}>{column.questionSource}</div> : null}
+        <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
       </section>
 
       <div className={styles.bodyLayout}>
-        <article className={styles.article}>
+        <article className={styles.article} data-article-body>
           <section className={styles.summary} id="summary">
             <b>{detailContent.coreTitle}</b>
             <p>{column.summary}</p>
@@ -168,7 +177,10 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <div id="precautions" className={styles.precautionsGroup}>
             <section className={styles.precautions}><h2><span>04</span> {detailContent.precautionsTitle}</h2><ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul></section>
             <section className={styles.faqSection}><h2>{detailContent.faqTitle}</h2><FaqList items={column.faqs.map((faq, index) => ({ ...faq, id: `faq-${index + 1}` }))} /></section>
+            {readerQuestions.length ? <section className={styles.faqSection}><h2>{getText(content, "qna.readerTitle")}</h2><FaqList items={readerQuestions.flatMap((item) => item.answer ? [{ q: item.question, a: item.answer, id: `reader-${item.id}` }] : [])} /></section> : null}
           </div>
+
+          <QuestionForm content={content} columnSlug={column.slug} />
 
           {column.references.length ? <section className={styles.references}><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
 
@@ -195,6 +207,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           ) : null}
 
           {previous || next ? <nav className={styles.articleNav} aria-label="이전 글과 다음 글">{previous ? <Link href={`/column/${previous.slug}`}>← 이전 글 {previous.title}</Link> : <span />}{next ? <Link href={`/column/${next.slug}`}>다음 글 {next.title} →</Link> : <span />}</nav> : null}
+          <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
           <div className={styles.notice}>{detailContent.notice}</div>
         </article>
 
@@ -211,6 +224,8 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       </div>
 
       <footer className={styles.footer}><div><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div><p>{getText(content, "column.footer.links")}</p><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
+      <FloatingQuickMenu content={content} compact />
+      <DevEditorMount page="column" content={content} />
     </main>
   );
 }
