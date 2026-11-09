@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { ImageSlot } from "./ImageSlot";
+import { EditableRichText } from "./EditableRichText";
 import styles from "./FacilityGallery.module.css";
 
 type FacilityGalleryProps = { content: SiteContent };
@@ -21,7 +22,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     <section className={styles.gallery}>
       <div className={styles.leftBand} />
       <ImageSlot className={styles.blurBackground} label="" alt="" editId="home.gallery.background" image={getImage(content, "home.gallery.background")} />
-      <div className={styles.heading}><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><span {...textEditProps("home.gallery.title")}>{getText(content, "home.gallery.title")}</span><br /><b {...textEditProps("home.gallery.titleStrong")}>{getText(content, "home.gallery.titleStrong")}</b></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
+      <div className={styles.heading}><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><EditableRichText id="home.gallery.title" value={getText(content, "home.gallery.title")} /></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
       <ImageSlot className={styles.previous} label="" alt="" align="end" editId={`home.gallery.${roomKeys[previousIndex]}`} image={roomImage(previousIndex)} />
       <ImageSlot className={styles.next} label="" alt="" variant="light" align="end" editId={`home.gallery.${roomKeys[nextIndex]}`} image={roomImage(nextIndex)} />
       <div className={styles.current}><ImageSlot label="" alt="" variant="dark" editId={`home.gallery.${roomKeys[index]}`} image={roomImage(index)} /><b {...textEditProps(`home.gallery.room.${roomKeys[index]}`)}>{roomName(index)}</b></div>

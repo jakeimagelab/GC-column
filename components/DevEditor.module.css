@@ -24,10 +24,11 @@
   border-radius: 3px;
   outline: 3px solid rgba(47, 111, 237, 0.18);
   background: rgba(255, 255, 255, 0.96);
-  resize: none;
+  overflow: auto;
+  white-space: pre-wrap;
 }
 
-.topline, .imageTools, .topline nav, .imageTools label {
+.topline, .slideTools, .imageTools, .topline nav, .imageTools label {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -37,7 +38,7 @@
   margin-right: 8px;
 }
 
-.topline a, .topline button, .imageTools button {
+.topline a, .topline button, .slideTools button, .imageTools button {
   min-height: 34px;
   padding: 7px 11px;
   border: 1px solid #d8d0c8;
@@ -45,7 +46,7 @@
   background: #fff;
 }
 
-.topline a:hover, .topline button:hover, .imageTools button:hover {
+.topline a:hover, .topline button:hover, .slideTools button:hover, .imageTools button:hover {
   border-color: #6e6052;
   color: #2b2b2b;
 }
@@ -53,6 +54,22 @@
 .topline button:disabled {
   opacity: 0.4;
 }
+
+.slideTools {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee8e1;
+}
+
+.slideTools button {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid #d8d0c8;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.slideTools button:disabled { opacity: 0.4; }
 
 .status {
   margin-left: auto;

@@ -4,9 +4,11 @@ import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
 import { DevEditorMount } from "@/components/DevEditorMount";
+import { EditableRichText } from "@/components/EditableRichText";
 import { FaqList } from "@/components/FaqList";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
+import { KakaoMap } from "@/components/KakaoMap";
 import { getColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
 import { getImage, getText, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, columnSearchFaqIndex, columnTreatmentSearchNames } from "@/content/site";
@@ -44,6 +46,8 @@ export default async function ColumnMainPage() {
     titleId: `column.principles.${index}.title`,
     descriptionId: `column.principles.${index}.description`,
   }));
+  const locationLat = getText(content, "home.location.lat");
+  const locationLng = getText(content, "home.location.lng");
 
   return (
     <main className="pageFrame">
@@ -52,7 +56,7 @@ export default async function ColumnMainPage() {
         <div className={styles.heroShade} />
         <ColumnHeader content={content} variant="overlay" page="main" />
         <div className={styles.heroContent}>
-          <h1><strong {...textEditProps("column.hero.title")}>{getText(content, "column.hero.title")}</strong> <span {...textEditProps("column.hero.titleSub")}>{getText(content, "column.hero.titleSub")}</span></h1>
+          <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
           <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
           <ColumnSearch columns={searchColumns} content={content} faqIndex={columnSearchFaqIndex} treatments={columnTreatmentSearchNames} />
         </div>
@@ -132,7 +136,7 @@ export default async function ColumnMainPage() {
       </section>
 
       <section className={styles.infoSection} id="location">
-        <ImageSlot className={styles.map} label="" alt="" variant="light" editId="column.location.map" image={getImage(content, "column.location.map")} />
+        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address="서울 강남구 봉은사로 207" lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} />
         <div>
           <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
           <p {...textEditProps("common.clinic.address")}>{getText(content, "common.clinic.address")}</p>

@@ -56,6 +56,7 @@ async function captureWithApi() {
     deviceScaleFactor: 1,
     locale: "ko-KR",
     colorScheme: "light",
+    reducedMotion: "reduce",
   });
   const page = await context.newPage();
   const results = [];
@@ -105,6 +106,7 @@ function captureWithCodexCli() {
       const widths = ${JSON.stringify(widths)};
       const targets = ${JSON.stringify(pages)};
       const results = [];
+      await page.emulateMedia({ reducedMotion: 'reduce' });
       for (const width of widths) {
         await page.setViewportSize({ width, height: 900 });
         for (const target of targets) {

@@ -1,10 +1,12 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import type { ImageContentEntry, SiteContentEntry } from "@/content/site-content-types";
+import { getEditableEntry, type ImageContentEntry, type SiteContentCollection, type SiteContentEntry } from "@/content/site-content-types";
 import {
   normalizeImageEntry,
+  normalizeTextValue,
   readSiteContent,
   saveUploadedImage,
+  updateSiteContentCollection,
   updateSiteContentEntry,
 } from "@/lib/contentStore";
 
@@ -29,9 +31,17 @@ export async function GET() {
 export async function PATCH(request: Request) {
   if (process.env.NODE_ENV !== "development") return unavailable();
   try {
-    const body = await request.json() as { id?: string; entry?: SiteContentEntry };
-    if (!body.id || !body.entry) throw new Error("저장할 항목이 없습니다.");
-    const entry = body.entry.type === "text" ? body.entry : normalizeImageEntry(body.entry);
+    const body = await request.json() as { id?: string; entry?: SiteContentEntry; collection?: SiteContentCollection };
+    if (!body.id) throw new Error("저장할 항목이 없습니다.");
+    if (body.collection) {
+      const collection = await updateSiteContentCollection(body.id, body.collection);
+      refreshPages();
+      return NextResponse.json({ id: body.id, collection });
+    }
+    if (!body.entry) throw new Error("저장할 항목이 없습니다.");
+    const entry = body.entry.type === "text"
+      ? { ...body.entry, value: normalizeTextValue(body.entry.value) }
+      : normalizeImageEntry(body.entry);
     const saved = await updateSiteContentEntry(body.id, entry);
     refreshPages();
     return NextResponse.json({ id: body.id, entry: saved });
@@ -49,7 +59,7 @@ export async function POST(request: Request) {
     if (typeof id !== "string" || !(file instanceof File)) throw new Error("이미지 파일을 선택해 주세요.");
     if (file.size > 15 * 1024 * 1024) throw new Error("이미지는 15MB 이하여야 합니다.");
     const content = await readSiteContent();
-    const current = content[id];
+    const current = getEditableEntry(content, id);
     if (!current || (current.type !== "image" && current.type !== "bgImage")) throw new Error("편집할 수 없는 이미지입니다.");
     const src = await saveUploadedImage(id, new Uint8Array(await file.arrayBuffer()), file.type);
     const entry: ImageContentEntry = { ...current, src };

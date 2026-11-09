@@ -13,6 +13,8 @@
 .popular { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 .popular > span { color: var(--muted); }
 .popular button { padding: 6px 14px; border: 0; border-radius: 999px; background: var(--paper); font-size: 13px; }
+.resultRegion { opacity: 0; transition: opacity 0.2s ease; }
+.resultRegionVisible { opacity: 1; }
 .results { padding-top: 8px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; }
 .topResult { padding: 26px 28px; background: var(--paper); display: flex; flex-direction: column; gap: 10px; }
 .topResult small { color: var(--brown); font-size: 12px; font-weight: 500; }

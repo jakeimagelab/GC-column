@@ -3,8 +3,8 @@
 .heroShade { position: absolute; inset: 0; background: rgba(30, 26, 22, 0.5); }
 .heroContent { position: relative; width: min(840px, calc(100% - var(--column-inner-gutter) - var(--column-inner-gutter))); margin: 0 auto; padding-top: 64px; display: flex; flex-direction: column; gap: 18px; }
 .heroContent h1 { margin: 0; font-family: var(--font-en); font-size: 40px; line-height: 1.1; }
-.heroContent h1 strong { font-weight: 700; }
-.heroContent h1 span { color: #cfc8bf; font-weight: 300; }
+.heroContent h1 > span { color: #cfc8bf; font-weight: 300; }
+.heroContent h1 strong { color: #fff; font-weight: 700; }
 .heroContent > p { margin: 0; color: #ede7e0; font-size: 17px; font-weight: 300; }
 
 .doctorSection { position: relative; height: 600px; padding: 80px var(--column-gutter); }
@@ -93,7 +93,7 @@
   .hero { height: 620px; }
   .heroContent { margin: 0 20px; padding-top: 68px; }
   .heroContent h1 { font-size: 30px; }
-  .heroContent h1 span { display: block; margin-top: 5px; }
+  .heroContent h1 > span { display: block; margin-top: 5px; }
   .doctorSection, .categorySection, .latestSection, .faqBand, .treatmentsSection, .principlesSection, .infoSection, .footer { padding-inline: 24px; }
   .doctorInner, .principlesSection, .infoSection { display: grid; grid-template-columns: 1fr; }
   .doctorPhoto { width: 100% !important; height: 340px; }

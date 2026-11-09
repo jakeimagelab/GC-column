@@ -38,6 +38,17 @@ body {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-break: strict;
+}
+
+h1, h2, h3, h4, h5, h6, [class*="card"] b, [class*="Card"] b {
+  text-wrap: balance;
+}
+
+p, li, dd, figcaption {
+  text-wrap: pretty;
 }
 
 button,

@@ -5,6 +5,8 @@
 .inputRow button { border: 0; cursor: pointer; }
 .clear { padding: 10px 12px; background: none; color: var(--muted-2); font-size: 14px; }
 .submit { padding: 14px 22px; background: var(--ink); color: #fff; font-size: 15px; }
+.resultRegion { opacity: 0; transition: opacity 0.2s ease; }
+.resultRegionVisible { opacity: 1; }
 .results, .empty { position: absolute; top: 76px; left: 0; width: 100%; z-index: 30; background: #fff; color: var(--ink); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25); }
 .results { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
 .related { padding: 24px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; font-size: 14px; }

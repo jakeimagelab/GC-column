@@ -6,3 +6,5 @@ out/
 *.tsbuildinfo
 .playwright-cli/
 .git-local/
+.env.local
+.env*.local
