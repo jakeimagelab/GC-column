@@ -36,6 +36,8 @@
 .latestGrid { margin-top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 28px; }
 .columnCard, .columnCardLink { display: flex; flex-direction: column; gap: 12px; }
 .cardPhoto { width: 100% !important; height: 230px; }
+.cardPhoto img { transition: transform 1.2s cubic-bezier(.22,.61,.36,1); }
+.columnCardLink:hover .cardPhoto img, .columnCardLink:focus-visible .cardPhoto img { transform: scale(1.05); }
 .columnCardLink > span { color: var(--brown); font-size: 13px; font-weight: 500; }
 .columnCardLink > b { font-size: 19px; line-height: 1.45; }
 .columnCard p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -75,6 +77,8 @@
 .footer b { color: #fff; font-size: 18px; letter-spacing: 3px; }
 .footer p { margin: 0; }
 .footer > div:last-child { text-align: right; }
+
+@media (prefers-reduced-motion: reduce) { .cardPhoto img { transition: none; } }
 
 @media (max-width: 1180px) {
   .heroContent { width: min(840px, calc(100% - var(--column-inner-gutter) - var(--column-inner-gutter))); }

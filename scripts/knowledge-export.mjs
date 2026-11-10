@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getPublishedColumns } from "../content/columns.ts";
+import { stripMotionMarkup } from "../lib/motion.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(scriptDir, "..");
@@ -10,12 +11,15 @@ const publishedQuestions = questions.filter((item) => item.status === "published
 const columns = getPublishedColumns().map((column) => ({
   id: `column:${column.slug}`,
   type: "column",
-  title: column.title,
-  summary: column.summary,
-  sections: column.sections,
-  judgement: column.judgement,
-  faqs: column.faqs,
-  videoTranscript: column.video?.transcript ?? null,
+  title: stripMotionMarkup(column.title),
+  summary: stripMotionMarkup(column.summary),
+  sections: column.sections.map((section) => ({ ...section, heading: stripMotionMarkup(section.heading), body: section.body.map(stripMotionMarkup) })),
+  judgement: {
+    recommend: column.judgement.recommend.map(stripMotionMarkup),
+    notRecommend: column.judgement.notRecommend.map(stripMotionMarkup),
+  },
+  faqs: column.faqs.map((faq) => ({ q: stripMotionMarkup(faq.q), a: stripMotionMarkup(faq.a) })),
+  videoTranscript: column.video?.transcript ? stripMotionMarkup(column.video.transcript) : null,
   reviewedAt: column.reviewedAt ?? null,
   sourceUrl: `https://blog.gloryclinic.co.kr/column/${column.slug}`,
   approvedByDoctor: true,

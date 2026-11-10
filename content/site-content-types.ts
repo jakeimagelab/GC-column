@@ -32,12 +32,14 @@ export type EquipmentContentItem = {
 };
 
 export type SiteContentEntry = TextContentEntry | ImageContentEntry;
-export type SiteContentCollection = HeroSlide[] | EquipmentContentItem[];
+export type TypingExamplesContent = string[];
+export type SiteContentCollection = HeroSlide[] | EquipmentContentItem[] | TypingExamplesContent;
 export type SiteContentValue = SiteContentEntry | SiteContentCollection;
 export type SiteContent = Record<string, SiteContentValue>;
 
 export const HERO_SLIDES_ID = "home.hero.slides";
 export const EQUIPMENT_ITEMS_ID = "home.equipment.items";
+export const TYPING_EXAMPLES_ID = "home.question.typingExamples";
 
 export function isSiteContentEntry(value: SiteContentValue | undefined): value is SiteContentEntry {
   return Boolean(value && !Array.isArray(value) && (value.type === "text" || value.type === "image" || value.type === "bgImage"));
@@ -69,6 +71,14 @@ export function getEquipmentItems(content: SiteContent): EquipmentContentItem[] 
   const items = content[EQUIPMENT_ITEMS_ID];
   if (!Array.isArray(items)) throw new Error("Missing home equipment items");
   return items as EquipmentContentItem[];
+}
+
+export function getTypingExamples(content: SiteContent): TypingExamplesContent {
+  const examples = content[TYPING_EXAMPLES_ID];
+  if (!Array.isArray(examples) || !examples.every((item) => typeof item === "string")) {
+    throw new Error("Missing home question typing examples");
+  }
+  return examples;
 }
 
 export function getEditableEntry(content: SiteContent, id: string): SiteContentEntry | undefined {

@@ -9,7 +9,9 @@ import {
   getEquipmentItems,
   getHeroSlides,
   getText,
+  getTypingExamples,
   HERO_SLIDES_ID,
+  TYPING_EXAMPLES_ID,
   withEditableEntry,
   type EquipmentContentItem,
   type HeroSlide,
@@ -43,10 +45,16 @@ type SiteInfoField = {
   id: string;
   label: string;
   multiline?: boolean;
-  kind?: "boolean" | "number" | "url";
+  kind?: "boolean" | "number" | "url" | "stringList";
 };
 
 const SITE_INFO_GROUPS: Array<{ title: string; fields: SiteInfoField[] }> = [
+  {
+    title: "홈 질문창",
+    fields: [
+      { id: TYPING_EXAMPLES_ID, label: "타이핑 예시 (한 줄에 하나)", multiline: true, kind: "stringList" },
+    ],
+  },
   {
     title: "병원",
     fields: [
@@ -217,7 +225,9 @@ export function DevEditor({ page, content }: DevEditorProps) {
     if (!siteInfoOpen) return;
     const next: Record<string, string> = {};
     for (const group of SITE_INFO_GROUPS) {
-      for (const field of group.fields) next[field.id] = getText(entries, field.id);
+      for (const field of group.fields) {
+        next[field.id] = field.kind === "stringList" ? getTypingExamples(entries).join("\n") : getText(entries, field.id);
+      }
     }
     setSiteDrafts(next);
   }, [entries, siteInfoOpen]);
@@ -276,7 +286,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
   }, [entries]);
 
   const saveCollection = useCallback(async (
-    id: typeof HERO_SLIDES_ID | typeof EQUIPMENT_ITEMS_ID,
+    id: typeof HERO_SLIDES_ID | typeof EQUIPMENT_ITEMS_ID | typeof TYPING_EXAMPLES_ID,
     next: SiteContentCollection,
     options: { record?: boolean; before?: SiteContentCollection } = {},
   ) => {
@@ -456,7 +466,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
   };
 
   const saveHistoryValue = async (id: string, value: EditorValue, before: EditorValue) => {
-    if (Array.isArray(value)) return saveCollection(id as typeof HERO_SLIDES_ID | typeof EQUIPMENT_ITEMS_ID, value, { record: false, before: before as SiteContentCollection });
+    if (Array.isArray(value)) return saveCollection(id as typeof HERO_SLIDES_ID | typeof EQUIPMENT_ITEMS_ID | typeof TYPING_EXAMPLES_ID, value, { record: false, before: before as SiteContentCollection });
     return saveEntry(id, value, { record: false, before: before as SiteContentEntry });
   };
 
@@ -481,6 +491,16 @@ export function DevEditor({ page, content }: DevEditorProps) {
   if (!active) return null;
 
   const saveSiteInfoField = (id: string) => {
+    const field = SITE_INFO_GROUPS.flatMap((group) => group.fields).find((item) => item.id === id);
+    if (field?.kind === "stringList") {
+      const before = entries[id];
+      if (!Array.isArray(before)) return;
+      const next = (siteDrafts[id] ?? "").split("\n").map((item) => item.trim()).filter(Boolean);
+      void saveCollection(TYPING_EXAMPLES_ID, next, { before: before as SiteContentCollection }).then((saved) => {
+        if (saved) router.refresh();
+      });
+      return;
+    }
     const before = getEditableEntry(entries, id);
     if (!before || before.type !== "text") return;
     void saveEntry(id, { type: "text", value: siteDrafts[id] ?? "" }, { before }).then((saved) => {
@@ -618,7 +638,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
           <div className={styles.imageTools}>
             <span className={styles.selected}>{selectedId}</span>
             <button type="button" onClick={() => fileInput.current?.click()}>이미지 교체</button>
-            <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(event) => {
+            <input ref={fileInput} type="file" accept={selectedId.endsWith("signatureImage") ? "image/jpeg,image/png,image/webp,image/svg+xml" : "image/jpeg,image/png,image/webp"} hidden onChange={(event) => {
               const file = event.target.files?.[0];
               if (file) void upload(file);
               event.currentTarget.value = "";

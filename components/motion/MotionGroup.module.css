@@ -1,0 +1,34 @@
+.group [data-motion-item] {
+  opacity: 1;
+  transform: none;
+}
+
+.armed [data-motion-item] {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.playing [data-motion-item] {
+  animation: motionGroupFadeUp .72s cubic-bezier(.22,.61,.36,1) var(--motion-delay, 0s) both;
+}
+
+@keyframes motionGroupFadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .armed [data-motion-item],
+  .playing [data-motion-item] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+:global(.devEditActive) .armed [data-motion-item],
+:global(.devEditActive) .playing [data-motion-item] {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}

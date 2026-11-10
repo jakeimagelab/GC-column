@@ -216,6 +216,12 @@
     "type": "text",
     "value": "리쥬란 몇 번 맞아야 하나요?"
   },
+  "home.question.typingExamples": [
+    "세르프가 좋은가요, 써마지가 좋은가요?",
+    "세르프와 써마지는 보통 어느 연령대가 선택하나요?",
+    "리프팅 시술 후 냉찜질, 꼭 해야 하나요?",
+    "리쥬란, 몇 번 맞아야 하나요?"
+  ],
   "home.question.closest": {
     "type": "text",
     "value": "가장 가까운 답"

@@ -6,6 +6,7 @@ import { getText } from "@/content/site-content-types";
 import { getTreatment } from "@/content/treatments";
 import { SITE_URL } from "@/content/site";
 import { localizedAlternates } from "./i18n";
+import { stripMotionMarkup } from "./motion";
 import {
   absoluteAsset,
   getClinicAddress,
@@ -24,7 +25,7 @@ export function hasPlaceholder(value: string) {
 }
 
 export function publicText(value?: string) {
-  const clean = value?.trim();
+  const clean = value ? stripMotionMarkup(value).trim() : undefined;
   return clean && !hasPlaceholder(clean) ? clean : undefined;
 }
 
@@ -206,14 +207,14 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
       ...column.faqs.map((item, index) => ({
       "@type": "Question",
       "@id": `${url}#faq-${index + 1}`,
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
+      name: stripMotionMarkup(item.q),
+      acceptedAnswer: { "@type": "Answer", text: stripMotionMarkup(item.a) },
       })),
       ...readerQuestions.flatMap((item) => item.answer ? [{
         "@type": "Question",
         "@id": `${url}#reader-${item.id}`,
-        name: item.question,
-        acceptedAnswer: { "@type": "Answer", text: item.answer },
+        name: stripMotionMarkup(item.question),
+        acceptedAnswer: { "@type": "Answer", text: stripMotionMarkup(item.answer) },
       }] : []),
     ],
   };
@@ -225,14 +226,14 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
     uploadDate: publicText(column.video.uploadDate),
     contentUrl: publicText(column.video.contentUrl),
     embedUrl: publicText(column.video.embedUrl),
-    transcript: column.video.transcript,
+    transcript: stripMotionMarkup(column.video.transcript),
   } : undefined;
 
   return graph(content, [
     {
       "@type": "MedicalWebPage",
       "@id": `${url}#webpage`,
-      headline: column.title,
+      headline: stripMotionMarkup(column.title),
       description: sentenceDescription(column.summary),
       url,
       inLanguage: "ko-KR",
@@ -257,7 +258,7 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
         { "@type": "ListItem", position: 1, name: "홈", item: SITE_URL },
         { "@type": "ListItem", position: 2, name: "원장 칼럼", item: `${SITE_URL}/column` },
         { "@type": "ListItem", position: 3, name: categoryName, item: categoryUrl },
-        { "@type": "ListItem", position: 4, name: column.title, item: url },
+        { "@type": "ListItem", position: 4, name: stripMotionMarkup(column.title), item: url },
       ],
     },
   ]);
@@ -283,7 +284,7 @@ export function collectionNodes(pathname: string, title: string, description: st
         "@type": "ListItem",
         position: index + 1,
         url: `${SITE_URL}/column/${column.slug}`,
-        name: column.title,
+        name: stripMotionMarkup(column.title),
       })),
     },
   ];

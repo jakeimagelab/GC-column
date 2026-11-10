@@ -13,13 +13,16 @@
 
 .toc a {
   color: var(--ink);
-  transition: color 150ms ease;
+  padding-left: 12px;
+  border-left: 2px solid transparent;
+  transition: color 300ms ease, border-color 300ms ease;
 }
 
 .toc a:hover,
 .toc .active {
   color: var(--brown);
   font-weight: 500;
+  border-left-color: var(--taupe);
 }
 
 .compact {

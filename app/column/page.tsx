@@ -11,6 +11,10 @@ import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
+import { DoctorReveal } from "@/components/motion/DoctorReveal";
+import { MotionGroup } from "@/components/motion/MotionGroup";
+import { OutlineWord } from "@/components/motion/OutlineWord";
+import { SignatureMotion } from "@/components/motion/SignatureMotion";
 import { containsPlaceholder, getColumns, getVisibleColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
 import { getImage, getText, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
@@ -19,6 +23,7 @@ import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
 import { getClinicAddress, getDisplayedHours } from "@/lib/site-info";
 import { TREATMENT_PAGES_READY } from "@/lib/config";
+import { extractFirstNumber } from "@/lib/motion";
 import styles from "./page.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,22 +71,22 @@ export default async function ColumnMainPage() {
         </div>
       </section>
 
-      <section className={styles.doctorSection}>
-        <div className={`${styles.outlineTitle} outlineWord`} aria-hidden="true">COLUMN</div>
+      <DoctorReveal className={styles.doctorSection}>
+        <OutlineWord className={styles.outlineTitle} text="COLUMN" fill="#fff" />
         <div className={styles.doctorBackdrop} />
         <div className={styles.doctorInner}>
-          <ImageSlot className={styles.doctorPhoto} label="" alt="" editId="column.doctor.photo" image={getImage(content, "column.doctor.photo")} />
+          <ImageSlot className={styles.doctorPhoto} label="" alt="" editId="column.doctor.photo" image={getImage(content, "column.doctor.photo")} motionRole="doctor-photo" />
           <div className={styles.doctorCopy}>
             <h2 {...textEditProps("column.doctor.title")}>{getText(content, "column.doctor.title")}</h2>
-            <p {...textEditProps("column.doctor.description")}>{getText(content, "column.doctor.description")}</p>
-            <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
+            <p data-motion-count={extractFirstNumber(getText(content, "column.doctor.description"))} {...textEditProps("column.doctor.description")}>{getText(content, "column.doctor.description")}</p>
+            <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span data-motion-career key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
             <div className={styles.doctorLinks}>
               <Link href="/doctor/lee-ho" {...textEditProps("column.doctor.more")}>{getText(content, "column.doctor.more")}</Link>
-              <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><ImageSlot className={styles.doctorSignatureImage} label="" alt="" editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} /></span>
+              <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><SignatureMotion className={styles.doctorSignatureImage} editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} /></span>
             </div>
           </div>
         </div>
-      </section>
+      </DoctorReveal>
 
       <section className={styles.categorySection}>
         <h2 {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
@@ -96,9 +101,9 @@ export default async function ColumnMainPage() {
 
       <section className={styles.latestSection}>
         <div className={styles.sectionHeading}><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column/all" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
-        <div className={styles.latestGrid}>
+        <MotionGroup className={styles.latestGrid}>
           {cards.map((column) => (
-            <article className={styles.columnCard} key={column.slug}>
+            <article className={styles.columnCard} data-motion-item key={column.slug}>
               <Link href={`/column/${column.slug}`} className={styles.columnCardLink}>
                 <ImageSlot className={styles.cardPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} />
                 <span>{getCategory(column.categorySlug)?.name}</span>
@@ -108,7 +113,7 @@ export default async function ColumnMainPage() {
               <small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small>
             </article>
           ))}
-        </div>
+        </MotionGroup>
         <div className={styles.pagination}><b>1</b><span>2</span><span>3</span><span {...textEditProps("column.latest.pageNext")}>{getText(content, "column.latest.pageNext")}</span></div>
       </section>
 

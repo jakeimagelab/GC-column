@@ -9,6 +9,7 @@ import { DevEditorMount } from "@/components/DevEditorMount";
 import { FaqList } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
+import { HighlightedParagraph } from "@/components/motion/HighlightedText";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { QuestionForm } from "@/components/QuestionForm";
 import { ShareButtons } from "@/components/ShareButtons";
@@ -144,7 +145,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           {column.sections.map((section) => (
             <section className={styles.articleSection} id={section.id} key={section.id}>
               <h2><span>{section.no}</span> {section.heading}</h2>
-              {section.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              {section.body.map((paragraph) => <HighlightedParagraph key={paragraph} value={paragraph} />)}
               {section.figure ? <figure className={styles.diagramFigure}><ImageSlot className={styles.diagram} label={section.figure.label} alt={section.figure.label.replace("\n", " ")} variant="diagram" /><figcaption>{section.figure.caption}</figcaption></figure> : null}
               {section.table ? (
                 <div className={styles.tableScroll}>

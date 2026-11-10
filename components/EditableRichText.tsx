@@ -5,13 +5,15 @@ type EditableRichTextProps = {
   id: string;
   value: string;
   className?: string;
+  countValue?: number;
 };
 
 function keepMiddotWithPreviousWord(value: string) {
   return value.replace(/ ([·])/g, " $1");
 }
 
-export function renderRichText(value: string): ReactNode {
+export function renderRichText(value: string, countValue?: number): ReactNode {
+  let strongIndex = 0;
   return value.split("\n").map((line, lineIndex, lines) => {
     const parts: ReactNode[] = [];
     const pattern = /\*\*([^*]+)\*\*/g;
@@ -20,7 +22,7 @@ export function renderRichText(value: string): ReactNode {
 
     while ((match = pattern.exec(line))) {
       if (match.index > cursor) parts.push(keepMiddotWithPreviousWord(line.slice(cursor, match.index)));
-      parts.push(<strong key={`${lineIndex}-${match.index}`}>{keepMiddotWithPreviousWord(match[1])}</strong>);
+      parts.push(<strong key={`${lineIndex}-${match.index}`} data-motion-count={strongIndex++ === 0 ? countValue : undefined}>{keepMiddotWithPreviousWord(match[1])}</strong>);
       cursor = match.index + match[0].length;
     }
     if (cursor < line.length) parts.push(keepMiddotWithPreviousWord(line.slice(cursor)));
@@ -34,10 +36,10 @@ export function renderRichText(value: string): ReactNode {
   });
 }
 
-export function EditableRichText({ id, value, className }: EditableRichTextProps) {
+export function EditableRichText({ id, value, className, countValue }: EditableRichTextProps) {
   return (
     <span className={className} {...textEditProps(id, true)}>
-      {renderRichText(value)}
+      {renderRichText(value, countValue)}
     </span>
   );
 }

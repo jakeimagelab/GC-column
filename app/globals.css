@@ -132,13 +132,6 @@ svg {
   background: var(--white);
 }
 
-.outlineWord {
-  color: transparent;
-  font-family: var(--font-en);
-  font-weight: 700;
-  -webkit-text-stroke: 1px #e6dfd6;
-}
-
 @media (max-width: 1024px) {
   body {
     font-size: 14px;

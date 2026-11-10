@@ -13,6 +13,10 @@ import { HomeHero } from "@/components/HomeHero";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
+import { DoctorReveal } from "@/components/motion/DoctorReveal";
+import { MotionGroup } from "@/components/motion/MotionGroup";
+import { OutlineWord } from "@/components/motion/OutlineWord";
+import { SignatureMotion } from "@/components/motion/SignatureMotion";
 import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns";
 import { getEquipmentItems, getHeroSlides, getImage, getText, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, SITE_URL } from "@/content/site";
@@ -20,6 +24,7 @@ import { getCategory } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, formatDateKo, graph } from "@/lib/seo";
 import { getClinicAddress, getDisplayedHours, getMapUrls } from "@/lib/site-info";
+import { extractFirstNumber } from "@/lib/motion";
 import { nanumPenScript } from "./fonts";
 import styles from "./page.module.css";
 
@@ -57,28 +62,28 @@ export default async function HomePage() {
 
       <HomeQuestionSearch columns={searchColumns} content={content} />
 
-      <section className={styles.doctorSection} id="doctor">
-        <div className={`${styles.directorOutline} outlineWord`} aria-hidden="true">DIRECTOR</div>
-        <div className={styles.doctorPhotoWrap}><div /><ImageSlot className={styles.doctorPhoto} label="" alt="" align="end" editId="home.doctor.photo" image={getImage(content, "home.doctor.photo")} /></div>
+      <DoctorReveal className={styles.doctorSection} id="doctor">
+        <OutlineWord className={styles.directorOutline} text="DIRECTOR" fill="#fff" />
+        <div className={styles.doctorPhotoWrap}><div /><ImageSlot className={styles.doctorPhoto} label="" alt="" align="end" editId="home.doctor.photo" image={getImage(content, "home.doctor.photo")} motionRole="doctor-photo" /></div>
         <div className={styles.doctorCopy}>
           <span {...textEditProps("home.doctor.eyebrow")}>{getText(content, "home.doctor.eyebrow")}</span><h2><EditableRichText id="home.doctor.title" value={getText(content, "home.doctor.title")} /></h2>
-          <div className={styles.years}><EditableRichText id="home.doctor.years" value={getText(content, "home.doctor.years")} /></div>
-          <div className={styles.careers}>{careers.map((career) => <span key={career.id} {...textEditProps(career.id)}>{career.value}</span>)}</div>
+          <div className={styles.years}><EditableRichText id="home.doctor.years" value={getText(content, "home.doctor.years")} countValue={extractFirstNumber(getText(content, "home.doctor.years"))} /></div>
+          <div className={styles.careers}>{careers.map((career) => <span key={career.id} data-motion-career {...textEditProps(career.id)}>{career.value}</span>)}</div>
           <div className={styles.doctorButtons}><ButtonLink href="/doctor/lee-ho" variant="dark"><span {...textEditProps("home.doctor.profileAction")}>{getText(content, "home.doctor.profileAction")}</span></ButtonLink><ButtonLink href="/column/all" variant="outline"><span {...textEditProps("home.doctor.columnAction")}>{getText(content, "home.doctor.columnAction")}</span></ButtonLink></div>
         </div>
-      </section>
+      </DoctorReveal>
 
       <section className={styles.vision} id="vision">
-        <div className="outlineWord" aria-hidden="true">VISION</div>
-        <div><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><ImageSlot className={styles.signatureImage} label="" alt="" editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} /></div></div>
+        <OutlineWord text="VISION" fill="var(--paper)" />
+        <div><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} /></div></div>
       </section>
 
       <EquipmentCarousel items={equipment} content={content} />
 
       <section className={styles.latestSection}>
-        <div className={`${styles.columnOutline} outlineWord`} aria-hidden="true">COLUMN</div>
+        <OutlineWord className={styles.columnOutline} text="COLUMN" fill="#fff" stroke="#ece7e1" />
         <div className={styles.latestHeading}><div><span {...textEditProps("home.latest.eyebrow")}>{getText(content, "home.latest.eyebrow")}</span><h2><EditableRichText id="home.latest.title" value={getText(content, "home.latest.title")} /></h2></div><Link href="/column/all" {...textEditProps("home.latest.all")}>{getText(content, "home.latest.all")}</Link></div>
-        <div className={styles.latestGrid}>{latestColumns.map((column) => <article key={column.slug}><Link className={styles.latestCardLink} href={`/column/${column.slug}`}><ImageSlot className={styles.latestPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{columnExcerpts.home[column.slug] ?? column.summary}</p></Link><small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small></article>)}</div>
+        <MotionGroup className={styles.latestGrid}>{latestColumns.map((column) => <article data-motion-item key={column.slug}><Link className={styles.latestCardLink} href={`/column/${column.slug}`}><ImageSlot className={styles.latestPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{columnExcerpts.home[column.slug] ?? column.summary}</p></Link><small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small></article>)}</MotionGroup>
       </section>
 
       <FacilityGallery content={content} />

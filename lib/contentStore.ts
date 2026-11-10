@@ -6,6 +6,7 @@ import {
   EQUIPMENT_ITEMS_ID,
   getEditableEntry,
   HERO_SLIDES_ID,
+  TYPING_EXAMPLES_ID,
   withEditableEntry,
   type EquipmentContentItem,
   type HeroSlide,
@@ -45,9 +46,10 @@ function validateImage(entry: ImageContentEntry, expectedType: ImageContentEntry
 
 function validateHeroSlides(value: SiteContentCollection): asserts value is HeroSlide[] {
   if (!Array.isArray(value) || value.length < 1 || value.length > 6) throw new Error("히어로 슬라이드는 1~6장이어야 합니다.");
+  if (!value.every((item) => typeof item === "object" && item !== null && "bgImage" in item)) throw new Error("히어로 슬라이드 형식이 올바르지 않습니다.");
   const ids = new Set<string>();
   value.forEach((slide) => {
-    if (!("bgImage" in slide) || slide.type !== "image" || !slide.id || ids.has(slide.id)) throw new Error("히어로 슬라이드 ID가 올바르지 않습니다.");
+    if (slide.type !== "image" || !slide.id || ids.has(slide.id)) throw new Error("히어로 슬라이드 ID가 올바르지 않습니다.");
     ids.add(slide.id);
     validateImage(slide.bgImage, "bgImage");
     if ([slide.eyebrow, slide.title, slide.titleStrong, slide.description].some((field) => typeof field !== "string")) {
@@ -58,19 +60,27 @@ function validateHeroSlides(value: SiteContentCollection): asserts value is Hero
 
 function validateEquipmentItems(value: SiteContentCollection): asserts value is EquipmentContentItem[] {
   if (!Array.isArray(value) || value.length < 1) throw new Error("장비는 1개 이상이어야 합니다.");
+  if (!value.every((item) => typeof item === "object" && item !== null && "image" in item)) throw new Error("장비 형식이 올바르지 않습니다.");
   const ids = new Set<string>();
   value.forEach((item) => {
-    if (!("image" in item) || !item.id || ids.has(item.id)) throw new Error("장비 ID가 올바르지 않습니다.");
+    if (!item.id || ids.has(item.id)) throw new Error("장비 ID가 올바르지 않습니다.");
     ids.add(item.id);
     validateImage(item.image, "image");
     if ([item.name, item.desc, item.link].some((field) => typeof field !== "string")) throw new Error("장비 정보가 올바르지 않습니다.");
   });
 }
 
+function validateTypingExamples(value: SiteContentCollection): asserts value is string[] {
+  if (!Array.isArray(value) || value.length < 1 || value.length > 12 || !value.every((item) => typeof item === "string" && item.trim())) {
+    throw new Error("타이핑 예시는 1~12개의 문장이어야 합니다.");
+  }
+}
+
 export async function updateSiteContentCollection(id: string, value: SiteContentCollection) {
   const content = await readSiteContent();
   if (id === HERO_SLIDES_ID) validateHeroSlides(value);
   else if (id === EQUIPMENT_ITEMS_ID) validateEquipmentItems(value);
+  else if (id === TYPING_EXAMPLES_ID) validateTypingExamples(value);
   else throw new Error(`Unknown collection id: ${id}`);
   content[id] = value;
   await writeSiteContent(content);
@@ -81,11 +91,12 @@ const extensions: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+  "image/svg+xml": "svg",
 };
 
 export async function saveUploadedImage(id: string, bytes: Uint8Array, mimeType: string) {
   const extension = extensions[mimeType];
-  if (!extension) throw new Error("JPG, PNG, WebP 이미지만 사용할 수 있습니다.");
+  if (!extension || (extension === "svg" && !id.endsWith("signatureImage"))) throw new Error("JPG, PNG, WebP 이미지만 사용할 수 있으며 서명에는 SVG도 사용할 수 있습니다.");
   const safeId = id.replace(/[^a-z0-9.-]+/gi, "-");
   const filename = `${safeId}-${Date.now()}.${extension}`;
   await mkdir(uploadsPath, { recursive: true });

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { getText, getTypingExamples, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import { QuestionForm } from "./QuestionForm";
 import styles from "./HomeQuestionSearch.module.css";
@@ -27,6 +27,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   const [inputFocused, setInputFocused] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [questionOpen, setQuestionOpen] = useState(false);
+  const [typingText, setTypingText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -37,6 +38,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   ]), [columns]);
   const suggestions = useMemo(() => getSuggestions(suggestionIndex, query), [query, suggestionIndex]);
   const suggestionsOpen = inputFocused && suggestions.length > 0;
+  const typingExamples = useMemo(() => getTypingExamples(content), [content]);
 
   const runSearch = (nextQuery: string) => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -59,6 +61,39 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   useEffect(() => () => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
   }, []);
+
+  useEffect(() => {
+    setTypingText("");
+    if (query || inputFocused || !typingExamples.length) return;
+    if (new URLSearchParams(window.location.search).get("edit") === "1" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let exampleIndex = 0;
+    let characterIndex = 0;
+    let deleting = false;
+    let timer = 0;
+    const tick = () => {
+      const example = typingExamples[exampleIndex] ?? "";
+      if (!deleting) {
+        characterIndex += 1;
+        setTypingText(example.slice(0, characterIndex));
+        if (characterIndex >= example.length) {
+          deleting = true;
+          timer = window.setTimeout(tick, 1600);
+          return;
+        }
+      } else {
+        characterIndex -= 1;
+        setTypingText(example.slice(0, Math.max(0, characterIndex)));
+        if (characterIndex <= 0) {
+          deleting = false;
+          exampleIndex = (exampleIndex + 1) % typingExamples.length;
+        }
+      }
+      timer = window.setTimeout(tick, deleting ? 28 : 85);
+    };
+    timer = window.setTimeout(tick, 60);
+    return () => window.clearTimeout(timer);
+  }, [inputFocused, query, typingExamples]);
 
   const hits = useMemo(() => {
     const q = searchQuery.toLowerCase();
@@ -93,37 +128,40 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
       </div>
       <div className={styles.inputRow}>
         <label htmlFor="ask">{getText(content, "home.question.inputLabel")}</label>
-        <input
-          ref={inputRef}
-          id="ask"
-          type="search"
-          value={query}
-          role="combobox"
-          aria-autocomplete="list"
-          aria-expanded={suggestionsOpen}
-          aria-controls="home-question-suggestions"
-          aria-activedescendant={suggestionsOpen && activeSuggestion >= 0 ? `home-question-suggestions-${activeSuggestion}` : undefined}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-          onChange={(event) => { setQuery(event.target.value); setActiveSuggestion(-1); }}
-          onCompositionStart={() => { composing.current = true; }}
-          onCompositionEnd={(event) => {
-            composing.current = false;
-            setQuery(event.currentTarget.value);
-            runSearch(event.currentTarget.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowDown" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => (value + 1) % suggestions.length); }
-            else if (event.key === "ArrowUp" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => value <= 0 ? suggestions.length - 1 : value - 1); }
-            else if (event.key === "Escape") { setInputFocused(false); }
-            else if (event.key === "Enter" && !composing.current) {
-              if (suggestionsOpen && activeSuggestion >= 0) { event.preventDefault(); selectSuggestion(suggestions[activeSuggestion]); }
-              else runSearch(query);
-            }
-          }}
-          placeholder={getText(content, "home.question.placeholder")}
-          data-edit-control
-        />
+        <div className={`${styles.field} ${typingText ? styles.typing : ""}`}>
+          {typingText ? <span className={styles.typingGhost} aria-hidden="true">{typingText}<i /></span> : null}
+          <input
+            ref={inputRef}
+            id="ask"
+            type="search"
+            value={query}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={suggestionsOpen}
+            aria-controls="home-question-suggestions"
+            aria-activedescendant={suggestionsOpen && activeSuggestion >= 0 ? `home-question-suggestions-${activeSuggestion}` : undefined}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            onChange={(event) => { setQuery(event.target.value); setActiveSuggestion(-1); }}
+            onCompositionStart={() => { composing.current = true; }}
+            onCompositionEnd={(event) => {
+              composing.current = false;
+              setQuery(event.currentTarget.value);
+              runSearch(event.currentTarget.value);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => (value + 1) % suggestions.length); }
+              else if (event.key === "ArrowUp" && suggestionsOpen) { event.preventDefault(); setActiveSuggestion((value) => value <= 0 ? suggestions.length - 1 : value - 1); }
+              else if (event.key === "Escape") { setInputFocused(false); }
+              else if (event.key === "Enter" && !composing.current) {
+                if (suggestionsOpen && activeSuggestion >= 0) { event.preventDefault(); selectSuggestion(suggestions[activeSuggestion]); }
+                else runSearch(query);
+              }
+            }}
+            placeholder={getText(content, "home.question.placeholder")}
+            data-edit-control
+          />
+        </div>
         <button type="button" className={styles.clear} onClick={() => chooseQuery("")} data-edit-control>{getText(content, "home.question.clear")}</button>
         <button type="button" className={styles.ask} onClick={() => runSearch(query)} data-edit-control>{getText(content, "home.question.ask")}</button>
         {suggestionsOpen ? <SearchAutocomplete id="home-question-suggestions" items={suggestions} query={query} activeIndex={activeSuggestion} onActive={setActiveSuggestion} onSelect={selectSuggestion} /> : null}

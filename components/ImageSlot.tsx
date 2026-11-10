@@ -16,6 +16,7 @@ type ImageSlotProps = {
   image?: ImageContentEntry;
   priority?: boolean;
   sizes?: string;
+  motionRole?: "doctor-photo";
 };
 
 export function ImageSlot({
@@ -31,6 +32,7 @@ export function ImageSlot({
   image,
   priority = false,
   sizes = "(max-width: 768px) 100vw, 50vw",
+  motionRole,
 }: ImageSlotProps) {
   const style = {
     width,
@@ -52,6 +54,7 @@ export function ImageSlot({
       aria-label={resolvedAlt}
       data-edit-id={editId}
       data-edit-type={image?.type}
+      data-motion-photo={motionRole === "doctor-photo" ? "" : undefined}
     >
       {image?.src ? (
         <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} />

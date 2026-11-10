@@ -1,0 +1,58 @@
+.root {
+  line-height: 1;
+  pointer-events: none;
+}
+
+.svg {
+  width: calc(var(--outline-ratio) * 1em);
+  height: 1em;
+  overflow: visible;
+}
+
+.text {
+  fill: var(--outline-fill);
+  stroke: var(--outline-stroke);
+  stroke-width: 2.4;
+  paint-order: stroke fill;
+  font-family: var(--font-en);
+  font-size: 150px;
+  font-weight: 700;
+  letter-spacing: -2px;
+}
+
+.secondary {
+  opacity: .42;
+  stroke-width: 2;
+}
+
+.armed .text {
+  stroke-dasharray: var(--outline-length);
+  stroke-dashoffset: var(--outline-length);
+}
+
+.playing .text {
+  animation: outlineDraw 2.6s cubic-bezier(.22,.61,.36,1) both;
+}
+
+.playing .secondary {
+  animation-delay: .25s;
+}
+
+@keyframes outlineDraw {
+  from { stroke-dashoffset: var(--outline-length); }
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .armed .text,
+  .playing .text {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
+
+:global(.devEditActive) .armed .text,
+:global(.devEditActive) .playing .text {
+  stroke-dashoffset: 0;
+  animation: none;
+}
