@@ -622,7 +622,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
       >
         <div className={styles.topline}>
           <b>{page === "home" ? "홈" : "칼럼 메인"} 편집</b>
-          <nav><Link href="/?edit=1">홈</Link><Link href="/column?edit=1">칼럼 메인</Link></nav>
+          <nav><Link href="/?edit=1">홈</Link><Link href="/column?edit=1">칼럼 메인</Link><Link href="/content-board">콘텐츠 슬라이드</Link></nav>
           <button type="button" onClick={() => void undo()} disabled={!undoStack.length}>되돌리기</button>
           <button type="button" onClick={() => void redo()} disabled={!redoStack.length}>다시하기</button>
           <button type="button" onClick={() => setSiteInfoOpen((current) => !current)}>사이트 정보</button>
