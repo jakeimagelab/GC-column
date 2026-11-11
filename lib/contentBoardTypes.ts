@@ -34,6 +34,7 @@ export type BoardTextItem = {
   label: string;
   value: string;
   style: BoardTextStyle;
+  styleTouched?: boolean;
   note: string;
 };
 

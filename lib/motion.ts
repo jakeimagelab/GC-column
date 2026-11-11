@@ -1,5 +1,11 @@
 export const MOTION_EASE = "cubic-bezier(.22,.61,.36,1)";
 
+export function isVisualEditingMode() {
+  if (typeof window === "undefined" || process.env.NODE_ENV !== "development") return false;
+  const search = new URLSearchParams(window.location.search);
+  return search.get("edit") === "1" || search.get("content-board-preview") === "1";
+}
+
 const HIGHLIGHT_PATTERN = /==([^=\n]+)==/g;
 
 export function stripMotionMarkup(value: string) {

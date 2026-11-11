@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { HeroSlide } from "@/content/site-content-types";
 import { textEditProps } from "@/content/site-content-types";
+import { isVisualEditingMode } from "@/lib/motion";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./HomeHero.module.css";
 
@@ -22,7 +23,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const editing = process.env.NODE_ENV === "development" && new URLSearchParams(window.location.search).get("edit") === "1";
+    const editing = isVisualEditingMode();
     setEditMode(editing);
     const update = () => {
       setReducedMotion(query.matches);

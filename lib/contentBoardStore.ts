@@ -122,7 +122,7 @@ function textStyle(id: string): BoardTextItem["style"] {
 
 function fromEntry(id: string, entry: SiteContentEntry, label = humanLabel(id)): BoardItem {
   if (entry.type === "text") {
-    return { id, type: "text", label, value: entry.value, style: textStyle(id), note: "" };
+    return { id, type: "text", label, value: entry.value, style: textStyle(id), styleTouched: false, note: "" };
   }
   const desktop = desktopTransform(entry);
   const mobile = entry.mobile ? mobileTransform(entry) : undefined;

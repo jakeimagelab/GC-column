@@ -19,6 +19,7 @@ import styles from "./ContentBoardEditor.module.css";
 type Props = { initialBoard: ContentBoard };
 type SaveState = "saved" | "saving" | "error";
 type PendingUpload = { slideId: string; item: BoardImageItem; file: File; objectUrl: string };
+type CanvasMode = "design" | "items";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
@@ -77,6 +78,13 @@ function transformFor(item: BoardImageItem, mode: BoardViewMode) {
 
 function findSlide(board: ContentBoard, slideId: string) {
   return board.pages.flatMap((page) => page.slides).find((slide) => slide.id === slideId);
+}
+
+function previewPath(slide: BoardSlide) {
+  if (slide.pageId === "column") return "/column";
+  if (slide.pageId === "doctor") return "/doctor/lee-ho";
+  if (slide.pageId === "detail") return "/column/xerf-vs-thermage";
+  return "/";
 }
 
 function TextCanvasItem({ item, selected, onSelect, onChange }: {
@@ -261,12 +269,50 @@ function ImageCanvasItem({ item, selected, mode, temporary, onSelect, onDropFile
   );
 }
 
+function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
+  slide: BoardSlide;
+  viewMode: BoardViewMode;
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  onLoad: () => void;
+}) {
+  const frame = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const width = viewMode === "mobile" ? 390 : 1440;
+  const height = viewMode === "mobile" ? 844 : 900;
+
+  useEffect(() => {
+    const target = frame.current;
+    if (!target) return;
+    const update = () => setScale(Math.min(1, Math.max(.2, (target.clientWidth - 24) / width)));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [width]);
+
+  return (
+    <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭 · 사진 드롭 · 사진 드래그/휠</span><em>{Math.round(scale * 100)}%</em></div>
+      <iframe
+        ref={iframeRef}
+        key={`${slide.id}-${viewMode}`}
+        title={`${slide.pageTitle} ${slide.title} 실제 디자인 편집 화면`}
+        src={`${previewPath(slide)}?content-board-preview=1`}
+        style={{ width, height, transform: `translateX(-50%) scale(${scale})` }}
+        onLoad={onLoad}
+      />
+    </div>
+  );
+}
+
 export function ContentBoardEditor({ initialBoard }: Props) {
   const [board, setBoard] = useState(() => clone(initialBoard));
   const firstSlide = initialBoard.pages[0]?.slides[0]?.id ?? "";
   const [activeSlideId, setActiveSlideId] = useState(firstSlide);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<BoardViewMode>("desktop");
+  const [canvasMode, setCanvasMode] = useState<CanvasMode>("design");
+  const [focusPreview, setFocusPreview] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [error, setError] = useState("");
   const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
@@ -274,6 +320,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const temporaryPreviewsRef = useRef<Record<string, string>>({});
   const timers = useRef(new Map<string, number>());
   const pendingPayloads = useRef(new Map<string, Record<string, unknown>>());
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const savingCount = useRef(0);
 
   const slides = useMemo(() => board.pages.flatMap((page) => page.slides), [board.pages]);
@@ -431,7 +478,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   };
 
   const saveTextStyle = (item: BoardTextItem, patch: Partial<BoardTextStyle>) => {
-    updateItem(activeSlide!.id, item.id, { style: { ...item.style, ...patch } } as Partial<BoardTextItem>, "text");
+    updateItem(activeSlide!.id, item.id, { style: { ...item.style, ...patch }, styleTouched: true } as Partial<BoardTextItem>, "text");
   };
 
   const saveImageTransform = (item: BoardImageItem, next: BoardImageTransform, commit: boolean) => {
@@ -460,10 +507,49 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     }, 0);
   };
 
+  const sendPreview = useCallback(() => {
+    if (!activeSlide || canvasMode !== "design") return;
+    iframeRef.current?.contentWindow?.postMessage({
+      type: "content-board:sync",
+      slideId: activeSlide.id,
+      items: activeSlide.items,
+      viewMode,
+    }, window.location.origin);
+  }, [activeSlide, canvasMode, viewMode]);
+
+  useEffect(() => {
+    sendPreview();
+  }, [sendPreview]);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent<Record<string, unknown>>) => {
+      if (event.origin !== window.location.origin || event.source !== iframeRef.current?.contentWindow || !activeSlide) return;
+      const id = typeof event.data.id === "string" ? event.data.id : "";
+      const item = activeSlide.items.find((value) => value.id === id);
+      if (event.data.type === "content-board:ready") {
+        sendPreview();
+      } else if (event.data.type === "content-board:select" && item) {
+        setSelectedItemId(id);
+      } else if (event.data.type === "content-board:text" && item?.type === "text" && typeof event.data.value === "string") {
+        updateItem(activeSlide.id, id, { value: event.data.value } as Partial<BoardTextItem>, "text", true);
+      } else if (event.data.type === "content-board:image-drop" && item && isBoardImageItem(item) && event.data.file instanceof File) {
+        setSelectedItemId(id);
+        requestUpload(activeSlide.id, item, event.data.file);
+      } else if (event.data.type === "content-board:image-transform" && item && isBoardImageItem(item) && event.data.value && typeof event.data.value === "object") {
+        const value = event.data.value as BoardImageTransform;
+        const mode = event.data.viewMode === "mobile" ? "mobile" : "desktop";
+        if (mode === "mobile") updateItem(activeSlide.id, id, { mobile: value } as Partial<BoardImageItem>, "image", true);
+        else updateItem(activeSlide.id, id, { desktop: value } as Partial<BoardImageItem>, "image", true);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [activeSlide, sendPreview, updateItem]);
+
   if (!activeSlide) return <main className={styles.empty}>편집할 슬라이드가 없습니다.</main>;
 
   return (
-    <main className={styles.boardShell}>
+    <main className={`${styles.boardShell} ${focusPreview ? styles.focusMode : ""}`}>
       <header className={styles.topbar}>
         <div className={styles.brand}><span>G</span><div><b>CONTENT BOARD</b><small>글로리의원 콘텐츠 편집 슬라이드</small></div></div>
         <div className={styles.topProgress}><span>{completed} / {slides.length} 완료</span><div><i style={{ width: `${slides.length ? completed / slides.length * 100 : 0}%` }} /></div></div>
@@ -498,40 +584,46 @@ export function ContentBoardEditor({ initialBoard }: Props) {
         <div className={styles.slideHeading}>
           <div><span>{activeSlide.pageTitle} · {String(activeIndex + 1).padStart(2, "0")}</span><h1>{activeSlide.title}</h1><p>{activeSlide.description}</p></div>
           <div className={styles.headingActions}>
+            <div className={styles.canvasSwitch}><button type="button" className={canvasMode === "design" ? styles.active : ""} onClick={() => setCanvasMode("design")}>실제 디자인</button><button type="button" className={canvasMode === "items" ? styles.active : ""} onClick={() => setCanvasMode("items")}>항목 목록</button></div>
             <div className={styles.viewSwitch}><button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => setViewMode("desktop")}>PC</button><button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => setViewMode("mobile")}>모바일</button></div>
+            {canvasMode === "design" ? <button type="button" className={styles.focusButton} onClick={() => setFocusPreview((value) => !value)}>{focusPreview ? "패널 보기" : "크게 보기"}</button> : null}
             <select value={activeSlide.status} onChange={(event) => updateSlide(activeSlide.id, { status: event.target.value as BoardStatus }, true)} aria-label="슬라이드 상태">
               <option>작성 중</option><option>확인 필요</option><option>작성 완료</option>
             </select>
           </div>
         </div>
 
-        <div className={`${styles.stageWrap} ${viewMode === "mobile" ? styles.mobileStage : ""}`}>
-          <div className={styles.stage}>
-            <div className={styles.stageMeta}><span>{activeSlide.pageTitle.toUpperCase()}</span><b>{activeSlide.title}</b><small>글자는 직접 클릭 · 사진은 파인더에서 드래그</small></div>
-            <div className={styles.itemsGrid}>
-              {activeSlide.items.map((item) => isBoardImageItem(item) ? (
-                <ImageCanvasItem
-                  key={item.id}
-                  item={item}
-                  selected={selectedItemId === item.id}
-                  mode={viewMode}
-                  temporary={temporaryPreviews[item.id]}
-                  onSelect={() => setSelectedItemId(item.id)}
-                  onDropFile={(file) => requestUpload(activeSlide.id, item, file)}
-                  onTransform={(next, commit) => saveImageTransform(item, next, commit)}
-                />
-              ) : (
-                <TextCanvasItem
-                  key={item.id}
-                  item={item}
-                  selected={selectedItemId === item.id}
-                  onSelect={() => setSelectedItemId(item.id)}
-                  onChange={(value) => updateItem(activeSlide.id, item.id, { value } as Partial<BoardTextItem>, "text", true)}
-                />
-              ))}
+        {canvasMode === "design" ? (
+          <DesignPreview slide={activeSlide} viewMode={viewMode} iframeRef={iframeRef} onLoad={sendPreview} />
+        ) : (
+          <div className={`${styles.stageWrap} ${viewMode === "mobile" ? styles.mobileStage : ""}`}>
+            <div className={styles.stage}>
+              <div className={styles.stageMeta}><span>{activeSlide.pageTitle.toUpperCase()}</span><b>{activeSlide.title}</b><small>글자는 직접 클릭 · 사진은 파인더에서 드래그</small></div>
+              <div className={styles.itemsGrid}>
+                {activeSlide.items.map((item) => isBoardImageItem(item) ? (
+                  <ImageCanvasItem
+                    key={item.id}
+                    item={item}
+                    selected={selectedItemId === item.id}
+                    mode={viewMode}
+                    temporary={temporaryPreviews[item.id]}
+                    onSelect={() => setSelectedItemId(item.id)}
+                    onDropFile={(file) => requestUpload(activeSlide.id, item, file)}
+                    onTransform={(next, commit) => saveImageTransform(item, next, commit)}
+                  />
+                ) : (
+                  <TextCanvasItem
+                    key={item.id}
+                    item={item}
+                    selected={selectedItemId === item.id}
+                    onSelect={() => setSelectedItemId(item.id)}
+                    onChange={(value) => updateItem(activeSlide.id, item.id, { value } as Partial<BoardTextItem>, "text", true)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className={styles.slideFooter}>
           <button type="button" onClick={() => navigate(activeIndex - 1)} disabled={activeIndex <= 0}>← 이전 섹션</button>

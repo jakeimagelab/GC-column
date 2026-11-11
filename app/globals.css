@@ -186,6 +186,65 @@ svg {
   background: var(--white);
 }
 
+.contentBoardCanvas *,
+.contentBoardCanvas *::before,
+.contentBoardCanvas *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+
+.contentBoardCanvas [data-edit-id] {
+  outline: 1px solid rgba(143, 121, 102, .24);
+  outline-offset: 3px;
+  cursor: text !important;
+  transition: outline-color 120ms ease, box-shadow 120ms ease !important;
+}
+
+.contentBoardCanvas [data-edit-id]:hover,
+.contentBoardCanvas [data-board-selected="true"] {
+  outline: 2px solid #9a7d65;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(154, 125, 101, .13);
+}
+
+.contentBoardCanvas [data-edit-type="image"],
+.contentBoardCanvas [data-edit-type="bgImage"] {
+  cursor: grab !important;
+  outline: 2px dashed rgba(154, 125, 101, .6);
+  outline-offset: -2px;
+}
+
+.contentBoardCanvas [data-edit-type="image"]::after,
+.contentBoardCanvas [data-edit-type="bgImage"]::after {
+  position: absolute;
+  z-index: 40;
+  right: 7px;
+  bottom: 7px;
+  max-width: calc(100% - 14px);
+  padding: 5px 7px;
+  border-radius: 3px;
+  content: attr(data-board-label);
+  overflow: hidden;
+  color: #fff;
+  background: rgba(45, 40, 36, .76);
+  font: 500 10px/1.25 var(--font-sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.contentBoardCanvas [data-board-dragover="true"] {
+  outline: 5px solid #b58b68 !important;
+  outline-offset: -5px !important;
+}
+
+.contentBoardCanvas [data-board-editing="true"] {
+  min-width: 1em;
+  outline: 2px solid #9a7d65 !important;
+  background: rgba(255, 255, 255, .88);
+}
+
 .devPlacementMobilePreview {
   background: #282522;
 }

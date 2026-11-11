@@ -298,11 +298,15 @@
 .headingActions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .headingActions select,
-.viewSwitch {
+.viewSwitch,
+.canvasSwitch,
+.focusButton {
   height: 38px;
   border: 1px solid #d2cbc2;
   border-radius: 7px;
@@ -318,6 +322,33 @@
 .viewSwitch {
   padding: 3px;
   display: flex;
+}
+
+.canvasSwitch {
+  padding: 3px;
+  display: flex;
+}
+
+.canvasSwitch button {
+  min-width: 68px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 5px;
+  color: #7c756e;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.canvasSwitch .active {
+  color: #fff;
+  background: #65584e;
+}
+
+.focusButton {
+  padding: 0 12px;
+  color: #5d554e;
+  cursor: pointer;
 }
 
 .viewSwitch button,
@@ -359,6 +390,74 @@
 
 .stageWrap.mobileStage {
   max-width: 470px;
+}
+
+.designPreview {
+  position: relative;
+  width: min(1100px, 100%);
+  min-height: 300px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #bfb7ae;
+  border-radius: 3px;
+  background: #65615c;
+  box-shadow: 0 20px 55px rgba(48, 43, 39, .2);
+}
+
+.designPreview iframe {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  display: block;
+  border: 0;
+  background: #fff;
+  transform-origin: top center;
+}
+
+.previewGuide {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 42px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, .8);
+  background: #3e3a36;
+  font-size: 10px;
+}
+
+.previewGuide b {
+  color: #fff;
+  font-size: 11px;
+}
+
+.previewGuide span {
+  flex: 1;
+}
+
+.previewGuide em {
+  font-family: var(--font-en), sans-serif;
+  font-style: normal;
+}
+
+.focusMode .sidebar,
+.focusMode .inspector {
+  display: none;
+}
+
+.focusMode .workspace {
+  margin-right: 0;
+  margin-left: 0;
+  padding-right: 18px;
+  padding-left: 18px;
+}
+
+.focusMode .slideHeading,
+.focusMode .designPreview,
+.focusMode .slideFooter {
+  width: min(1600px, 100%);
 }
 
 .stage {
@@ -998,7 +1097,8 @@
   }
 
   .headingActions select,
-  .viewSwitch {
+  .viewSwitch,
+  .canvasSwitch {
     flex: 1;
   }
 

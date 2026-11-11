@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { isVisualEditingMode } from "@/lib/motion";
 import { getText, getTypingExamples, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import { QuestionForm } from "./QuestionForm";
@@ -65,7 +66,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   useEffect(() => {
     setTypingText("");
     if (query || inputFocused || !typingExamples.length) return;
-    if (new URLSearchParams(window.location.search).get("edit") === "1" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (isVisualEditingMode() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let exampleIndex = 0;
     let characterIndex = 0;

@@ -122,6 +122,7 @@ export async function PATCH(request: Request) {
       const board = await updateBoardItem(slideId, itemId, {
         ...(typeof patch.value === "string" ? { value: patch.value.slice(0, 20000) } : {}),
         ...(patch.style ? { style: textStyle(patch.style) } : {}),
+        ...(typeof patch.styleTouched === "boolean" ? { styleTouched: patch.styleTouched } : {}),
         ...(typeof patch.note === "string" ? { note: patch.note.slice(0, 3000) } : {}),
       });
       return NextResponse.json({ board });

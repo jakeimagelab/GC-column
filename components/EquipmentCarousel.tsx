@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { getText, type EquipmentContentItem, type SiteContent } from "@/content/site-content-types";
 import { getTreatment } from "@/content/treatments";
 import { TREATMENT_PAGES_READY } from "@/lib/config";
+import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./EquipmentCarousel.module.css";
@@ -73,7 +74,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const paused = interactionPaused || userPaused || reducedMotion || !flowReady;
 
   useEffect(() => {
-    const editing = process.env.NODE_ENV === "development" && new URLSearchParams(window.location.search).get("edit") === "1";
+    const editing = isVisualEditingMode();
     setEditMode(editing);
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(query.matches);

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { isVisualEditingMode } from "@/lib/motion";
 
 export function motionDisabled() {
-  return new URLSearchParams(window.location.search).get("edit") === "1" ||
+  return isVisualEditingMode() ||
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 

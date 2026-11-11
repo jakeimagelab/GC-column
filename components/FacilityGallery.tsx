@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
 import styles from "./FacilityGallery.module.css";
@@ -27,7 +28,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const paused = interactionPaused || userPaused || editMode || reducedMotion;
 
   useEffect(() => {
-    const editing = process.env.NODE_ENV === "development" && new URLSearchParams(window.location.search).get("edit") === "1";
+    const editing = isVisualEditingMode();
     setEditMode(editing);
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(query.matches);
