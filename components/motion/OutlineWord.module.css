@@ -7,6 +7,7 @@
   width: calc(var(--outline-ratio) * 1em);
   height: 1em;
   overflow: visible;
+  clip-path: inset(0);
 }
 
 .text {
@@ -20,39 +21,30 @@
   letter-spacing: -2px;
 }
 
-.secondary {
-  opacity: .42;
-  stroke-width: 2;
+.armed .svg {
+  clip-path: inset(0 100% 0 0);
 }
 
-.armed .text {
-  stroke-dasharray: var(--outline-length);
-  stroke-dashoffset: var(--outline-length);
+.playing .svg {
+  animation: outlineReveal 1.6s cubic-bezier(.22,.61,.36,1) both;
+  will-change: clip-path;
 }
 
-.playing .text {
-  animation: outlineDraw 2.6s cubic-bezier(.22,.61,.36,1) both;
-}
-
-.playing .secondary {
-  animation-delay: .25s;
-}
-
-@keyframes outlineDraw {
-  from { stroke-dashoffset: var(--outline-length); }
-  to { stroke-dashoffset: 0; }
+@keyframes outlineReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .armed .text,
-  .playing .text {
-    stroke-dashoffset: 0;
+  .armed .svg,
+  .playing .svg {
+    clip-path: inset(0);
     animation: none;
   }
 }
 
-:global(.devEditActive) .armed .text,
-:global(.devEditActive) .playing .text {
-  stroke-dashoffset: 0;
+:global(.devEditActive) .armed .svg,
+:global(.devEditActive) .playing .svg {
+  clip-path: inset(0);
   animation: none;
 }
