@@ -15,7 +15,14 @@ const widths = { DIRECTOR: 880, VISION: 610, COLUMN: 720 } as const;
 
 export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3" }: OutlineWordProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const options = useMemo(() => ({ threshold: 0.22 }), []);
+  const options = useMemo(() => ({
+    threshold: 0.22,
+    onPlay: (element: HTMLDivElement) => {
+      window.setTimeout(() => {
+        element.classList.remove(styles.armed, styles.playing);
+      }, 2_900);
+    },
+  }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
   const filterId = useId().replace(/:/g, "");
   const viewWidth = widths[text];
