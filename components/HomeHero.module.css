@@ -1,5 +1,5 @@
 .slider { position: absolute; inset: 0; }
-.heroMedia { position: absolute; inset: 0; width: 100% !important; height: 100% !important; padding: 0 var(--home-gutter) 34px; background: #4e463f; color: #cfc8bf; justify-content: flex-end !important; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
+.heroMedia { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; padding: 0 var(--home-gutter) 34px; background: #4e463f; color: #cfc8bf; justify-content: flex-end !important; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity 0.8s ease; }
 .activeMedia { opacity: 1; pointer-events: auto; }
 .heroMedia:not(.activeMedia) [data-bg-edit-hint] { display: none !important; }
 .heroShade { position: absolute; z-index: 1; inset: 0; background: rgba(30, 26, 22, 0.42); pointer-events: none; }

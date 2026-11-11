@@ -13,7 +13,7 @@ type OutlineWordProps = {
 
 const widths = { DIRECTOR: 880, VISION: 610, COLUMN: 720 } as const;
 
-export function OutlineWord({ text, className = "", fill, stroke = "#e6dfd6" }: OutlineWordProps) {
+export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3" }: OutlineWordProps) {
   const ref = useRef<HTMLDivElement>(null);
   const options = useMemo(() => ({ threshold: 0.22 }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
