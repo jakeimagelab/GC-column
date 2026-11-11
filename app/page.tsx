@@ -81,7 +81,7 @@ export default async function HomePage() {
       <EquipmentCarousel items={equipment} content={content} />
 
       <section className={styles.latestSection}>
-        <OutlineWord className={styles.columnOutline} text="COLUMN" fill="#fff" stroke="#ece7e1" />
+        <OutlineWord className={styles.columnOutline} text="COLUMN" fill="#fff" />
         <div className={styles.latestHeading}><div><span {...textEditProps("home.latest.eyebrow")}>{getText(content, "home.latest.eyebrow")}</span><h2><EditableRichText id="home.latest.title" value={getText(content, "home.latest.title")} /></h2></div><Link href="/column/all" {...textEditProps("home.latest.all")}>{getText(content, "home.latest.all")}</Link></div>
         <MotionGroup className={styles.latestGrid}>{latestColumns.map((column) => <article data-motion-item key={column.slug}><Link className={styles.latestCardLink} href={`/column/${column.slug}`}><ImageSlot className={styles.latestPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{columnExcerpts.home[column.slug] ?? column.summary}</p></Link><small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small></article>)}</MotionGroup>
       </section>

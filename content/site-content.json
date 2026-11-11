@@ -1153,7 +1153,7 @@
   },
   "common.quick.kakaoUrl": {
     "type": "text",
-    "value": ""
+    "value": "https://pf.kakao.com/_xkRRPG"
   },
   "common.quick.reserveUrl": {
     "type": "text",

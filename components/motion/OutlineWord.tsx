@@ -23,7 +23,7 @@ export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3" }: 
     "--outline-ratio": viewWidth / 170,
     "--outline-fill": fill,
     "--outline-stroke": stroke,
-    "--outline-length": text === "DIRECTOR" ? 1280 : text === "VISION" ? 920 : 1050,
+    "--outline-length": text === "DIRECTOR" ? 700 : text === "VISION" ? 560 : 620,
   } as CSSProperties;
 
   return (
