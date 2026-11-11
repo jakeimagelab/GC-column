@@ -15,6 +15,7 @@ import {
   type SiteContentCollection,
   type SiteContentEntry,
 } from "@/content/site-content-types";
+import { normalizePlacementTransform } from "@/lib/imagePlacement";
 
 const contentPath = path.join(process.cwd(), "content", "site-content.json");
 const uploadsPath = path.join(process.cwd(), "public", "uploads");
@@ -105,11 +106,15 @@ export async function saveUploadedImage(id: string, bytes: Uint8Array, mimeType:
 }
 
 export function normalizeImageEntry(entry: ImageContentEntry): ImageContentEntry {
+  const desktop = entry.desktop ? normalizePlacementTransform(entry.desktop) : undefined;
+  const mobile = entry.mobile ? normalizePlacementTransform(entry.mobile) : undefined;
   return {
     ...entry,
     zoom: Math.min(250, Math.max(100, Math.round(entry.zoom))),
     focusX: Math.min(100, Math.max(0, Math.round(entry.focusX))),
     focusY: Math.min(100, Math.max(0, Math.round(entry.focusY))),
+    ...(desktop ? { desktop } : {}),
+    ...(mobile ? { mobile } : {}),
   };
 }
 

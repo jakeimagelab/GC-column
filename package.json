@@ -9,12 +9,14 @@
     "shots": "node scripts/shots.mjs && node scripts/shots-2-2.mjs",
     "seo:check": "node scripts/seo-check.mjs",
     "indexnow": "node scripts/indexnow.mjs",
-    "knowledge:export": "node --experimental-strip-types scripts/knowledge-export.mjs"
+    "knowledge:export": "node --experimental-strip-types scripts/knowledge-export.mjs",
+    "images:apply": "node scripts/images-apply.mjs"
   },
   "dependencies": {
     "next": "16.4.3",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

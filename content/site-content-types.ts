@@ -11,6 +11,8 @@ export type ImageContentEntry = {
   zoom: number;
   focusX: number;
   focusY: number;
+  desktop?: { x: number; y: number; zoom: number };
+  mobile?: { x: number; y: number; zoom: number };
 };
 
 export type HeroSlide = {

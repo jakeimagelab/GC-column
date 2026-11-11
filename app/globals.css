@@ -109,7 +109,61 @@ svg {
 
 .devEditActive [data-edit-type="image"],
 .devEditActive [data-edit-type="bgImage"] {
-  cursor: pointer !important;
+  position: relative;
+  cursor: grab !important;
+  outline: 2px dashed rgba(47, 111, 237, 0.72);
+  outline-offset: -2px;
+}
+
+.devEditActive [data-edit-type="image"]::after,
+.devEditActive [data-edit-type="bgImage"]::after {
+  position: absolute;
+  z-index: 30;
+  right: 6px;
+  bottom: 6px;
+  max-width: calc(100% - 12px);
+  padding: 5px 8px;
+  border-radius: 4px;
+  content: attr(data-placement-display);
+  overflow: hidden;
+  background: rgba(43, 43, 43, 0.82);
+  color: #fff;
+  font: 500 10px/1.25 var(--font-sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.devEditActive [data-placement-dragover="true"] {
+  outline: 4px solid #2f6fed;
+  outline-offset: -4px;
+}
+
+.devEditActive [data-placement-pending] {
+  outline-color: #d17a35;
+}
+
+.devEditActive [data-placement-adjusting="true"] {
+  overflow: visible !important;
+  z-index: 100;
+  cursor: grabbing !important;
+}
+
+.devEditActive [data-placement-adjusting="true"] img {
+  opacity: .42;
+}
+
+.devEditActive [data-placement-preview] {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--image-focus-x) var(--image-focus-y);
+  transform: scale(var(--image-scale));
+  transform-origin: var(--image-focus-x) var(--image-focus-y);
+  pointer-events: none;
 }
 
 .devEditActive [data-bg-edit-hint] {
@@ -132,11 +186,37 @@ svg {
   background: var(--white);
 }
 
+.devPlacementMobilePreview {
+  background: #282522;
+}
+
+.devPlacementMobilePreview .pageFrame {
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.2), 0 20px 80px rgba(0,0,0,.34);
+}
+
+.devPlacementMobilePreview [data-edit-type="image"] img,
+.devPlacementMobilePreview [data-edit-type="bgImage"] img {
+  object-position: var(--image-mobile-focus-x) var(--image-mobile-focus-y) !important;
+  transform: scale(var(--image-mobile-scale)) !important;
+  transform-origin: var(--image-mobile-focus-x) var(--image-mobile-focus-y) !important;
+}
+
 @media (max-width: 1024px) {
   body {
     font-size: 14px;
   }
   .pageFrame {
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 640px) {
+  .devEditActive [data-placement-preview] {
+    object-position: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
+    transform: scale(var(--image-mobile-scale));
+    transform-origin: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
   }
 }

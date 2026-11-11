@@ -9,3 +9,4 @@ output/
 .git-local/
 .env.local
 .env*.local
+photos-inbox/

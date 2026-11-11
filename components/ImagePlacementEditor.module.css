@@ -1,0 +1,88 @@
+.placementBadge {
+  position: fixed;
+  z-index: 1250;
+  top: 16px;
+  right: 16px;
+  width: 310px;
+  border: 1px solid #c8beb2;
+  border-radius: 8px;
+  background: rgba(255,255,255,.97);
+  color: #2b2b2b;
+  box-shadow: 0 12px 34px rgba(0,0,0,.16);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.placementBadge > button { width: 100%; min-height: 42px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; border: 0; background: transparent; }
+.placementBadge > button span { color: #6b6b6b; }
+.placementList { max-height: min(62vh, 520px); padding: 0 8px 8px; overflow: auto; border-top: 1px solid #eee8e1; }
+.placementList article { position: relative; display: grid; grid-template-columns: 1fr auto; border-bottom: 1px solid #eee8e1; }
+.placementList article > button:first-child { min-width: 0; padding: 10px 6px; display: grid; gap: 1px; border: 0; background: transparent; text-align: left; }
+.placementList article > button:last-child { width: 32px; border: 0; background: transparent; color: #b42318; font-size: 18px; }
+.placementList b, .placementList span, .placementList small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.placementList b { font-size: 11px; }
+.placementList span { font-weight: 500; }
+.placementList small { color: #6b6b6b; }
+.placementList .needsAlt { color: #b42318; font-weight: 700; }
+.placementList > p { margin: 14px 6px 8px; color: #6b6b6b; }
+
+.slotCancel {
+  position: absolute;
+  z-index: 40;
+  top: 5px;
+  right: 5px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,.8);
+  border-radius: 50%;
+  background: rgba(43,43,43,.86);
+  color: #fff;
+  font: 700 17px/1 var(--font-sans);
+  cursor: pointer;
+}
+
+.slotTools {
+  position: fixed;
+  z-index: 1300;
+  min-height: 40px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #b9aea2;
+  border-radius: 7px;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 10px 28px rgba(0,0,0,.18);
+  color: #2b2b2b;
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+.slotTools button { min-height: 30px; padding: 4px 8px; border: 1px solid #ddd5cb; border-radius: 4px; background: #fff; }
+.slotTools output { min-width: 42px; text-align: center; font-weight: 700; }
+.slotTools .done { border-color: #2b2b2b; background: #2b2b2b; color: #fff; }
+.slotTools button:disabled { opacity: .42; }
+.viewSwitch { display: flex; padding: 2px; border-radius: 5px; background: #f3f0eb; }
+.viewSwitch button { border-color: transparent; background: transparent; }
+.viewSwitch button.active { border-color: #b5a595; background: #fff; }
+.qualityWarning { position: absolute; top: calc(100% + 5px); left: 0; padding: 5px 8px; border-radius: 4px; background: #fff2dc; color: #8a4b12; white-space: nowrap; }
+
+.dropDialog { position: fixed; z-index: 1500; inset: 0; padding: 20px; display: grid; place-items: center; background: rgba(43,43,43,.52); backdrop-filter: blur(5px); }
+.dropDialog section { width: min(100%, 470px); padding: 28px; border-radius: 10px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.25); color: #2b2b2b; font-family: var(--font-sans); }
+.dropDialog section > span { color: #6e6052; font-family: var(--font-en); font-size: 10px; font-weight: 700; letter-spacing: .14em; }
+.dropDialog h2 { margin: 8px 0; font-size: 24px; }
+.dropDialog p { color: #6b6b6b; }
+.dropDialog .dropWarning { padding: 9px 10px; border-radius: 5px; background: #fff2dc; color: #8a4b12; font-size: 12px; }
+.dropDialog label { display: grid; gap: 6px; margin-top: 18px; font-weight: 700; }
+.dropDialog input { min-height: 44px; padding: 0 11px; border: 1px solid #c8beb2; border-radius: 5px; }
+.dropDialog section > div { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.dropDialog button { min-height: 44px; border: 1px solid #d8d0c8; border-radius: 5px; background: #fff; }
+.dropDialog button:last-child { border-color: #2b2b2b; background: #2b2b2b; color: #fff; }
+
+.notice { position: fixed; z-index: 1600; right: 18px; bottom: 112px; max-width: min(430px, calc(100vw - 36px)); padding: 11px 38px 11px 13px; border: 1px solid #c8beb2; border-radius: 7px; background: #fff; box-shadow: 0 12px 30px rgba(0,0,0,.18); color: #2b2b2b; font: 12px/1.5 var(--font-sans); }
+.notice button { position: absolute; inset: 0 0 0 auto; width: 34px; border: 0; background: transparent; }
+
+@media (max-width: 640px) {
+  .placementBadge { top: 8px; right: 8px; width: min(300px, calc(100vw - 16px)); }
+  .slotTools { right: 8px; left: 8px !important; top: auto !important; bottom: 49vh; flex-wrap: wrap; }
+  .qualityWarning { white-space: normal; }
+}

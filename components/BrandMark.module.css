@@ -73,3 +73,11 @@
   transform: scale(var(--image-scale));
   transform-origin: var(--image-focus-x) var(--image-focus-y);
 }
+
+@media (max-width: 640px) {
+  .image {
+    object-position: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
+    transform: scale(var(--image-mobile-scale));
+    transform-origin: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
+  }
+}

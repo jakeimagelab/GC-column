@@ -21,7 +21,9 @@ import {
   type SiteContentEntry,
   type TextContentEntry,
 } from "@/content/site-content-types";
+import { desktopTransform, mobileTransform } from "@/lib/imagePlacement";
 import styles from "./DevEditor.module.css";
+import { ImagePlacementEditor } from "./ImagePlacementEditor";
 
 type DevEditorProps = {
   page: "home" | "column";
@@ -181,9 +183,14 @@ function applyDomEntry(id: string, entry: SiteContentEntry) {
     }
 
     target.setAttribute("aria-label", entry.alt);
-    target.style.setProperty("--image-scale", String(entry.zoom / 100));
-    target.style.setProperty("--image-focus-x", `${entry.focusX}%`);
-    target.style.setProperty("--image-focus-y", `${entry.focusY}%`);
+    const desktop = desktopTransform(entry);
+    const mobile = mobileTransform(entry);
+    target.style.setProperty("--image-scale", String(desktop.zoom / 100));
+    target.style.setProperty("--image-focus-x", `${desktop.x}%`);
+    target.style.setProperty("--image-focus-y", `${desktop.y}%`);
+    target.style.setProperty("--image-mobile-scale", String(mobile.zoom / 100));
+    target.style.setProperty("--image-mobile-focus-x", `${mobile.x}%`);
+    target.style.setProperty("--image-mobile-focus-y", `${mobile.y}%`);
     const hint = target.querySelector<HTMLElement>("[data-bg-edit-hint]");
     target.querySelectorAll("img, [data-edit-preview]").forEach((node) => node.remove());
     Array.from(target.childNodes).filter((node) => node.nodeType === Node.TEXT_NODE).forEach((node) => node.remove());
@@ -192,7 +199,7 @@ function applyDomEntry(id: string, entry: SiteContentEntry) {
       image.src = entry.src;
       image.alt = entry.alt;
       image.dataset.editPreview = "true";
-      image.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${entry.focusX}% ${entry.focusY}%;transform:scale(${entry.zoom / 100});transform-origin:${entry.focusX}% ${entry.focusY}%;`;
+      image.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:${desktop.x}% ${desktop.y}%;transform:scale(${desktop.zoom / 100});transform-origin:${desktop.x}% ${desktop.y}%;`;
       target.insertBefore(image, hint ?? null);
     } else {
       target.insertBefore(document.createTextNode(entry.label), hint ?? null);
@@ -461,8 +468,12 @@ export function DevEditor({ page, content }: DevEditorProps) {
   };
 
   const commitImageDraft = (nextDraft: ImageContentEntry) => {
-    setDraft(nextDraft);
-    if (selectedId) void saveEntry(selectedId, nextDraft);
+    const withDesktop = {
+      ...nextDraft,
+      desktop: { x: nextDraft.focusX, y: nextDraft.focusY, zoom: nextDraft.zoom },
+    };
+    setDraft(withDesktop);
+    if (selectedId) void saveEntry(selectedId, withDesktop);
   };
 
   const saveHistoryValue = async (id: string, value: EditorValue, before: EditorValue) => {
@@ -510,6 +521,7 @@ export function DevEditor({ page, content }: DevEditorProps) {
 
   return (
     <>
+      <ImagePlacementEditor content={entries} />
       {inlineEdit ? (
         <div
           ref={inlineEditor}

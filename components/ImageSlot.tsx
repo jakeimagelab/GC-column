@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ImageContentEntry } from "@/content/site-content-types";
+import { desktopTransform, getImagePlacementMeta, mobileTransform } from "@/lib/imagePlacement";
 import styles from "./ImageSlot.module.css";
 
 type ImageSlotProps = {
@@ -34,13 +35,19 @@ export function ImageSlot({
   sizes = "(max-width: 768px) 100vw, 50vw",
   motionRole,
 }: ImageSlotProps) {
+  const desktop = image ? desktopTransform(image) : { x: 50, y: 50, zoom: 100 };
+  const mobile = image ? mobileTransform(image) : desktop;
+  const placement = editId ? getImagePlacementMeta(editId, image?.label ?? label) : null;
   const style = {
     width,
     height,
     aspectRatio: ratio,
-    "--image-scale": (image?.zoom ?? 100) / 100,
-    "--image-focus-x": `${image?.focusX ?? 50}%`,
-    "--image-focus-y": `${image?.focusY ?? 50}%`,
+    "--image-scale": desktop.zoom / 100,
+    "--image-focus-x": `${desktop.x}%`,
+    "--image-focus-y": `${desktop.y}%`,
+    "--image-mobile-scale": mobile.zoom / 100,
+    "--image-mobile-focus-x": `${mobile.x}%`,
+    "--image-mobile-focus-y": `${mobile.y}%`,
   } as CSSProperties;
 
   const resolvedLabel = image?.label ?? label;
@@ -54,6 +61,10 @@ export function ImageSlot({
       aria-label={resolvedAlt}
       data-edit-id={editId}
       data-edit-type={image?.type}
+      data-placement-page={placement?.page}
+      data-placement-section={placement?.section}
+      data-placement-name={placement?.slotName}
+      data-placement-display={placement?.displayName}
       data-motion-photo={motionRole === "doctor-photo" ? "" : undefined}
     >
       {image?.src ? (
