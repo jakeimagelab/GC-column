@@ -11,3 +11,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Project skills
 
 - For Scroll World planning or implementation, read `skills/scroll-world/SKILL.md` completely before acting and follow its referenced workflow files as required.
+- For UX research, product-flow audits, design critique, accessibility review, prototype ideation, or design-to-implementation QA, read `skills/product-design/skills/index/SKILL.md` completely before acting. Follow its routing instructions and read the selected focused skill (especially `audit` or `design-qa`) plus every required reference before taking task actions.
