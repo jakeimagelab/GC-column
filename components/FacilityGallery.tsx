@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
@@ -19,13 +19,17 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [interactionPaused, setInteractionPaused] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const stageTouchStart = useRef<number | null>(null);
   const modalTouchStart = useRef<number | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stageDrag = useRef({ active: false, startX: 0, moved: false });
+  const suppressStageClick = useRef(false);
   const bandRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLElement>(null);
   const roomName = (roomIndex: number) => getText(content, `home.gallery.room.${roomKeys[roomIndex]}`);
   const roomImage = (roomIndex: number) => getImage(content, `home.gallery.${roomKeys[roomIndex]}`);
-  const paused = interactionPaused || userPaused || editMode || reducedMotion;
+  const paused = interactionPaused || userPaused || editMode || reducedMotion || dragging;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -39,9 +43,9 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
 
   useEffect(() => {
     if (paused || roomKeys.length <= 1) return;
-    const timer = window.setInterval(() => setIndex((current) => (current + 1) % roomKeys.length), 4000);
-    return () => window.clearInterval(timer);
-  }, [paused]);
+    const timer = window.setTimeout(() => setIndex((current) => (current + 1) % roomKeys.length), 4000);
+    return () => window.clearTimeout(timer);
+  }, [index, paused]);
 
   useEffect(() => {
     if (editMode || reducedMotion) return;
@@ -87,6 +91,33 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const swipe = (distance: number) => {
     if (Math.abs(distance) > 50) setIndex((current) => (current + (distance > 0 ? -1 : 1) + roomKeys.length) % roomKeys.length);
   };
+  const move = (delta: number) => setIndex((current) => (current + delta + roomKeys.length) % roomKeys.length);
+  const resetStageDrag = (event: ReactPointerEvent<HTMLDivElement>, commit: boolean) => {
+    if (!stageDrag.current.active) return;
+    const distance = event.clientX - stageDrag.current.startX;
+    const moved = stageDrag.current.moved;
+    stageDrag.current = { active: false, startX: 0, moved: false };
+    stageRef.current?.style.removeProperty("--gallery-drag");
+    setDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (!commit || !moved) return;
+    suppressStageClick.current = true;
+    swipe(distance);
+    window.setTimeout(() => { suppressStageClick.current = false; }, 0);
+  };
+  const startStageDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (editMode || event.pointerType !== "mouse" || event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("[data-gallery-control]")) return;
+    stageDrag.current = { active: true, startX: event.clientX, moved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
+  };
+  const dragStage = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!stageDrag.current.active) return;
+    const distance = event.clientX - stageDrag.current.startX;
+    if (Math.abs(distance) > 5) stageDrag.current.moved = true;
+    event.currentTarget.style.setProperty("--gallery-drag", `${Math.max(-120, Math.min(120, distance))}px`);
+  };
 
   useEffect(() => {
     if (modalIndex === null) return;
@@ -116,8 +147,18 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
       <div className={styles.heading} data-scroll-world-layer="copy"><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><EditableRichText id="home.gallery.title" value={getText(content, "home.gallery.title")} /></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
 
       <div
-        className={styles.stage}
+        ref={stageRef}
+        className={`${styles.stage} ${dragging ? styles.stageDragging : ""}`}
         data-scroll-world-layer="depth"
+        onPointerDown={startStageDrag}
+        onPointerMove={dragStage}
+        onPointerUp={(event) => resetStageDrag(event, true)}
+        onPointerCancel={(event) => resetStageDrag(event, false)}
+        onClickCapture={(event) => {
+          if (!suppressStageClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
         onTouchStart={(event) => { stageTouchStart.current = event.changedTouches[0]?.clientX ?? null; }}
         onTouchEnd={(event) => {
           if (stageTouchStart.current === null) return;
@@ -144,6 +185,8 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
             </button>
           );
         })}
+        <button type="button" className={`${styles.stageArrow} ${styles.stagePrevious}`} data-gallery-control onClick={() => move(-1)} aria-label="이전 시설">‹</button>
+        <button type="button" className={`${styles.stageArrow} ${styles.stageNext}`} data-gallery-control onClick={() => move(1)} aria-label="다음 시설">›</button>
       </div>
 
       <div className={styles.controls}>

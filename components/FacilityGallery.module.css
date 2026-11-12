@@ -9,16 +9,24 @@
 .heading a { margin-top: 18px; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .heading i { width: 40px; height: 1px; background: #fff; }
 
-.stage { position: absolute; z-index: 4; top: 230px; left: 0; right: 0; height: 390px; }
+.stage { --gallery-drag: 0px; position: absolute; z-index: 4; top: 230px; left: 0; right: 0; height: 390px; cursor: grab; user-select: none; }
+.stageDragging { cursor: grabbing; }
 .room { position: absolute; top: 50%; left: 50%; width: min(462px, 32.0833vw); height: 330px; padding: 0 28px 26px; border: 0; background: #a89a8b; color: #fff; box-shadow: 0 20px 40px rgba(0, 0, 0, .22); cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; transition: transform .9s cubic-bezier(.22,.61,.36,1), opacity .9s cubic-bezier(.22,.61,.36,1), filter .9s cubic-bezier(.22,.61,.36,1); }
 .photoSlot { position: absolute !important; inset: 0 0 70px; width: 100% !important; height: auto !important; background: transparent; color: #f3eee8; }
 .room b { position: relative; z-index: 2; font-size: 18px; text-align: left; }
-.room[data-position="0"] { z-index: 5; opacity: 1; transform: translate(-50%, -56%) scale(1); cursor: zoom-in; }
-.room[data-position="-1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(-128%, -44%) scale(.78); }
-.room[data-position="1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(28%, -44%) scale(.78); }
-.room[data-position="-2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(-190%, -44%) scale(.6); }
-.room[data-position="2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(90%, -44%) scale(.6); }
+.room[data-position="0"] { z-index: 5; opacity: 1; transform: translate(calc(-50% + var(--gallery-drag)), -56%) scale(1); cursor: grab; }
+.room[data-position="-1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(calc(-128% + var(--gallery-drag)), -44%) scale(.78); }
+.room[data-position="1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(calc(28% + var(--gallery-drag)), -44%) scale(.78); }
+.room[data-position="-2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(calc(-190% + var(--gallery-drag)), -44%) scale(.6); }
+.room[data-position="2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(calc(90% + var(--gallery-drag)), -44%) scale(.6); }
 .room:not([data-position="0"]) b { opacity: 0; }
+.stageDragging .room { transition: none; cursor: grabbing; }
+
+.stageArrow { position: absolute; z-index: 8; top: 48%; width: 48px; height: 64px; padding: 0; transform: translateY(-50%); border: 1px solid rgba(255,255,255,.62); background: rgba(58,52,46,.38); color: #fff; font-family: var(--font-en); font-size: 34px; font-weight: 300; opacity: 0; cursor: pointer; backdrop-filter: blur(4px); transition: opacity .25s ease, background-color .25s ease; }
+.stagePrevious { left: max(24px, calc(50% - 590px)); }
+.stageNext { right: max(24px, calc(50% - 590px)); }
+.gallery:hover .stageArrow, .stage:focus-within .stageArrow { opacity: 1; }
+.stageArrow:hover, .stageArrow:focus-visible { background: rgba(58,52,46,.72); }
 
 .controls { position: absolute; z-index: 7; top: 636px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; }
 .pages { display: flex; align-items: center; gap: 8px; }
@@ -43,6 +51,8 @@
 
 :global(.devEditActive) .leftBand { transform: none !important; }
 :global(.devEditActive) .room, :global(.devEditActive) .pages button { transition: none; }
+:global(.devEditActive) .stage { cursor: default; }
+:global(.devEditActive) .stageArrow { display: none; }
 
 @media (max-width: 1024px) {
   .gallery { height: auto; min-height: 700px; }
@@ -58,8 +68,9 @@
   .heading h2 { font-size: 30px; }
   .stage { top: 220px; height: 360px; touch-action: pan-y; }
   .room { width: 70%; height: 330px; }
-  .room[data-position="-1"] { transform: translate(-112%, -44%) scale(.7); }
-  .room[data-position="1"] { transform: translate(12%, -44%) scale(.7); }
+  .room[data-position="-1"] { transform: translate(calc(-112% + var(--gallery-drag)), -44%) scale(.7); }
+  .room[data-position="1"] { transform: translate(calc(12% + var(--gallery-drag)), -44%) scale(.7); }
+  .stageArrow { display: none; }
   .controls { top: 594px; }
   .modal { padding: 62px 14px 28px; }
   .modalArrow { top: auto; bottom: 18px; width: 44px; height: 44px; transform: none; z-index: 2; }
