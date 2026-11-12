@@ -127,8 +127,10 @@ export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackIm
   const showFallback = failed || !ready;
   return (
     <div className={`${styles.wrap} ${className}`} ref={wrapRef} data-scroll-world-layer={scrollWorldLayer}>
-      {showFallback ? <ImageSlot className={styles.fallback} label="" alt="" variant="light" editId={fallbackEditId} image={fallbackImage} /> : null}
-      {!failed && apiKey ? <div className={styles.canvas} ref={mapRef} hidden={!visible} aria-label={`${address} 카카오맵`} /> : null}
+      <div className={styles.stage}>
+        {showFallback ? <ImageSlot className={styles.fallback} label="" alt="" variant="light" editId={fallbackEditId} image={fallbackImage} /> : null}
+        {!failed && apiKey ? <div className={styles.canvas} ref={mapRef} hidden={!visible} aria-label={`${address} 카카오맵`} /> : null}
+      </div>
       <div className={styles.coordinates}>
         <button type="button" {...textEditProps("home.location.lat")}>위도 {lat || "입력"}</button>
         <button type="button" {...textEditProps("home.location.lng")}>경도 {lng || "입력"}</button>

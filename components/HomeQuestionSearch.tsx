@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isVisualEditingMode } from "@/lib/motion";
 import { getText, getTypingExamples, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { useMotionOnce } from "./motion/useMotionOnce";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import { QuestionForm } from "./QuestionForm";
 import styles from "./HomeQuestionSearch.module.css";
@@ -20,6 +21,8 @@ export type HomeSearchColumn = {
 
 type HomeQuestionSearchProps = { columns: HomeSearchColumn[]; content: SiteContent };
 
+const QUESTION_REVEAL_OPTIONS = { threshold: 0.18, rootMargin: "0px 0px -28%", armBeforePlay: true };
+
 export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -29,6 +32,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [questionOpen, setQuestionOpen] = useState(false);
   const [typingText, setTypingText] = useState("");
+  const panelRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const composing = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -40,6 +44,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   const suggestions = useMemo(() => getSuggestions(suggestionIndex, query), [query, suggestionIndex]);
   const suggestionsOpen = inputFocused && suggestions.length > 0;
   const typingExamples = useMemo(() => getTypingExamples(content), [content]);
+  useMotionOnce(panelRef, styles.unfoldArmed, styles.unfoldPlaying, QUESTION_REVEAL_OPTIONS);
 
   const runSearch = (nextQuery: string) => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -122,7 +127,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   };
 
   return (
-    <section className={styles.panel} aria-labelledby="home-question-title" data-scroll-world-scene data-scroll-world-strength="soft">
+    <section ref={panelRef} className={styles.panel} aria-labelledby="home-question-title" data-scroll-world-scene data-scroll-world-strength="soft">
       <div className={styles.heading} data-scroll-world-layer="copy">
         <div><span {...textEditProps("home.question.eyebrow")}>{getText(content, "home.question.eyebrow")}</span><h2 id="home-question-title" {...textEditProps("home.question.title")}>{getText(content, "home.question.title")}</h2></div>
         <p {...textEditProps("home.question.description")}>{getText(content, "home.question.description")}</p>

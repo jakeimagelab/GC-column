@@ -12,14 +12,16 @@ export function useMotionOnce<T extends HTMLElement>(
   ref: RefObject<T | null>,
   armedClass: string,
   playingClass: string,
-  options: { threshold?: number; rootMargin?: string; onPlay?: (element: T) => void } = {},
+  options: { threshold?: number; rootMargin?: string; armBeforePlay?: boolean; onPlay?: (element: T) => void } = {},
 ) {
   useEffect(() => {
     const element = ref.current;
     if (!element || motionDisabled()) return;
 
+    if (options.armBeforePlay) element.classList.add(armedClass);
+
     const play = () => {
-      element.classList.add(armedClass);
+      if (!options.armBeforePlay) element.classList.add(armedClass);
       options.onPlay?.(element);
       void element.offsetWidth;
       requestAnimationFrame(() => element.classList.add(playingClass));

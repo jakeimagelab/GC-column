@@ -30,9 +30,20 @@
   will-change: clip-path;
 }
 
+.tracking .text { letter-spacing: -2px; }
+.tracking.armed .svg { clip-path: inset(0); }
+.tracking.playing .svg { animation: none; }
+.tracking.armed .text { letter-spacing: 42px; }
+.tracking.playing .text { animation: outlineTracking 1.35s cubic-bezier(.22,.61,.36,1) both; will-change: letter-spacing; }
+
 @keyframes outlineReveal {
   from { clip-path: inset(0 100% 0 0); }
   to { clip-path: inset(0); }
+}
+
+@keyframes outlineTracking {
+  from { letter-spacing: 42px; }
+  to { letter-spacing: -2px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -41,6 +52,8 @@
     clip-path: inset(0);
     animation: none;
   }
+  .tracking.armed .text,
+  .tracking.playing .text { letter-spacing: -2px; animation: none; }
 }
 
 :global(.devEditActive) .armed .svg,
@@ -48,3 +61,6 @@
   clip-path: inset(0);
   animation: none;
 }
+
+:global(.devEditActive) .tracking.armed .text,
+:global(.devEditActive) .tracking.playing .text { letter-spacing: -2px; animation: none; }

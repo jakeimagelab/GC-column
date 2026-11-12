@@ -105,7 +105,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
       <div className={styles.heroCopy} key={current.id}>
         <span {...textEditProps(`home.hero.slides.${current.id}.eyebrow`)}>{current.eyebrow}</span>
         <h1>
-          <span className={styles.titleLine}><span {...textEditProps(`home.hero.slides.${current.id}.title`)}>{current.title}</span></span>
+          <span className={styles.titleLine}><span className={styles.scriptTitle} {...textEditProps(`home.hero.slides.${current.id}.title`)}>{current.title}</span></span>
           <span className={styles.titleLine}><b {...textEditProps(`home.hero.slides.${current.id}.titleStrong`)}>{current.titleStrong}</b></span>
         </h1>
         <p {...textEditProps(`home.hero.slides.${current.id}.description`)}>{current.description}</p>

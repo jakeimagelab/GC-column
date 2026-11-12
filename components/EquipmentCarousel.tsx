@@ -219,7 +219,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
           {!editMode && canRotate ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "장비 흐름 재생" : "장비 흐름 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
         </div>
       </div>
-      <div className={styles.viewport} ref={viewportRef} data-scroll-world-layer="depth">
+      <div className={styles.viewport} ref={viewportRef}>
         {editMode ? (
           <div
             ref={trackRef}

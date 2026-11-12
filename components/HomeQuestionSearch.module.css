@@ -1,4 +1,6 @@
 .panel { position: relative; z-index: 10; margin: -110px var(--home-gutter) 0; padding: 40px clamp(32px, 3.8889vw, 56px) 36px; background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14); display: flex; flex-direction: column; gap: 18px; }
+.unfoldArmed { opacity: 0; transform: translateY(-24px) scaleY(.04); transform-origin: top center; }
+.unfoldPlaying { animation: questionUnfold 1s cubic-bezier(.22,.61,.36,1) both; will-change: opacity, transform; }
 .heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
 .heading > div { display: flex; align-items: baseline; gap: 16px; }
 .heading span { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 4px; }
@@ -37,11 +39,19 @@
 .empty button { padding: 12px 18px; border: 0; background: var(--taupe); color: #fff; font-size: 14px; white-space: nowrap; }
 
 @keyframes typingCaret { 50% { opacity: 0; } }
+@keyframes questionUnfold {
+  from { opacity: 0; transform: translateY(-24px) scaleY(.04); }
+  to { opacity: 1; transform: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .typingGhost { display: none; }
   .typing input::placeholder { color: #9c938b; }
+  .unfoldArmed, .unfoldPlaying { opacity: 1; transform: none; animation: none; }
 }
+
+:global(.devEditActive) .unfoldArmed,
+:global(.devEditActive) .unfoldPlaying { opacity: 1; transform: none; animation: none; }
 
 @media (max-width: 1024px) {
   .panel { padding-inline: 36px; }
