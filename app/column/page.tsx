@@ -93,7 +93,7 @@ export default async function ColumnMainPage() {
             <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span data-motion-career key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
             <div className={styles.doctorLinks}>
               <Link href="/doctor/lee-ho" {...textEditProps("column.doctor.more")}>{getText(content, "column.doctor.more")}</Link>
-              <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><SignatureMotion className={styles.doctorSignatureImage} editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} /></span>
+              <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><SignatureMotion className={styles.doctorSignatureImage} editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} fallbackText={getText(content, "doctor.name")} /></span>
             </div>
           </div>
         </div>

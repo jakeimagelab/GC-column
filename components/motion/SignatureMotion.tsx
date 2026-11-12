@@ -11,6 +11,7 @@ type SignatureMotionProps = {
   image: ImageContentEntry;
   editId: string;
   className?: string;
+  fallbackText?: string;
 };
 
 function sanitizeSvg(source: string) {
@@ -28,7 +29,7 @@ function sanitizeSvg(source: string) {
   return svg.outerHTML;
 }
 
-export function SignatureMotion({ image, editId, className = "" }: SignatureMotionProps) {
+export function SignatureMotion({ image, editId, className = "", fallbackText }: SignatureMotionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [svgMarkup, setSvgMarkup] = useState("");
   const isSvg = Boolean(image.src && /\.svg(?:\?.*)?$/i.test(image.src));
@@ -95,7 +96,7 @@ export function SignatureMotion({ image, editId, className = "" }: SignatureMoti
       {image.src ? (
         svgMarkup ? <span className={styles.inlineSvg} aria-hidden="true" dangerouslySetInnerHTML={{ __html: svgMarkup }} /> :
           <Image src={image.src} alt={image.alt} fill sizes="220px" unoptimized={isSvg} />
-      ) : image.label}
+      ) : (fallbackText ?? image.label)}
     </div>
   );
 }

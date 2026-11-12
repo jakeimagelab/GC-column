@@ -91,7 +91,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const swipe = (distance: number) => {
     if (Math.abs(distance) > 50) setIndex((current) => (current + (distance > 0 ? -1 : 1) + roomKeys.length) % roomKeys.length);
   };
-  const move = (delta: number) => setIndex((current) => (current + delta + roomKeys.length) % roomKeys.length);
   const resetStageDrag = (event: ReactPointerEvent<HTMLDivElement>, commit: boolean) => {
     if (!stageDrag.current.active) return;
     const distance = event.clientX - stageDrag.current.startX;
@@ -107,7 +106,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   };
   const startStageDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (editMode || event.pointerType !== "mouse" || event.button !== 0) return;
-    if ((event.target as HTMLElement).closest("[data-gallery-control]")) return;
     stageDrag.current = { active: true, startX: event.clientX, moved: false };
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
@@ -185,8 +183,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
             </button>
           );
         })}
-        <button type="button" className={`${styles.stageArrow} ${styles.stagePrevious}`} data-gallery-control onClick={() => move(-1)} aria-label="이전 시설">‹</button>
-        <button type="button" className={`${styles.stageArrow} ${styles.stageNext}`} data-gallery-control onClick={() => move(1)} aria-label="다음 시설">›</button>
       </div>
 
       <div className={styles.controls}>

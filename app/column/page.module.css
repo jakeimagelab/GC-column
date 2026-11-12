@@ -27,7 +27,7 @@
 .doctorLinks { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 14px; }
 .doctorLinks a { padding-bottom: 2px; border-bottom: 1px solid var(--ink); font-size: 15px; }
 .doctorSignature { display: flex; align-items: center; gap: 5px; }
-.doctorSignatureImage { width: 90px; height: 38px; padding: 0; background: transparent; color: var(--ink); font-size: 30px; font-style: italic; font-weight: 700; }
+.doctorSignatureImage { width: 90px; height: 46px; padding: 0; background: transparent; color: var(--ink); font-size: 30px; font-style: italic; font-weight: 700; line-height: 1.2; }
 
 .categorySection { padding: 40px var(--column-gutter) 60px; }
 .categorySection h2, .latestSection h2, .treatmentsSection h2, .principlesSection h2, .infoSection h2 { margin: 0; font-size: 26px; }
