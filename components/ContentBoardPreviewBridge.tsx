@@ -8,6 +8,7 @@ type SyncMessage = {
   slideId: string;
   items: BoardItem[];
   viewMode: BoardViewMode;
+  selectedItemId?: string | null;
 };
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
@@ -69,6 +70,7 @@ function post(message: Record<string, unknown>) {
 export function ContentBoardPreviewBridge() {
   const items = useRef(new Map<string, BoardItem>());
   const viewMode = useRef<BoardViewMode>("desktop");
+  const slideId = useRef("");
   const drag = useRef<{ target: HTMLElement; item: BoardImageItem; pointerId: number; startX: number; startY: number; start: BoardImageTransform; latest: BoardImageTransform } | null>(null);
 
   useEffect(() => {
@@ -109,7 +111,7 @@ export function ContentBoardPreviewBridge() {
       target.setAttribute("aria-label", item.alt || "설명 필요");
       target.querySelectorAll("[data-board-generated]").forEach((node) => node.remove());
 
-      const source = item.asset ? `/api/dev-content-board?asset=${encodeURIComponent(item.asset)}` : null;
+      const source = item.previewSrc ?? (item.asset ? `/api/dev-content-board?asset=${encodeURIComponent(item.asset)}` : null);
       let image = source ? null : target.querySelector<HTMLImageElement>("img:not([data-board-generated])");
       if (source) {
         image = document.createElement("img");
@@ -166,11 +168,22 @@ export function ContentBoardPreviewBridge() {
       });
     };
 
+    const markSelected = (target?: HTMLElement | null) => {
+      document.querySelectorAll("[data-board-selected]").forEach((node) => node.removeAttribute("data-board-selected"));
+      if (target) target.dataset.boardSelected = "true";
+    };
+
     const onMessage = (event: MessageEvent<SyncMessage>) => {
       if (event.origin !== window.location.origin || event.data?.type !== "content-board:sync") return;
+      const shouldScroll = slideId.current !== event.data.slideId;
+      slideId.current = event.data.slideId;
       items.current = new Map(event.data.items.map((item) => [item.id, item]));
       viewMode.current = event.data.viewMode;
-      applyAll(true);
+      applyAll(shouldScroll);
+      const selected = event.data.selectedItemId
+        ? document.querySelector<HTMLElement>(targetSelector(event.data.selectedItemId))
+        : null;
+      markSelected(selected);
     };
 
     const onClick = (event: MouseEvent) => {
@@ -187,8 +200,7 @@ export function ContentBoardPreviewBridge() {
       event.stopPropagation();
       const id = target.dataset.editId!;
       const item = items.current.get(id)!;
-      document.querySelectorAll("[data-board-selected]").forEach((node) => node.removeAttribute("data-board-selected"));
-      target.dataset.boardSelected = "true";
+      markSelected(target);
       post({ type: "content-board:select", id });
       if (item.type !== "text" || target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.dataset.editAttribute) return;
       target.contentEditable = "true";
@@ -233,8 +245,10 @@ export function ContentBoardPreviewBridge() {
 
     const onDragOver = (event: DragEvent) => {
       const found = imageTarget(event.target);
-      if (!found) return;
+      if (!event.dataTransfer?.types.includes("Files")) return;
       event.preventDefault();
+      document.body.dataset.boardFileDragging = "true";
+      if (!found) return;
       found.target.dataset.boardDragover = "true";
     };
 
@@ -245,12 +259,23 @@ export function ContentBoardPreviewBridge() {
     const onDrop = (event: DragEvent) => {
       const found = imageTarget(event.target);
       const file = event.dataTransfer?.files[0];
-      if (!found || !file) return;
+      document.body.removeAttribute("data-board-file-dragging");
+      document.querySelectorAll("[data-board-dragover]").forEach((node) => node.removeAttribute("data-board-dragover"));
+      if (!file) return;
       event.preventDefault();
       event.stopPropagation();
-      found.target.removeAttribute("data-board-dragover");
+      if (!found) {
+        post({ type: "content-board:error", message: "사진을 점선으로 표시된 이미지 박스 위에 놓아주세요." });
+        return;
+      }
+      markSelected(found.target);
       post({ type: "content-board:select", id: found.item.id });
       post({ type: "content-board:image-drop", id: found.item.id, file });
+    };
+
+    const onDragEnd = () => {
+      document.body.removeAttribute("data-board-file-dragging");
+      document.querySelectorAll("[data-board-dragover]").forEach((node) => node.removeAttribute("data-board-dragover"));
     };
 
     const onPointerDown = (event: PointerEvent) => {
@@ -258,6 +283,7 @@ export function ContentBoardPreviewBridge() {
       if (!found || event.button !== 0) return;
       event.preventDefault();
       const start = transformFor(found.item, viewMode.current);
+      markSelected(found.target);
       found.target.setPointerCapture(event.pointerId);
       drag.current = { target: found.target, item: found.item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
       post({ type: "content-board:select", id: found.item.id });
@@ -309,6 +335,7 @@ export function ContentBoardPreviewBridge() {
     document.addEventListener("dragover", onDragOver, true);
     document.addEventListener("dragleave", onDragLeave, true);
     document.addEventListener("drop", onDrop, true);
+    document.addEventListener("dragend", onDragEnd, true);
     document.addEventListener("pointerdown", onPointerDown, true);
     document.addEventListener("pointermove", onPointerMove, true);
     document.addEventListener("pointerup", finishPointer, true);
@@ -327,6 +354,7 @@ export function ContentBoardPreviewBridge() {
       document.removeEventListener("dragover", onDragOver, true);
       document.removeEventListener("dragleave", onDragLeave, true);
       document.removeEventListener("drop", onDrop, true);
+      document.removeEventListener("dragend", onDragEnd, true);
       document.removeEventListener("pointerdown", onPointerDown, true);
       document.removeEventListener("pointermove", onPointerMove, true);
       document.removeEventListener("pointerup", finishPointer, true);

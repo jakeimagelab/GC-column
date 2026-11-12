@@ -21,6 +21,11 @@ const mimeByExtension: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
+function imageMime(file: File) {
+  if (["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) return file.type;
+  return mimeByExtension[path.extname(file.name).toLowerCase()] ?? "";
+}
+
 function unavailable() {
   return NextResponse.json({ error: "Not found" }, { status: 404 });
 }
@@ -97,7 +102,9 @@ export async function POST(request: Request) {
     const itemId = form.get("itemId");
     if (!(file instanceof File) || typeof slideId !== "string" || typeof itemId !== "string") throw new Error("사진과 배치할 자리를 확인해 주세요.");
     if (file.size > 30 * 1024 * 1024) throw new Error("사진은 한 장당 30MB 이하여야 합니다.");
-    const result = await saveBoardImage(slideId, itemId, file.name, file.type, new Uint8Array(await file.arrayBuffer()));
+    const mimeType = imageMime(file);
+    if (!mimeType) throw new Error("JPG, PNG, WebP, SVG 이미지만 사용할 수 있습니다.");
+    const result = await saveBoardImage(slideId, itemId, file.name, mimeType, new Uint8Array(await file.arrayBuffer()));
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "사진을 저장하지 못했습니다." }, { status: 400 });

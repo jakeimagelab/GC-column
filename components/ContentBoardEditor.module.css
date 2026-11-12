@@ -882,6 +882,23 @@
   resize: vertical;
 }
 
+.contentField textarea {
+  min-height: 88px !important;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.altWarning {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #e4c9a9;
+  border-radius: 5px;
+  color: #8a5825;
+  background: #fff7e9;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .inspectorHelp {
   margin: 14px 0 0;
   padding: 12px;
@@ -956,6 +973,14 @@
   color: #716a63;
   font-size: 13px;
   line-height: 1.7;
+}
+
+.confirmPreview {
+  width: 100%;
+  height: 210px;
+  display: block;
+  object-fit: contain;
+  background: #eee9e2;
 }
 
 .confirmLayer section > div {

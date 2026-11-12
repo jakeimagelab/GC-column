@@ -43,6 +43,8 @@ export type BoardImageItem = {
   type: "image" | "bgImage";
   label: string;
   sourceSrc: string | null;
+  /** Client-only object URL used while a newly dropped file is uploading. */
+  previewSrc?: string;
   asset: string | null;
   originalFileName: string | null;
   alt: string;

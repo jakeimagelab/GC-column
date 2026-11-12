@@ -23,6 +23,16 @@ type CanvasMode = "design" | "items";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
+const previewKey = (slideId: string, itemId: string) => `${slideId}:${itemId}`;
+
+function imageMime(file: File) {
+  if (["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) return file.type;
+  const extension = file.name.split(".").at(-1)?.toLowerCase();
+  return extension === "jpg" || extension === "jpeg" ? "image/jpeg"
+    : extension === "png" ? "image/png"
+      : extension === "webp" ? "image/webp"
+        : extension === "svg" ? "image/svg+xml" : "";
+}
 
 function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -292,7 +302,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
 
   return (
     <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
-      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭 · 사진 드롭 · 사진 드래그/휠</span><em>{Math.round(scale * 100)}%</em></div>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭 · 파인더 사진을 점선 박스에 드롭 · 사진 드래그/휠</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
         key={`${slide.id}-${viewMode}`}
@@ -318,6 +328,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
   const [temporaryPreviews, setTemporaryPreviews] = useState<Record<string, string>>({});
   const temporaryPreviewsRef = useRef<Record<string, string>>({});
+  const pendingUploadRef = useRef<PendingUpload | null>(null);
   const timers = useRef(new Map<string, number>());
   const pendingPayloads = useRef(new Map<string, Record<string, unknown>>());
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -336,7 +347,13 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   useEffect(() => () => {
     timers.current.forEach((timer) => window.clearTimeout(timer));
     Object.values(temporaryPreviewsRef.current).forEach((url) => URL.revokeObjectURL(url));
+    if (pendingUploadRef.current) URL.revokeObjectURL(pendingUploadRef.current.objectUrl);
   }, []);
+
+  const setUploadDraft = (draft: PendingUpload | null) => {
+    pendingUploadRef.current = draft;
+    setPendingUpload(draft);
+  };
 
   const performSave = useCallback(async (payload: Record<string, unknown>) => {
     savingCount.current += 1;
@@ -386,6 +403,25 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     timers.current.set(key, timer);
   }, [performSave]);
 
+  useEffect(() => {
+    const flushQueuedSaves = () => {
+      timers.current.forEach((timer) => window.clearTimeout(timer));
+      timers.current.clear();
+      const payloads = Array.from(pendingPayloads.current.values());
+      pendingPayloads.current.clear();
+      payloads.forEach((payload) => {
+        void fetch("/api/dev-content-board", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        });
+      });
+    };
+    window.addEventListener("pagehide", flushQueuedSaves);
+    return () => window.removeEventListener("pagehide", flushQueuedSaves);
+  }, []);
+
   const updateItem = useCallback((slideId: string, itemId: string, patch: Partial<BoardItem>, saveKind: "text" | "image", immediate = false) => {
     setBoard((current) => {
       const next = clone(current);
@@ -418,9 +454,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   };
 
   const uploadImage = async (draft: PendingUpload) => {
-    setPendingUpload(null);
+    setUploadDraft(null);
     setSaveState("saving");
-    setTemporaryPreviews((current) => ({ ...current, [draft.item.id]: draft.objectUrl }));
+    const key = previewKey(draft.slideId, draft.item.id);
+    setTemporaryPreviews((current) => ({ ...current, [key]: draft.objectUrl }));
     const form = new FormData();
     form.set("slideId", draft.slideId);
     form.set("itemId", draft.item.id);
@@ -442,7 +479,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       URL.revokeObjectURL(draft.objectUrl);
       setTemporaryPreviews((current) => {
         const next = { ...current };
-        delete next[draft.item.id];
+        delete next[key];
         return next;
       });
       setSaveState("saved");
@@ -450,7 +487,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       URL.revokeObjectURL(draft.objectUrl);
       setTemporaryPreviews((current) => {
         const next = { ...current };
-        delete next[draft.item.id];
+        delete next[key];
         return next;
       });
       setSaveState("error");
@@ -459,13 +496,19 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   };
 
   const requestUpload = (slideId: string, item: BoardImageItem, file: File) => {
-    if (!new Set(["image/jpeg", "image/png", "image/webp", "image/svg+xml"]).has(file.type)) {
+    if (!imageMime(file)) {
       setSaveState("error");
       setError("JPG, PNG, WebP, SVG 이미지만 넣을 수 있습니다.");
       return;
     }
+    if (file.size > 30 * 1024 * 1024) {
+      setSaveState("error");
+      setError("사진은 한 장당 30MB 이하여야 합니다.");
+      return;
+    }
     const draft = { slideId, item, file, objectUrl: URL.createObjectURL(file) };
-    if (item.asset || item.sourceSrc) setPendingUpload(draft);
+    if (pendingUploadRef.current) URL.revokeObjectURL(pendingUploadRef.current.objectUrl);
+    if (item.asset || item.sourceSrc) setUploadDraft(draft);
     else void uploadImage(draft);
   };
 
@@ -509,13 +552,19 @@ export function ContentBoardEditor({ initialBoard }: Props) {
 
   const sendPreview = useCallback(() => {
     if (!activeSlide || canvasMode !== "design") return;
+    const items = activeSlide.items.map((item) => {
+      if (!isBoardImageItem(item)) return item;
+      const previewSrc = temporaryPreviews[previewKey(activeSlide.id, item.id)];
+      return previewSrc ? { ...item, previewSrc } : item;
+    });
     iframeRef.current?.contentWindow?.postMessage({
       type: "content-board:sync",
       slideId: activeSlide.id,
-      items: activeSlide.items,
+      items,
       viewMode,
+      selectedItemId,
     }, window.location.origin);
-  }, [activeSlide, canvasMode, viewMode]);
+  }, [activeSlide, canvasMode, selectedItemId, temporaryPreviews, viewMode]);
 
   useEffect(() => {
     sendPreview();
@@ -528,6 +577,9 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       const item = activeSlide.items.find((value) => value.id === id);
       if (event.data.type === "content-board:ready") {
         sendPreview();
+      } else if (event.data.type === "content-board:error" && typeof event.data.message === "string") {
+        setSaveState("error");
+        setError(event.data.message);
       } else if (event.data.type === "content-board:select" && item) {
         setSelectedItemId(id);
       } else if (event.data.type === "content-board:text" && item?.type === "text" && typeof event.data.value === "string") {
@@ -606,7 +658,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
                     item={item}
                     selected={selectedItemId === item.id}
                     mode={viewMode}
-                    temporary={temporaryPreviews[item.id]}
+                    temporary={temporaryPreviews[previewKey(activeSlide.id, item.id)]}
                     onSelect={() => setSelectedItemId(item.id)}
                     onDropFile={(file) => requestUpload(activeSlide.id, item, file)}
                     onTransform={(next, commit) => saveImageTransform(item, next, commit)}
@@ -637,6 +689,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           const item = selectedItem as BoardTextItem;
           return <>
             <div className={styles.inspectorHeader}><span>TEXT</span><b>{item.label}</b><small>{item.id}</small></div>
+            <label className={styles.contentField}>내용<textarea value={item.value} rows={Math.min(8, Math.max(3, item.value.split("\n").length + 1))} onChange={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <fieldset><legend>글꼴</legend><select value={item.style.fontFamily} onChange={(event) => saveTextStyle(item, { fontFamily: event.target.value })}>{BOARD_FONT_OPTIONS.map((font) => <option key={font.value} value={font.value}>{font.label}</option>)}</select></fieldset>
             <div className={styles.controlGrid}>
               <label>크기<input type="number" min="10" max="120" value={item.style.fontSize} onChange={(event) => saveTextStyle(item, { fontSize: Number(event.target.value) })} /></label>
@@ -646,7 +699,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
             </div>
             <fieldset><legend>글자색</legend><div className={styles.colorControl}><input type="color" value={item.style.color} onChange={(event) => saveTextStyle(item, { color: event.target.value })} /><code>{item.style.color}</code></div></fieldset>
             <fieldset><legend>정렬</legend><div className={styles.segmented}>{(["left", "center", "right"] as const).map((align) => <button type="button" key={align} className={item.style.textAlign === align ? styles.active : ""} onClick={() => saveTextStyle(item, { textAlign: align })}>{align === "left" ? "왼쪽" : align === "center" ? "가운데" : "오른쪽"}</button>)}</div></fieldset>
-            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} /></label>
+            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <p className={styles.inspectorHelp}>슬라이드에서 글자를 직접 수정하세요. Enter는 줄바꿈, Cmd+B는 선택 글자 굵게입니다.</p>
           </>;
         })() : selectedItem && isBoardImageItem(selectedItem) ? (() => {
@@ -673,19 +726,20 @@ export function ContentBoardEditor({ initialBoard }: Props) {
               <label className={styles.rangeLabel}>농도 <input type="range" min="0" max="100" value={item.effects.gradientOpacity} onChange={(event) => updateEffects({ gradientOpacity: Number(event.target.value) })} /><output>{item.effects.gradientOpacity}%</output></label>
             </fieldset>
             <label>사진 설명(alt)<input value={item.alt} placeholder="설명 필요" onChange={(event) => updateItem(activeSlide.id, item.id, { alt: event.target.value } as Partial<BoardImageItem>, "image")} /></label>
-            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="사진 처리 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image")} /></label>
+            {!item.alt ? <p className={styles.altWarning}>사진 설명이 비어 있습니다. 검색·접근성을 위해 입력해 주세요.</p> : null}
+            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="사진 처리 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image")} onBlur={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image", true)} /></label>
             <div className={styles.inspectorButtons}><button type="button" onClick={() => resetImage(item)}>효과 초기화</button><button type="button" className={styles.danger} onClick={() => updateItem(activeSlide.id, item.id, { asset: null, originalFileName: null } as Partial<BoardImageItem>, "image", true)}>새 사진 지우기</button></div>
           </>;
         })() : <>
           <div className={styles.inspectorHeader}><span>SECTION</span><b>{activeSlide.title}</b><small>{activeSlide.id}</small></div>
           <label>진행 상태<select value={activeSlide.status} onChange={(event) => updateSlide(activeSlide.id, { status: event.target.value as BoardStatus }, true)}><option>작성 중</option><option>확인 필요</option><option>작성 완료</option></select></label>
-          <label className={styles.noteField}>섹션 전체 메모<textarea value={activeSlide.note} placeholder="이 섹션 전체에 대한 개발 요청을 적으세요" onChange={(event) => updateSlide(activeSlide.id, { note: event.target.value })} /></label>
+          <label className={styles.noteField}>섹션 전체 메모<textarea value={activeSlide.note} placeholder="이 섹션 전체에 대한 개발 요청을 적으세요" onChange={(event) => updateSlide(activeSlide.id, { note: event.target.value })} onBlur={(event) => updateSlide(activeSlide.id, { note: event.target.value }, true)} /></label>
           <div className={styles.guideBox}><b>사용 방법</b><ol><li>글자를 클릭해 직접 수정</li><li>파인더 사진을 원하는 칸에 드래그</li><li>선택한 항목을 오른쪽에서 세부 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
         </>}
       </aside>
 
       {pendingUpload ? <div className={styles.confirmLayer} role="dialog" aria-modal="true" aria-label="사진 교체 확인">
-        <section><span>REPLACE IMAGE</span><h2>이 사진으로 교체할까요?</h2><p><b>{pendingUpload.item.label}</b><br />{pendingUpload.file.name}</p><div><button type="button" onClick={() => { URL.revokeObjectURL(pendingUpload.objectUrl); setPendingUpload(null); }}>취소</button><button type="button" onClick={() => void uploadImage(pendingUpload)}>교체하기</button></div></section>
+        <section><span>REPLACE IMAGE</span><h2>이 사진으로 교체할까요?</h2><img className={styles.confirmPreview} src={pendingUpload.objectUrl} alt="새로 놓은 사진 미리보기" /><p><b>{pendingUpload.item.label}</b><br />{pendingUpload.file.name}</p><div><button type="button" onClick={() => { URL.revokeObjectURL(pendingUpload.objectUrl); setUploadDraft(null); }}>취소</button><button type="button" onClick={() => void uploadImage(pendingUpload)}>교체하기</button></div></section>
       </div> : null}
     </main>
   );
