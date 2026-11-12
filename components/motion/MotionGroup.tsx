@@ -9,9 +9,10 @@ type MotionGroupProps = {
   children: ReactNode;
   className?: string;
   label?: string;
+  scrollWorldLayer?: "depth" | "copy" | "counter";
 };
 
-export function MotionGroup({ as = "div", children, className = "", label }: MotionGroupProps) {
+export function MotionGroup({ as = "div", children, className = "", label, scrollWorldLayer }: MotionGroupProps) {
   const ref = useRef<HTMLElement>(null);
   const options = useMemo(() => ({ threshold: 0.18 }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
@@ -25,6 +26,7 @@ export function MotionGroup({ as = "div", children, className = "", label }: Mot
   return createElement(as, {
     ref,
     className: `${styles.group} ${className}`,
+    "data-scroll-world-layer": scrollWorldLayer,
     ...(label ? { "aria-label": label } : {}),
   }, children);
 }

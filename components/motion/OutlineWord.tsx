@@ -9,11 +9,12 @@ type OutlineWordProps = {
   className?: string;
   fill: string;
   stroke?: string;
+  scrollWorldLayer?: "depth" | "copy" | "counter";
 };
 
 const widths = { DIRECTOR: 880, VISION: 610, COLUMN: 720 } as const;
 
-export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3" }: OutlineWordProps) {
+export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3", scrollWorldLayer }: OutlineWordProps) {
   const ref = useRef<HTMLDivElement>(null);
   const options = useMemo(() => ({
     threshold: 0.22,
@@ -32,7 +33,7 @@ export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3" }: 
   } as CSSProperties;
 
   return (
-    <div ref={ref} className={`${styles.root} ${className}`} style={style} aria-hidden="true">
+    <div ref={ref} className={`${styles.root} ${className}`} style={style} aria-hidden="true" data-scroll-world-layer={scrollWorldLayer}>
       <svg className={styles.svg} viewBox={`0 0 ${viewWidth} 170`} focusable="false">
         <text className={styles.text} x="0" y="142">{text}</text>
       </svg>

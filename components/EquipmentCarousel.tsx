@@ -205,8 +205,8 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false);
       }}
     >
-      <div className={styles.band} />
-      <div className={styles.heading}>
+      <div className={styles.band} data-scroll-world-layer="counter" />
+      <div className={styles.heading} data-scroll-world-layer="copy">
         <div>
           <span data-edit-id="home.equipment.eyebrow" data-edit-type="text">{getText(content, "home.equipment.eyebrow")}</span>
           <h2><EditableRichText id="home.equipment.title" value={getText(content, "home.equipment.title")} /></h2>
@@ -218,7 +218,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
           {!editMode && canRotate ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "장비 흐름 재생" : "장비 흐름 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
         </div>
       </div>
-      <div className={styles.viewport} ref={viewportRef}>
+      <div className={styles.viewport} ref={viewportRef} data-scroll-world-layer="depth">
         {editMode ? (
           <div
             ref={trackRef}

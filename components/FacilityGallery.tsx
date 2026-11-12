@@ -112,10 +112,11 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     >
       <div ref={bandRef} className={styles.leftBand} />
       <ImageSlot className={styles.blurBackground} label="" alt="" editId="home.gallery.background" image={getImage(content, "home.gallery.background")} />
-      <div className={styles.heading}><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><EditableRichText id="home.gallery.title" value={getText(content, "home.gallery.title")} /></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
+      <div className={styles.heading} data-scroll-world-layer="copy"><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><EditableRichText id="home.gallery.title" value={getText(content, "home.gallery.title")} /></h2><Link href="#"><span {...textEditProps("home.gallery.more")}>{getText(content, "home.gallery.more")}</span> <i /></Link></div>
 
       <div
         className={styles.stage}
+        data-scroll-world-layer="depth"
         onTouchStart={(event) => { stageTouchStart.current = event.changedTouches[0]?.clientX ?? null; }}
         onTouchEnd={(event) => {
           if (stageTouchStart.current === null) return;

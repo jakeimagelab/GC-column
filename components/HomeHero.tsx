@@ -79,6 +79,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
   return (
     <div
       className={`${styles.slider} ${motionReady ? styles.motionReady : ""}`}
+      data-scroll-world-layer="depth"
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}
