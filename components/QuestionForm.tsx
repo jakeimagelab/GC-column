@@ -4,7 +4,14 @@ import { useState, type FormEvent } from "react";
 import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import styles from "./QuestionForm.module.css";
 
-export function QuestionForm({ content, columnSlug, compact = false }: { content: SiteContent; columnSlug: string | null; compact?: boolean }) {
+type QuestionFormProps = {
+  content: SiteContent;
+  columnSlug: string | null;
+  compact?: boolean;
+  sidebar?: boolean;
+};
+
+export function QuestionForm({ content, columnSlug, compact = false, sidebar = false }: QuestionFormProps) {
   const [question, setQuestion] = useState("");
   const [consentPrivacy, setConsentPrivacy] = useState(false);
   const [consentPublic, setConsentPublic] = useState(false);
@@ -40,7 +47,7 @@ export function QuestionForm({ content, columnSlug, compact = false }: { content
   };
 
   return (
-    <section className={`${styles.section} ${compact ? styles.compact : ""}`}>
+    <section className={`${styles.section} ${compact ? styles.compact : ""} ${sidebar ? styles.sidebar : ""}`}>
       <div className={styles.heading}><h2 {...textEditProps("qna.title")}>{getText(content, "qna.title")}</h2><p {...textEditProps("qna.description")}>{getText(content, "qna.description")}</p></div>
       <form onSubmit={submit}>
         <label className="srOnly" htmlFor={`qna-question-${columnSlug ?? "home"}`}>질문</label>

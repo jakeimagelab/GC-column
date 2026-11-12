@@ -426,11 +426,18 @@
 
 .sidebar {
   width: 100%;
+  align-self: stretch;
 }
 
 .stickySidebar {
   position: sticky;
-  top: 24px;
+  top: 88px;
+  max-height: calc(100svh - 112px);
+  padding-right: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -507,6 +514,9 @@
 
   .stickySidebar {
     position: static;
+    max-height: none;
+    padding-right: 0;
+    overflow: visible;
   }
 }
 

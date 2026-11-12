@@ -181,8 +181,6 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             {readerQuestions.length ? <section className={styles.faqSection} data-scroll-world-layer="depth"><h2>{getText(content, "qna.readerTitle")}</h2><FaqList items={readerQuestions.flatMap((item) => item.answer ? [{ q: item.question, a: item.answer, id: `reader-${item.id}` }] : [])} /></section> : null}
           </div>
 
-          <QuestionForm content={content} columnSlug={column.slug} />
-
           {column.references.length ? <section className={styles.references} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy"><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
 
           <section className={styles.authorBox} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
@@ -215,6 +213,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         <aside className={styles.sidebar}>
           <div className={styles.stickySidebar}>
             <ArticleToc items={tocItems} title="목차" />
+            <QuestionForm content={content} columnSlug={column.slug} sidebar />
             <div className={styles.doctorCard}>
               <Link href="/doctor/lee-ho"><span aria-hidden="true" /><b>{getText(content, "doctor.jobTitle")} {getText(content, "doctor.name")}</b></Link>
               <p>상담부터 시술까지 직접 진행합니다.</p>
