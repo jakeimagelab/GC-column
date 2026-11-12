@@ -12,6 +12,7 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
 import { DoctorReveal } from "@/components/motion/DoctorReveal";
+import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
@@ -64,14 +65,20 @@ export default async function ColumnMainPage() {
 
   return (
     <main className="pageFrame">
-      <section className={styles.hero} data-scroll-world-scene>
-        <ImageSlot className={styles.heroImage} label="" alt="" variant="dark" align="end" editId="column.hero.background" image={getImage(content, "column.hero.background")} scrollWorldLayer="depth" />
-        <div className={styles.heroShade} />
-        <ColumnHeader content={content} variant="overlay" page="main" />
-        <div className={styles.heroContent} data-scroll-world-layer="copy">
-          <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
-          <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
-          <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+      <section className={styles.hero} data-column-hero>
+        <div className={styles.heroStage}>
+          <div className={styles.heroPanel}>
+            <ImageSlot className={styles.heroImage} label="" alt="" variant="dark" align="end" editId="column.hero.background" image={getImage(content, "column.hero.background")} />
+            <div className={styles.heroShade} />
+            <div className={styles.heroContent}>
+              <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
+              <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
+              <div className={styles.searchReveal}>
+                <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+              </div>
+            </div>
+          </div>
+          <ColumnHeader content={content} variant="overlay" page="main" />
         </div>
       </section>
 
@@ -129,7 +136,7 @@ export default async function ColumnMainPage() {
         <FaqList items={mainFaqs} scrollWorldLayer="depth" />
       </section>
 
-      <section className={styles.treatmentsSection} data-scroll-world-scene data-scroll-world-strength="subtle">
+      <section className={styles.treatmentsSection} data-scroll-world-scene data-scroll-world-strength="subtle" data-column-section-motion="treatments">
         <h2 data-scroll-world-layer="copy" {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
         <div className={styles.treatmentGrid} data-scroll-world-layer="depth">
           {treatmentCards.map((treatment) => (
@@ -142,7 +149,7 @@ export default async function ColumnMainPage() {
         </div>
       </section>
 
-      <section className={styles.principlesSection} data-scroll-world-scene data-scroll-world-strength="subtle">
+      <section className={styles.principlesSection} data-scroll-world-scene data-scroll-world-strength="subtle" data-column-section-motion="principles">
         <ImageSlot className={styles.loungePhoto} label="" alt="" editId="column.principles.photo" image={getImage(content, "column.principles.photo")} scrollWorldLayer="depth" />
         <div data-scroll-world-layer="copy">
           <h2 {...textEditProps("column.principles.title")}>{getText(content, "column.principles.title")}</h2>
@@ -167,6 +174,7 @@ export default async function ColumnMainPage() {
       </footer>
 
       <FloatingQuickMenu content={content} compact />
+      <ColumnMainMotion />
       <DevEditorMount page="column" content={content} />
       <JsonLd value={pageGraph} />
     </main>
