@@ -335,6 +335,10 @@
     "type": "text",
     "value": "장비별 시술 안내를 확인하세요"
   },
+  "home.equipment.hoverLabel": {
+    "type": "text",
+    "value": "추천 포인트"
+  },
   "home.equipment.related": {
     "type": "text",
     "value": "시술 안내 →"

@@ -11,7 +11,7 @@ type BrandMarkProps = {
   plain?: boolean;
 };
 
-export function BrandMark({ image, name, nameEn, compact = false, plain = false }: BrandMarkProps) {
+export function BrandMark({ image, name, compact = false, plain = false }: BrandMarkProps) {
   const desktop = desktopTransform(image);
   const mobile = mobileTransform(image);
   const placement = getImagePlacementMeta("common.header.logo", image.label);
@@ -35,16 +35,13 @@ export function BrandMark({ image, name, nameEn, compact = false, plain = false 
     >
       {image.src ? (
         <Image className={styles.image} src={image.src} alt={image.alt} fill sizes="150px" unoptimized />
-      ) : plain ? (
-        <span className={styles.plain}>G <b data-edit-id="common.brand.name" data-edit-type="text">{name}</b></span>
       ) : (
-        <>
-          <span className={styles.symbol}>G</span>
-          <span className={styles.words}>
-            <b data-edit-id="common.brand.name" data-edit-type="text">{name}</b>
-            {nameEn ? <small data-edit-id="common.brand.nameEn" data-edit-type="text">{nameEn}</small> : null}
+        <span className={styles.wordmark}>
+          <span className={styles.monogram} aria-hidden="true">
+            <svg viewBox="0 0 54 54" focusable="false"><text x="2" y="45">G</text><text x="0" y="47">G</text><text x="3" y="44">G</text></svg>
           </span>
-        </>
+          <b data-edit-id="common.brand.name" data-edit-type="text">{name}</b>
+        </span>
       )}
     </span>
   );

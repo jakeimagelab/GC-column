@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { getText, type EquipmentContentItem, type SiteContent } from "@/content/site-content-types";
 import { getTreatment } from "@/content/treatments";
 import { TREATMENT_PAGES_READY } from "@/lib/config";
@@ -26,14 +26,24 @@ function EquipmentCard({ item, content, duplicate = false, editMode = false, onE
   const editPrefix = `home.equipment.items.${item.id}`;
   const detailPath = getTreatment(item.id)?.detailPath;
   const cardContent = <>
-    <div className={styles.imageWrap}><ImageSlot className={styles.equipmentSlot} label="" alt="" editId={duplicate ? undefined : `${editPrefix}.image`} image={item.image} /></div>
+    <div className={styles.imageWrap}>
+      <ImageSlot className={styles.equipmentSlot} label="" alt="" editId={duplicate ? undefined : `${editPrefix}.image`} image={item.image} />
+      <div className={styles.benefitPanel} aria-hidden="true"><small {...(!duplicate ? { "data-edit-id": "home.equipment.hoverLabel", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.hoverLabel")}</small><span>{item.desc}</span></div>
+    </div>
     <b>{duplicate ? item.name : <EditableRichText id={`${editPrefix}.name`} value={item.name} />}</b>
     <span>{duplicate ? item.desc : <EditableRichText id={`${editPrefix}.desc`} value={item.desc} />}</span>
     <small {...(!duplicate ? (TREATMENT_PAGES_READY ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : { "data-edit-id": "common.treatment.preparing", "data-edit-type": "text" }) : {})}>{TREATMENT_PAGES_READY ? getText(content, "home.equipment.related") : getText(content, "common.treatment.preparing")}</small>
   </>;
 
   return (
-    <article className={styles.card} data-carousel-card data-motion-item={!duplicate ? "" : undefined} aria-hidden={duplicate || undefined}>
+    <article
+      className={styles.card}
+      data-carousel-card
+      data-motion-item={!duplicate ? "" : undefined}
+      aria-hidden={duplicate || undefined}
+      aria-label={!duplicate ? `${item.name}: ${item.desc.replaceAll("\n", " ")}` : undefined}
+      tabIndex={!duplicate && (!TREATMENT_PAGES_READY || !detailPath) ? 0 : undefined}
+    >
       {TREATMENT_PAGES_READY && detailPath
         ? <Link href={detailPath} tabIndex={duplicate ? -1 : undefined}>{cardContent}</Link>
         : <div className={styles.disabledCard} role="link" aria-disabled="true">{cardContent}</div>}
@@ -55,23 +65,20 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const groupRef = useRef<HTMLDivElement>(null);
-  const nudgeRef = useRef<HTMLDivElement>(null);
-  const nudgeTimer = useRef<number | null>(null);
+  const dragState = useRef({ active: false, startX: 0, startScrollLeft: 0, moved: false });
+  const preventClick = useRef(false);
   const [virtualIndex, setVirtualIndex] = useState(canRotate ? items.length : 0);
   const [step, setStep] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
-  const [interactionPaused, setInteractionPaused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [revealing, setRevealing] = useState(false);
-  const [flowReady, setFlowReady] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
-  const [nudging, setNudging] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
 
   const normalizedEditIndex = items.length ? ((virtualIndex % items.length) + items.length) % items.length : 0;
   const renderedEditItems = canRotate ? [items, items, items].flat() : items;
-  const paused = interactionPaused || userPaused || reducedMotion || !flowReady;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -85,19 +92,15 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   useEffect(() => {
     if (editMode || reducedMotion) {
-      setFlowReady(false);
+      setRevealing(false);
       return;
     }
     const section = sectionRef.current;
     if (!section) return;
-    let startTimer = 0;
-    const play = () => {
-      setRevealing(true);
-      startTimer = window.setTimeout(() => setFlowReady(true), 1200);
-    };
+    const play = () => setRevealing(true);
     if (!("IntersectionObserver" in window)) {
       play();
-      return () => window.clearTimeout(startTimer);
+      return;
     }
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
@@ -105,7 +108,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
       play();
     }, { threshold: 0.18 });
     observer.observe(section);
-    return () => { observer.disconnect(); window.clearTimeout(startTimer); };
+    return () => observer.disconnect();
   }, [editMode, reducedMotion]);
 
   useEffect(() => {
@@ -129,6 +132,35 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     return () => observer.disconnect();
   }, [editMode, renderedEditItems.length]);
 
+  const updateManualPosition = useCallback(() => {
+    if (editMode) return;
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+    const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
+    const cardStep = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth ?? viewport.clientWidth;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const index = cardStep ? Math.round(viewport.scrollLeft / cardStep) : 0;
+    setDisplayIndex(Math.min(Math.max(index, 0), Math.max(items.length - 1, 0)));
+    setCanScrollPrev(viewport.scrollLeft > 2);
+    setCanScrollNext(viewport.scrollLeft < maxScroll - 2);
+  }, [editMode, items.length]);
+
+  useEffect(() => {
+    if (editMode) return;
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+    const observer = new ResizeObserver(updateManualPosition);
+    observer.observe(viewport);
+    observer.observe(track);
+    const frame = window.requestAnimationFrame(updateManualPosition);
+    return () => {
+      observer.disconnect();
+      window.cancelAnimationFrame(frame);
+    };
+  }, [editMode, items.length, updateManualPosition]);
+
   const moveEdit = useCallback((delta: number) => {
     if (!canRotate || transitioning) return;
     setTransitioning(true);
@@ -144,50 +176,46 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     if (next !== virtualIndex) setVirtualIndex(next);
   };
 
-  useEffect(() => {
-    if (editMode || !canRotate || !flowReady) return;
-    const timer = window.setInterval(() => {
-      const animation = trackRef.current?.getAnimations()[0];
-      const currentTime = Number(animation?.currentTime ?? 0);
-      const nextIndex = Math.floor((((currentTime % 38000) + 38000) % 38000) / 38000 * items.length) % items.length;
-      setDisplayIndex(nextIndex);
-    }, 250);
-    return () => window.clearInterval(timer);
-  }, [canRotate, editMode, flowReady, items.length]);
-
-  const moveFlow = (delta: number) => {
-    if (!canRotate || editMode || nudging) return;
+  const moveManual = (delta: number) => {
+    const viewport = viewportRef.current;
     const track = trackRef.current;
-    const group = groupRef.current;
-    const nudge = nudgeRef.current;
-    const cards = group?.querySelectorAll<HTMLElement>("[data-carousel-card]");
-    const first = cards?.[0];
-    const second = cards?.[1];
-    const distance = first && second ? second.offsetLeft - first.offsetLeft : first?.offsetWidth ?? 0;
-    const groupWidth = group?.offsetWidth ?? 0;
-    const animation = track?.getAnimations()[0];
-    if (!nudge || !animation || !distance || !groupWidth) return;
-
-    setNudging(true);
-    animation.pause();
-    nudge.style.transition = reducedMotion ? "none" : "transform .6s cubic-bezier(.22,.61,.36,1)";
-    nudge.style.transform = `translate3d(${delta * distance * -1}px,0,0)`;
-    if (nudgeTimer.current) window.clearTimeout(nudgeTimer.current);
-    nudgeTimer.current = window.setTimeout(() => {
-      const current = Number(animation.currentTime ?? 0);
-      animation.currentTime = current + (delta * distance / groupWidth * 38000);
-      nudge.style.transition = "none";
-      nudge.style.transform = "translate3d(0,0,0)";
-      void nudge.offsetWidth;
-      if (!paused && !reducedMotion) animation.play();
-      setDisplayIndex((value) => (value + delta + items.length) % items.length);
-      setNudging(false);
-    }, reducedMotion ? 0 : 620);
+    if (!viewport || !track) return;
+    const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
+    const distance = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth ?? viewport.clientWidth;
+    viewport.scrollBy({ left: distance * delta, behavior: reducedMotion ? "auto" : "smooth" });
   };
 
-  useEffect(() => () => {
-    if (nudgeTimer.current) window.clearTimeout(nudgeTimer.current);
-  }, []);
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (editMode || event.pointerType !== "mouse" || event.button !== 0) return;
+    dragState.current = { active: true, startX: event.clientX, startScrollLeft: event.currentTarget.scrollLeft, moved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
+    if (!drag.active) return;
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 4) drag.moved = true;
+    event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
+    if (drag.moved) event.preventDefault();
+  };
+
+  const finishPointerDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
+    if (!drag.active) return;
+    drag.active = false;
+    setDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (!drag.moved) return;
+    preventClick.current = true;
+    window.setTimeout(() => { preventClick.current = false; }, 0);
+    const cards = trackRef.current?.querySelectorAll<HTMLElement>("[data-carousel-card]");
+    const distance = cards && cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : 0;
+    if (!distance) return;
+    const next = Math.round(event.currentTarget.scrollLeft / distance);
+    event.currentTarget.scrollTo({ left: next * distance, behavior: reducedMotion ? "auto" : "smooth" });
+  };
 
   const editEquipment = (action: EquipmentAction, itemId: string) => {
     window.dispatchEvent(new CustomEvent("glory:equipment-command", { detail: { action, itemId } }));
@@ -198,13 +226,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
       ref={sectionRef}
       id="equipment"
       data-scroll-world-scene
-      className={`${styles.section} ${revealing ? styles.revealing : ""} ${flowReady && canRotate && !editMode && !reducedMotion ? styles.flowing : ""} ${paused ? styles.paused : ""}`}
-      onMouseEnter={() => setInteractionPaused(true)}
-      onMouseLeave={() => setInteractionPaused(false)}
-      onFocusCapture={() => setInteractionPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false);
-      }}
+      className={`${styles.section} ${revealing ? styles.revealing : ""}`}
     >
       <div className={styles.band} data-scroll-world-layer="counter" />
       <div className={styles.heading} data-scroll-world-layer="copy">
@@ -214,12 +236,21 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         </div>
         <div>
           <span data-edit-id="home.equipment.guide" data-edit-type="text">{getText(content, "home.equipment.guide")}</span>
-          <button type="button" data-edit-control onClick={() => editMode ? moveEdit(-1) : moveFlow(-1)} aria-label="이전 장비" disabled={!canRotate}>‹</button>
-          <button type="button" data-edit-control onClick={() => editMode ? moveEdit(1) : moveFlow(1)} aria-label="다음 장비" disabled={!canRotate}>›</button>
-          {!editMode && canRotate ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "장비 흐름 재생" : "장비 흐름 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
+          <button type="button" data-edit-control onClick={() => editMode ? moveEdit(-1) : moveManual(-1)} aria-label="이전 장비" disabled={editMode ? !canRotate : !canScrollPrev}>‹</button>
+          <button type="button" data-edit-control onClick={() => editMode ? moveEdit(1) : moveManual(1)} aria-label="다음 장비" disabled={editMode ? !canRotate : !canScrollNext}>›</button>
         </div>
       </div>
-      <div className={styles.viewport} ref={viewportRef} data-scroll-world-layer="depth">
+      <div
+        className={`${styles.viewport} ${dragging ? styles.viewportDragging : ""}`}
+        ref={viewportRef}
+        data-scroll-world-layer="depth"
+        onScroll={updateManualPosition}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finishPointerDrag}
+        onPointerCancel={finishPointerDrag}
+        onClickCapture={(event) => { if (preventClick.current) { event.preventDefault(); event.stopPropagation(); } }}
+      >
         {editMode ? (
           <div
             ref={trackRef}
@@ -233,11 +264,8 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
             })}
           </div>
         ) : (
-          <div ref={nudgeRef} className={styles.nudge}>
-            <div ref={trackRef} className={styles.track}>
-              <div ref={groupRef} className={styles.group}>{items.map((item) => <EquipmentCard item={item} content={content} itemCount={items.length} key={item.id} />)}</div>
-              {canRotate ? <div className={styles.group} aria-hidden="true">{items.map((item) => <EquipmentCard item={item} content={content} duplicate itemCount={items.length} key={`copy-${item.id}`} />)}</div> : null}
-            </div>
+          <div ref={trackRef} className={`${styles.track} ${styles.manualTrack}`}>
+            {items.map((item) => <EquipmentCard item={item} content={content} itemCount={items.length} key={item.id} />)}
           </div>
         )}
       </div>
