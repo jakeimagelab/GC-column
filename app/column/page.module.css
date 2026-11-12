@@ -1,6 +1,6 @@
 .hero { position: relative; min-height: 190svh; background: #fff; color: #fff; z-index: 5; }
 .heroStage { position: sticky; top: 0; height: 100svh; min-height: 700px; overflow: clip; }
-.heroPanel { position: absolute; inset: 0 0 var(--column-panel-bottom, 0); overflow: clip; background: var(--dark-brown); }
+.heroPanel { position: absolute; inset: 0; overflow: clip; background: var(--dark-brown); }
 .heroImage { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; padding: 24px var(--column-gutter); justify-content: flex-end; color: #d9d1c7; }
 .heroShade { position: absolute; inset: 0; background: rgba(30, 26, 22, 0.5); }
 .heroContent { position: relative; width: min(840px, calc(100% - var(--column-inner-gutter) - var(--column-inner-gutter))); height: 100%; margin: 0 auto; padding: 96px 0 36px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
@@ -8,13 +8,11 @@
 .heroContent h1 > span { color: #cfc8bf; font-weight: 300; }
 .heroContent h1 strong { color: #fff; font-weight: 700; }
 .heroContent > p { margin: 0; color: #ede7e0; font-size: 17px; font-weight: 300; }
-.searchReveal { width: 100%; transform-origin: 50% 0; }
-.hero[data-column-hero-ready] .heroPanel { border-radius: 0 0 var(--column-panel-radius, 0) var(--column-panel-radius, 0); box-shadow: 0 24px 70px rgba(43, 43, 43, var(--column-panel-shadow, 0)); transition: bottom 80ms linear, border-radius 80ms linear, box-shadow 80ms linear; }
-.hero[data-column-hero-ready] .heroContent { opacity: var(--column-copy-opacity, 1); transform: translate3d(0, var(--column-copy-y, 0), 0) scale(var(--column-copy-scale, 1)); }
-.hero[data-column-hero-ready] .searchReveal { opacity: var(--column-search-opacity, 1); clip-path: inset(0 0 var(--column-search-clip, 0) 0); transform: translate3d(0, var(--column-search-y, 0), 0) scaleY(var(--column-search-scale, 1)); transition: opacity 80ms linear, transform 80ms linear, clip-path 80ms linear; }
-.hero[data-column-hero-ready] .heroContent,
-.hero[data-column-hero-ready] .searchReveal { will-change: transform, opacity, clip-path; }
-.hero[data-column-hero-ready] .heroPanel { will-change: bottom, border-radius; }
+.searchReveal { width: 100%; }
+.hero[data-column-hero-ready] .heroPanel { clip-path: inset(0 0 var(--column-panel-clip, 0) 0); transition: clip-path 100ms linear; }
+.hero[data-column-hero-ready] .heroContent { transform: translate3d(0, var(--column-copy-y, 0), 0) scale(var(--column-copy-scale, 1)); transition: transform 100ms linear; }
+.hero[data-column-hero-ready] .heroContent { will-change: transform; }
+.hero[data-column-hero-ready] .heroPanel { will-change: clip-path; }
 
 .doctorSection { position: relative; z-index: 6; height: 600px; margin-top: -32svh; padding: 80px var(--column-gutter); background: #fff; }
 .outlineTitle { position: absolute; left: calc(var(--canvas-left) + clamp(24px, 4.1667vw, 60px)); top: 20px; font-size: clamp(120px, 12.5vw, 180px); letter-spacing: 8px; }
@@ -107,13 +105,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cardPhoto img { transition: none; }
-  .hero[data-column-hero-ready] .heroPanel, .hero[data-column-hero-ready] .heroContent, .hero[data-column-hero-ready] .searchReveal { bottom: 0; opacity: 1; clip-path: none; border-radius: 0; box-shadow: none; transform: none; }
+  .hero[data-column-hero-ready] .heroPanel, .hero[data-column-hero-ready] .heroContent { clip-path: none; transform: none; transition: none; }
   .treatmentsSection[data-column-motion-ready] .treatmentGrid > *, .principlesSection[data-column-motion-ready] .loungePhoto, .principlesSection[data-column-motion-ready] li { opacity: 1; clip-path: none; transform: none; transition: none; }
 }
 
 :global(.devEditActive) .hero { min-height: 700px; }
 :global(.devEditActive) .heroStage { position: relative; height: 700px; }
-:global(.devEditActive) .heroPanel { bottom: 0; border-radius: 0; box-shadow: none; transform: none; }
+:global(.devEditActive) .heroPanel { clip-path: none; transform: none; }
 :global(.devEditActive) .doctorSection { margin-top: 0; }
 
 @media (max-width: 1180px) {
@@ -123,7 +121,7 @@
 @media (max-width: 1024px) {
   .hero { min-height: 650px; }
   .heroStage { position: relative; height: 650px; min-height: 0; }
-  .heroPanel { bottom: 0 !important; border-radius: 0 !important; box-shadow: none !important; transform: none !important; }
+  .heroPanel { clip-path: none !important; transform: none !important; }
   .heroContent { width: auto; margin: 0 var(--column-inner-gutter); padding: 84px 0 28px; }
   .doctorSection { height: auto; margin-top: 0; }
   .doctorInner { gap: 40px; }

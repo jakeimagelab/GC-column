@@ -17,22 +17,13 @@ export function ColumnMainMotion() {
       const rect = hero.getBoundingClientRect();
       const travel = Math.max(hero.offsetHeight - window.innerHeight, 1);
       const rawProgress = desktop ? clamp(-rect.top / travel) : 1;
-      const reveal = desktop ? clamp((rawProgress - 0.03) / 0.34) : 1;
-      const revealEased = 1 - Math.pow(1 - reveal, 3);
-      const exit = desktop ? clamp((rawProgress - 0.42) / 0.58) : 0;
+      const exit = desktop ? clamp((rawProgress - 0.12) / 0.88) : 0;
       const exitEased = exit * exit * (3 - 2 * exit);
 
       hero.style.setProperty("--column-hero-progress", rawProgress.toFixed(4));
-      hero.style.setProperty("--column-search-opacity", (0.48 + revealEased * 0.52).toFixed(4));
-      hero.style.setProperty("--column-search-y", `${((1 - revealEased) * 36).toFixed(2)}px`);
-      hero.style.setProperty("--column-search-scale", (0.84 + revealEased * 0.16).toFixed(4));
-      hero.style.setProperty("--column-search-clip", `${((1 - revealEased) * 42).toFixed(2)}%`);
-      hero.style.setProperty("--column-panel-bottom", `${(exitEased * 32).toFixed(3)}svh`);
-      hero.style.setProperty("--column-panel-radius", `${(exitEased * 18).toFixed(2)}px`);
-      hero.style.setProperty("--column-panel-shadow", (exitEased * 0.16).toFixed(4));
-      hero.style.setProperty("--column-copy-y", `${(exitEased * -12).toFixed(2)}px`);
+      hero.style.setProperty("--column-panel-clip", `${(exitEased * 32).toFixed(3)}svh`);
+      hero.style.setProperty("--column-copy-y", `${(exitEased * -16).toFixed(3)}svh`);
       hero.style.setProperty("--column-copy-scale", (1 - exitEased * 0.16).toFixed(4));
-      hero.style.setProperty("--column-copy-opacity", "1");
       hero.setAttribute("data-column-hero-ready", "");
     };
 
@@ -65,16 +56,9 @@ export function ColumnMainMotion() {
       hero.removeAttribute("data-column-hero-ready");
       [
         "--column-hero-progress",
-        "--column-search-opacity",
-        "--column-search-y",
-        "--column-search-scale",
-        "--column-search-clip",
-        "--column-panel-bottom",
-        "--column-panel-radius",
-        "--column-panel-shadow",
+        "--column-panel-clip",
         "--column-copy-y",
         "--column-copy-scale",
-        "--column-copy-opacity",
       ].forEach((property) => hero.style.removeProperty(property));
       sections.forEach((section) => {
         section.removeAttribute("data-column-motion-ready");
