@@ -2,5 +2,8 @@
 .footer > div:first-child { display: flex; flex-direction: column; gap: 8px; }
 .footer b { color: #fff; font-size: 16px; letter-spacing: 2px; }
 .footer p { margin: 0; }
-.footer > div:last-child { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-@media (max-width: 640px) { .footer { padding: 48px 24px 90px; grid-template-columns: 1fr; } .footer > div:last-child { align-items: flex-start; } }
+.footer nav { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.footer nav div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; }
+.footer nav a { color: inherit; }
+.footer nav a:hover { color: #fff; }
+@media (max-width: 640px) { .footer { padding: 48px 24px 90px; grid-template-columns: 1fr; } .footer nav { align-items: flex-start; } .footer nav div { justify-content: flex-start; } }

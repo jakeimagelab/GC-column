@@ -91,9 +91,9 @@ export const xerfVsThermage: Column = {
   keywords: ["세르프", "XERF", "써마지", "고주파", "리프팅"],
   author: "대표원장 이호",
   // 임시 발행일: 원장 최종 승인 시 실제 날짜로 교체합니다.
-  reviewedAt: "2026-12-15",
-  publishedAt: "2026-12-15",
-  updatedAt: "2026-12-15",
+  reviewedAt: "2026-11-13",
+  publishedAt: "2026-11-13",
+  updatedAt: "2026-11-13",
   readMinutes: 6,
 };
 
@@ -244,7 +244,7 @@ export function getPublishedColumns() {
 }
 
 export function getVisibleColumns() {
-  return process.env.NODE_ENV === "development" ? columns : getPublishedColumns();
+  return getPublishedColumns();
 }
 
 export function getVisibleColumn(slug: string) {
@@ -254,8 +254,9 @@ export function getVisibleColumn(slug: string) {
 }
 
 export function getColumns(slugs: string[]) {
+  const published = getPublishedColumns();
   return slugs.flatMap((slug) => {
-    const column = getVisibleColumn(slug);
+    const column = published.find((item) => item.slug === slug);
     return column ? [column] : [];
   });
 }

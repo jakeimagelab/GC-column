@@ -54,6 +54,10 @@ export default async function ColumnMainPage() {
   }));
   const locationLat = getText(content, "home.location.lat");
   const locationLng = getText(content, "home.location.lng");
+  const phone = getText(content, "common.clinic.phone");
+  const phoneHref = `tel:${phone.replace(/[^0-9+]/g, "")}`;
+  const kakaoUrl = getText(content, "common.quick.kakaoUrl");
+  const reserveUrl = getText(content, "common.quick.reserveUrl") || phoneHref;
   const collectionColumns = getVisibleColumns();
   const faqIndex = collectionColumns.flatMap((column) => column.faqs.map((faq, index) => ({ q: faq.q, keywords: column.keywords, slug: column.slug, id: `faq-${index + 1}` })));
   const pageGraph = graph(content, collectionNodes("/column", getText(content, "seo.column.title"), getText(content, "seo.column.description"), collectionColumns));
@@ -114,7 +118,7 @@ export default async function ColumnMainPage() {
             </article>
           ))}
         </MotionGroup>
-        <div className={styles.pagination}><b>1</b><span>2</span><span>3</span><span {...textEditProps("column.latest.pageNext")}>{getText(content, "column.latest.pageNext")}</span></div>
+        <div className={styles.pagination}><Link href="/column/all">{getText(content, "column.latest.all")} →</Link></div>
       </section>
 
       <section className={styles.faqBand} data-scroll-world-scene data-scroll-world-strength="subtle">
@@ -152,8 +156,8 @@ export default async function ColumnMainPage() {
           <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
           <p>{getClinicAddress(content)}</p>
           <p>{getDisplayedHours(content)} <ClinicOpenStatus content={content} /></p>
-          <a className={styles.phone} href="tel:0269587525" {...textEditProps("common.clinic.phone")}>{getText(content, "common.clinic.phone")}</a>
-          <div className={styles.infoButtons}><ButtonLink href="#" variant="taupe"><span {...textEditProps("column.location.reserve")}>{getText(content, "column.location.reserve")}</span></ButtonLink><ButtonLink href="#" variant="outline"><span {...textEditProps("column.location.kakao")}>{getText(content, "column.location.kakao")}</span></ButtonLink></div>
+          <a className={styles.phone} href={phoneHref} {...textEditProps("common.clinic.phone")}>{phone}</a>
+          <div className={styles.infoButtons}><ButtonLink href={reserveUrl} variant="taupe" target={reserveUrl.startsWith("http") ? "_blank" : undefined} rel={reserveUrl.startsWith("http") ? "noopener noreferrer" : undefined}><span {...textEditProps("column.location.reserve")}>{getText(content, "column.location.reserve")}</span></ButtonLink>{kakaoUrl ? <ButtonLink href={kakaoUrl} variant="outline" target="_blank" rel="noopener noreferrer"><span {...textEditProps("column.location.kakao")}>{getText(content, "column.location.kakao")}</span></ButtonLink> : null}</div>
         </div>
       </section>
 

@@ -1,0 +1,8 @@
+.hero { padding: 88px var(--column-gutter) 70px; background: var(--paper); }
+.hero > span { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 4px; }
+.hero h1 { max-width: 940px; margin: 13px 0 18px; font-size: clamp(40px, 4.7vw, 68px); font-weight: 400; line-height: 1.2; }
+.hero p { max-width: 720px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.8; }
+.hero div { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+.hero div > * { padding: 7px 11px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 12px; }
+.hero div b { border-color: var(--taupe); background: var(--taupe); color: #fff; }
+@media (max-width: 640px) { .hero { padding: 62px 24px 44px; } .hero h1 { font-size: 38px; } .hero p { font-size: 15px; } }

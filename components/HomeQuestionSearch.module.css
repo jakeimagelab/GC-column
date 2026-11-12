@@ -19,6 +19,10 @@
 .popular { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 .popular > span { color: var(--muted); }
 .popular button { padding: 6px 14px; border: 0; border-radius: 999px; background: var(--paper); font-size: 13px; }
+.guideLink { padding: 14px 18px; border: 1px solid var(--line-soft); background: #faf9f7; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.guideLink > span { color: var(--brown); font-family: var(--font-en); font-size: 10px; letter-spacing: 2px; }
+.guideLink > b { font-size: 14px; }
+.guideLink > small { border-bottom: 1px solid currentColor; font-size: 12px; }
 .resultRegion { opacity: 0; transition: opacity 0.2s ease; }
 .resultRegionVisible { opacity: 1; }
 .results { padding-top: 8px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; }
@@ -64,6 +68,8 @@
   .inputRow input { font-size: 16px; }
   .typingGhost { font-size: 16px; }
   .ask { display: none; }
+  .guideLink { grid-template-columns: 1fr auto; }
+  .guideLink > span { grid-column: 1 / -1; }
   .results { grid-template-columns: 1fr; }
   .empty { align-items: stretch; flex-direction: column; }
 }

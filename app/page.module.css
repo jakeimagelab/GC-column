@@ -82,7 +82,10 @@
 .footer > div:first-child { display: flex; flex-direction: column; gap: 10px; }
 .footer p { margin: 0; }
 .footer p:last-child { color: #9e968c; }
-.footer > div:last-child { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.footer nav { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.footer nav div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; }
+.footer nav a { color: inherit; }
+.footer nav a:hover { color: #fff; }
 .footerLogo { color: #fff; display: flex; align-items: center; gap: 10px; }
 .footerLogo span { width: 32px; height: 32px; border: 1px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-en); font-weight: 300; }
 .footerLogo b { font-size: 16px; font-weight: 400; letter-spacing: 3px; }
@@ -125,5 +128,6 @@
   .location { padding: 70px 24px; }
   .map { height: 300px; }
   .footer { padding: 50px 24px 90px; grid-template-columns: 1fr; }
-  .footer > div:last-child { align-items: flex-start; }
+  .footer nav { align-items: flex-start; }
+  .footer nav div { justify-content: flex-start; }
 }

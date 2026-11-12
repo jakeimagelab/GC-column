@@ -22,8 +22,9 @@
 .surface a { color: inherit; }
 .actions { display: flex; align-items: center; gap: 20px; white-space: nowrap; font-size: 14px; }
 .locales { display: flex; align-items: center; gap: 10px; }
-.locales a { padding: 6px 8px; border: 1px solid currentColor; display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: .8; }
+.locales a, .localeDisabled { padding: 6px 8px; border: 1px solid currentColor; display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: .8; }
 .locales a:first-child { opacity: 1; }
+.localeDisabled { cursor: default; opacity: .45; }
 .megaMenu { position: absolute; top: 96px; left: 0; width: 100%; padding: 0 var(--column-gutter); max-height: 0; overflow: hidden; background: #fff; color: var(--ink); box-shadow: 0 24px 48px rgba(0, 0, 0, .18); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(24px, 3.88vw, 56px); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .2s ease, transform .2s ease, max-height .2s ease, padding .2s ease, visibility .2s; }
 .scrolled .megaMenu { top: 72px; }
 .megaMenuVisible { max-height: calc(100vh - 96px); padding-block: 44px 48px; overflow: auto; opacity: 1; visibility: visible; transform: translateY(0); }

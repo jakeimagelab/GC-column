@@ -27,7 +27,7 @@ function Flag({ locale }: { locale: "KR" | "EN" | "CN" }) {
 }
 
 function TreatmentTarget({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return TREATMENT_PAGES_READY ? <Link href={href} className={className}>{children}</Link> : <div className={className} role="link" aria-disabled="true">{children}</div>;
+  return TREATMENT_PAGES_READY ? <Link href={href} className={className}>{children}</Link> : <div className={className} aria-disabled="true">{children}</div>;
 }
 
 export function ColumnHeader({ content, variant = "taupe", page = "detail" }: ColumnHeaderProps) {
@@ -85,7 +85,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
           </nav>
 
           <div className={styles.actions}>
-            {isHome ? <div className={styles.locales}>{(["KR", "EN", "CN"] as const).map((locale) => { const id = `home.header.locale.${locale.toLowerCase()}`; return <Link href={locale === "KR" ? "/" : locale === "EN" ? "/en" : "/zh"} key={locale}><Flag locale={locale} /><span {...textEditProps(id)}>{getText(content, id)}</span></Link>; })}</div>
+            {isHome ? <div className={styles.locales}>{(["KR", "EN", "CN"] as const).map((locale) => { const id = `home.header.locale.${locale.toLowerCase()}`; return locale === "KR" ? <Link href="/" key={locale}><Flag locale={locale} /><span {...textEditProps(id)}>{getText(content, id)}</span></Link> : <span className={styles.localeDisabled} aria-disabled="true" title="준비 중" key={locale}><Flag locale={locale} /><span {...textEditProps(id)}>{getText(content, id)}</span></span>; })}</div>
               : page === "main" ? <><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link><span {...textEditProps("common.header.locales")}>{getText(content, "common.header.locales")}</span></>
               : <><Link href="/column#search" {...textEditProps("common.header.search")}>{getText(content, "common.header.search")}</Link><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link></>}
           </div>

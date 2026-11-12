@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "status": "review_required",
+  "treatments": [
+    {
+      "id": "ulthera-prime",
+      "name": "울쎄라 프라임",
+      "category": "리프팅",
+      "priceMin": null,
+      "priceMax": null,
+      "priceUnit": "1회",
+      "concerns": ["jawline-fat", "sagging", "compare-lifting"],
+      "preferences": ["deeper-layer", "one-visit"],
+      "effectSummary": "초음파를 사용해 피하지방·근막층까지 에너지를 전달하는 리프팅 시술입니다.",
+      "limitSummary": "연령이나 고민만으로 샷 수를 정하지 않습니다.",
+      "cautionSummary": "피부 탄력과 지방량을 확인한 뒤 적용 여부와 범위를 판단합니다.",
+      "sourceColumnSlugs": ["xerf-vs-thermage"],
+      "doctorApprovedAt": null,
+      "active": true
+    },
+    {
+      "id": "thermage-flx",
+      "name": "써마지 FLX",
+      "category": "리프팅",
+      "priceMin": null,
+      "priceMax": null,
+      "priceUnit": "1회",
+      "concerns": ["sagging", "volume-concern", "compare-lifting"],
+      "preferences": ["dermis", "one-visit"],
+      "effectSummary": "고주파 에너지를 진피층에 전달하는 리프팅 시술입니다.",
+      "limitSummary": "다른 장비와 에너지 종류와 주로 닿는 층이 다릅니다.",
+      "cautionSummary": "현재 피부 탄력과 지방량을 함께 확인해 비교합니다.",
+      "sourceColumnSlugs": ["xerf-vs-thermage"],
+      "doctorApprovedAt": null,
+      "active": true
+    },
+    {
+      "id": "xerf",
+      "name": "세르프",
+      "category": "리프팅",
+      "priceMin": null,
+      "priceMax": null,
+      "priceUnit": "1회",
+      "concerns": ["sagging", "volume-concern", "compare-lifting"],
+      "preferences": ["dermis", "deeper-layer"],
+      "effectSummary": "고주파 에너지를 진피층에 전달하고 DEEP 모드로 더 깊은 층을 함께 비교하는 시술입니다.",
+      "limitSummary": "울쎄라와는 에너지 종류와 주로 닿는 층이 다릅니다.",
+      "cautionSummary": "지방 감소가 걱정되는 경우에도 피부 탄력과 지방량을 먼저 확인합니다.",
+      "sourceColumnSlugs": ["xerf-vs-thermage"],
+      "doctorApprovedAt": null,
+      "active": true
+    },
+    {
+      "id": "onda",
+      "name": "온다",
+      "category": "리프팅",
+      "priceMin": null,
+      "priceMax": null,
+      "priceUnit": "1회",
+      "concerns": ["jawline-fat", "compare-lifting"],
+      "preferences": ["fat-concern"],
+      "effectSummary": "홈페이지 장비 정보에서 지방 감소와 리프팅 관련 장비로 분류하고 있습니다.",
+      "limitSummary": "현재 등록된 정보만으로 적용 부위와 횟수를 정할 수 없습니다.",
+      "cautionSummary": "지방량과 피부 처짐의 비율을 확인한 뒤 다른 리프팅과 비교합니다.",
+      "sourceColumnSlugs": [],
+      "doctorApprovedAt": null,
+      "active": true
+    }
+  ]
+}

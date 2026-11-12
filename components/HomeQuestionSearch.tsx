@@ -176,6 +176,11 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
         <span>{getText(content, "home.question.popularLabel")}</span>
         {popular.map((question) => <button type="button" key={question.id} onClick={() => chooseQuery(question.value)} data-edit-control>{question.value}</button>)}
       </div>
+      <Link className={styles.guideLink} href="/consultation" data-scroll-world-layer="copy">
+        <span>{getText(content, "home.question.guideEyebrow")}</span>
+        <b>{getText(content, "home.question.guideTitle")}</b>
+        <small>{getText(content, "home.question.guideAction")}</small>
+      </Link>
 
       {searchQuery ? (
         <div className={`${styles.resultRegion} ${resultsVisible ? styles.resultRegionVisible : ""}`} aria-live="polite" data-scroll-world-layer="depth">
