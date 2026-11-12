@@ -5,7 +5,7 @@ import { useMotionOnce } from "./useMotionOnce";
 import styles from "./OutlineWord.module.css";
 
 type OutlineWordProps = {
-  text: "DIRECTOR" | "VISION" | "COLUMN";
+  text: "DIRECTOR" | "VISION" | "GLORY" | "COLUMN";
   className?: string;
   fill: string;
   stroke?: string;
@@ -13,7 +13,7 @@ type OutlineWordProps = {
   trackingMotion?: boolean;
 };
 
-const widths = { DIRECTOR: 880, VISION: 610, COLUMN: 720 } as const;
+const widths = { DIRECTOR: 880, VISION: 610, GLORY: 610, COLUMN: 720 } as const;
 
 export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3", scrollWorldLayer, trackingMotion = false }: OutlineWordProps) {
   const ref = useRef<HTMLDivElement>(null);

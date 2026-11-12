@@ -76,7 +76,7 @@ export default async function HomePage() {
       </DoctorReveal>
 
       <section className={styles.vision} id="vision" data-scroll-world-scene>
-        <OutlineWord text="VISION" fill="var(--paper)" scrollWorldLayer="counter" trackingMotion />
+        <OutlineWord text="GLORY" fill="var(--paper)" scrollWorldLayer="counter" trackingMotion />
         <div data-scroll-world-layer="copy"><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} /></div></div>
       </section>
 
