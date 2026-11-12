@@ -31,9 +31,9 @@ export default async function AllColumnsPage({ searchParams }: { searchParams: P
     <main className="pageFrame">
       <ColumnHeader content={content} />
       <JsonLd value={pageGraph} />
-      <section className={styles.hero}><span className={styles.eyebrow}>ALL COLUMNS</span><h1>원장 칼럼 전체 보기</h1><p>{getText(content, "seo.all.description")}</p></section>
+      <section className={styles.hero} data-scroll-world-scene data-scroll-world-strength="subtle"><span className={styles.eyebrow} data-scroll-world-layer="counter">ALL COLUMNS</span><h1 data-scroll-world-layer="copy">원장 칼럼 전체 보기</h1><p data-scroll-world-layer="copy">{getText(content, "seo.all.description")}</p></section>
       <div className={styles.content}>
-        <section><ColumnList columns={columns} />{totalPages > 1 ? <nav className={styles.pagination} aria-label="칼럼 페이지">{Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => page === currentPage ? <span aria-current="page" key={page}>{page}</span> : <Link href={`/column/all?page=${page}`} key={page}>{page}</Link>)}</nav> : null}</section>
+        <section data-scroll-world-scene data-scroll-world-strength="subtle"><ColumnList columns={columns} />{totalPages > 1 ? <nav className={styles.pagination} aria-label="칼럼 페이지" data-scroll-world-layer="copy">{Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => page === currentPage ? <span aria-current="page" key={page}>{page}</span> : <Link href={`/column/all?page=${page}`} key={page}>{page}</Link>)}</nav> : null}</section>
       </div>
       <ColumnFooter content={content} />
       <FloatingQuickMenu content={content} compact />

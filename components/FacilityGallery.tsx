@@ -105,6 +105,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
       ref={galleryRef}
       className={styles.gallery}
       id="gallery"
+      data-scroll-world-scene
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}

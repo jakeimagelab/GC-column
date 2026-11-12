@@ -60,23 +60,23 @@ export default async function ColumnMainPage() {
 
   return (
     <main className="pageFrame">
-      <section className={styles.hero}>
-        <ImageSlot className={styles.heroImage} label="" alt="" variant="dark" align="end" editId="column.hero.background" image={getImage(content, "column.hero.background")} />
+      <section className={styles.hero} data-scroll-world-scene>
+        <ImageSlot className={styles.heroImage} label="" alt="" variant="dark" align="end" editId="column.hero.background" image={getImage(content, "column.hero.background")} scrollWorldLayer="depth" />
         <div className={styles.heroShade} />
         <ColumnHeader content={content} variant="overlay" page="main" />
-        <div className={styles.heroContent}>
+        <div className={styles.heroContent} data-scroll-world-layer="copy">
           <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
           <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
           <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
         </div>
       </section>
 
-      <DoctorReveal className={styles.doctorSection}>
-        <OutlineWord className={styles.outlineTitle} text="COLUMN" fill="#fff" />
-        <div className={styles.doctorBackdrop} />
+      <DoctorReveal className={styles.doctorSection} scrollWorldScene>
+        <OutlineWord className={styles.outlineTitle} text="COLUMN" fill="#fff" scrollWorldLayer="counter" />
+        <div className={styles.doctorBackdrop} data-scroll-world-layer="counter" />
         <div className={styles.doctorInner}>
-          <ImageSlot className={styles.doctorPhoto} label="" alt="" editId="column.doctor.photo" image={getImage(content, "column.doctor.photo")} motionRole="doctor-photo" />
-          <div className={styles.doctorCopy}>
+          <ImageSlot className={styles.doctorPhoto} label="" alt="" editId="column.doctor.photo" image={getImage(content, "column.doctor.photo")} motionRole="doctor-photo" scrollWorldLayer="depth" />
+          <div className={styles.doctorCopy} data-scroll-world-layer="copy">
             <h2 {...textEditProps("column.doctor.title")}>{getText(content, "column.doctor.title")}</h2>
             <p data-motion-count={extractFirstNumber(getText(content, "column.doctor.description"))} {...textEditProps("column.doctor.description")}>{getText(content, "column.doctor.description")}</p>
             <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span data-motion-career key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
@@ -88,9 +88,9 @@ export default async function ColumnMainPage() {
         </div>
       </DoctorReveal>
 
-      <section className={styles.categorySection}>
-        <h2 {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
-        <div className={styles.categoryGrid}>
+      <section className={styles.categorySection} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <h2 data-scroll-world-layer="copy" {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
+        <div className={styles.categoryGrid} data-scroll-world-layer="depth">
           {categories.map((category) => (
             <Link href={`/column/category/${category.slug}`} key={category.slug}>
               <span>{category.nameEn}</span><b>{category.name}</b><small>{collectionColumns.filter((column) => column.categorySlug === category.slug).length ? `칼럼 ${collectionColumns.filter((column) => column.categorySlug === category.slug).length}편` : getText(content, "column.category.count")}</small>
@@ -99,9 +99,9 @@ export default async function ColumnMainPage() {
         </div>
       </section>
 
-      <section className={styles.latestSection}>
-        <div className={styles.sectionHeading}><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column/all" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
-        <MotionGroup className={styles.latestGrid}>
+      <section className={styles.latestSection} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <div className={styles.sectionHeading} data-scroll-world-layer="copy"><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column/all" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
+        <MotionGroup className={styles.latestGrid} scrollWorldLayer="depth">
           {cards.map((column) => (
             <article className={styles.columnCard} data-motion-item key={column.slug}>
               <Link href={`/column/${column.slug}`} className={styles.columnCardLink}>
@@ -117,17 +117,17 @@ export default async function ColumnMainPage() {
         <div className={styles.pagination}><b>1</b><span>2</span><span>3</span><span {...textEditProps("column.latest.pageNext")}>{getText(content, "column.latest.pageNext")}</span></div>
       </section>
 
-      <section className={styles.faqBand}>
-        <div>
+      <section className={styles.faqBand} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <div data-scroll-world-layer="copy">
           <h2 {...textEditProps("column.faq.title")}>{getText(content, "column.faq.title")}</h2>
           <p {...textEditProps("column.faq.description")}>{getText(content, "column.faq.description")}</p>
         </div>
-        <FaqList items={mainFaqs} />
+        <FaqList items={mainFaqs} scrollWorldLayer="depth" />
       </section>
 
-      <section className={styles.treatmentsSection}>
-        <h2 {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
-        <div className={styles.treatmentGrid}>
+      <section className={styles.treatmentsSection} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <h2 data-scroll-world-layer="copy" {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
+        <div className={styles.treatmentGrid} data-scroll-world-layer="depth">
           {treatmentCards.map((treatment) => (
             TREATMENT_PAGES_READY ? <Link href={treatment.detailPath} key={treatment.slug}>
               <b>{treatment.displayName}</b><span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span><small {...textEditProps("column.treatments.links")}>{getText(content, "column.treatments.links")}</small>
@@ -138,17 +138,17 @@ export default async function ColumnMainPage() {
         </div>
       </section>
 
-      <section className={styles.principlesSection}>
-        <ImageSlot className={styles.loungePhoto} label="" alt="" editId="column.principles.photo" image={getImage(content, "column.principles.photo")} />
-        <div>
+      <section className={styles.principlesSection} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <ImageSlot className={styles.loungePhoto} label="" alt="" editId="column.principles.photo" image={getImage(content, "column.principles.photo")} scrollWorldLayer="depth" />
+        <div data-scroll-world-layer="copy">
           <h2 {...textEditProps("column.principles.title")}>{getText(content, "column.principles.title")}</h2>
           <ol>{principles.map((principle) => <li key={principle.no}><b>{principle.no} <span className={styles.principleTitle} {...textEditProps(principle.titleId)}>{getText(content, principle.titleId)}</span></b><span {...textEditProps(principle.descriptionId)}>{getText(content, principle.descriptionId)}</span></li>)}</ol>
         </div>
       </section>
 
-      <section className={styles.infoSection} id="location">
-        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} />
-        <div>
+      <section className={styles.infoSection} id="location" data-scroll-world-scene data-scroll-world-strength="subtle">
+        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} scrollWorldLayer="depth" />
+        <div data-scroll-world-layer="copy">
           <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
           <p>{getClinicAddress(content)}</p>
           <p>{getDisplayedHours(content)} <ClinicOpenStatus content={content} /></p>
@@ -157,9 +157,9 @@ export default async function ColumnMainPage() {
         </div>
       </section>
 
-      <footer className={styles.footer}>
-        <div><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><p {...textEditProps("column.footer.notice")}>{getText(content, "column.footer.notice")}</p><p {...textEditProps("column.footer.business")}>{getText(content, "column.footer.business")}</p></div>
-        <div><p {...textEditProps("column.footer.links")}>{getText(content, "column.footer.links")}</p><p {...textEditProps("column.footer.sitemap")}>{getText(content, "column.footer.sitemap")}</p></div>
+      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft">
+        <div data-scroll-world-layer="copy"><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><p {...textEditProps("column.footer.notice")}>{getText(content, "column.footer.notice")}</p><p {...textEditProps("column.footer.business")}>{getText(content, "column.footer.business")}</p></div>
+        <div data-scroll-world-layer="counter"><p {...textEditProps("column.footer.links")}>{getText(content, "column.footer.links")}</p><p {...textEditProps("column.footer.sitemap")}>{getText(content, "column.footer.sitemap")}</p></div>
       </footer>
 
       <FloatingQuickMenu content={content} compact />

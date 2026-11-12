@@ -17,7 +17,6 @@ import { DoctorReveal } from "@/components/motion/DoctorReveal";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
-import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
 import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns";
 import { getEquipmentItems, getHeroSlides, getImage, getText, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, SITE_URL } from "@/content/site";
@@ -56,14 +55,14 @@ export default async function HomePage() {
 
   return (
     <main className="pageFrame">
-      <section className={styles.hero} id="home-hero">
+      <section className={styles.hero} id="home-hero" data-scroll-world-scene>
         <HomeHero slides={slides} />
         <ColumnHeader content={content} variant="overlay" page="home" />
       </section>
 
       <HomeQuestionSearch columns={searchColumns} content={content} />
 
-      <DoctorReveal className={styles.doctorSection} id="doctor">
+      <DoctorReveal className={styles.doctorSection} id="doctor" scrollWorldScene>
         <OutlineWord className={styles.directorOutline} text="DIRECTOR" fill="#fff" scrollWorldLayer="counter" />
         <div className={styles.doctorPhotoWrap} data-scroll-world-layer="depth"><div /><ImageSlot className={styles.doctorPhoto} label="" alt="" align="end" editId="home.doctor.photo" image={getImage(content, "home.doctor.photo")} motionRole="doctor-photo" /></div>
         <div className={styles.doctorCopy} data-scroll-world-layer="copy">
@@ -74,14 +73,14 @@ export default async function HomePage() {
         </div>
       </DoctorReveal>
 
-      <section className={styles.vision} id="vision">
+      <section className={styles.vision} id="vision" data-scroll-world-scene>
         <OutlineWord text="VISION" fill="var(--paper)" scrollWorldLayer="counter" />
         <div data-scroll-world-layer="copy"><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} /></div></div>
       </section>
 
       <EquipmentCarousel items={equipment} content={content} />
 
-      <section className={styles.latestSection} id="latest-column">
+      <section className={styles.latestSection} id="latest-column" data-scroll-world-scene>
         <OutlineWord className={styles.columnOutline} text="COLUMN" fill="#fff" scrollWorldLayer="counter" />
         <div className={styles.latestHeading} data-scroll-world-layer="copy"><div><span {...textEditProps("home.latest.eyebrow")}>{getText(content, "home.latest.eyebrow")}</span><h2><EditableRichText id="home.latest.title" value={getText(content, "home.latest.title")} /></h2></div><Link href="/column/all" {...textEditProps("home.latest.all")}>{getText(content, "home.latest.all")}</Link></div>
         <MotionGroup className={styles.latestGrid} scrollWorldLayer="depth">{latestColumns.map((column) => <article data-motion-item key={column.slug}><Link className={styles.latestCardLink} href={`/column/${column.slug}`}><ImageSlot className={styles.latestPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} align="end" /><span>{getCategory(column.categorySlug)?.name}</span><b>{column.title}</b><p>{columnExcerpts.home[column.slug] ?? column.summary}</p></Link><small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small></article>)}</MotionGroup>
@@ -89,16 +88,15 @@ export default async function HomePage() {
 
       <FacilityGallery content={content} />
 
-      <section className={styles.location} id="location">
-        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={lat} lng={lng} fallbackEditId="home.location.map" fallbackImage={getImage(content, "home.location.map")} />
+      <section className={styles.location} id="location" data-scroll-world-scene>
+        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={lat} lng={lng} fallbackEditId="home.location.map" fallbackImage={getImage(content, "home.location.map")} scrollWorldLayer="depth" />
         <div data-scroll-world-layer="copy"><span {...textEditProps("home.location.eyebrow")}>{getText(content, "home.location.eyebrow")}</span><h2><EditableRichText id="home.location.title" value={getText(content, "home.location.title")} /></h2><dl><div><dt {...textEditProps("home.location.addressLabel")}>{getText(content, "home.location.addressLabel")}</dt><dd>{address}</dd></div><div><dt {...textEditProps("home.location.subwayLabel")}>{getText(content, "home.location.subwayLabel")}</dt><dd {...textEditProps("home.location.subway")}>{getText(content, "home.location.subway")}</dd></div><div><dt {...textEditProps("home.location.hoursLabel")}>{getText(content, "home.location.hoursLabel")}</dt><dd>{getDisplayedHours(content)} <ClinicOpenStatus content={content} /></dd></div><div><dt {...textEditProps("home.location.parkingLabel")}>{getText(content, "home.location.parkingLabel")}</dt><dd {...textEditProps("home.location.parking")}>{getText(content, "home.location.parking")}</dd></div><div><dt {...textEditProps("home.location.phoneLabel")}>{getText(content, "home.location.phoneLabel")}</dt><dd><a href="tel:0269587525" {...textEditProps("common.clinic.phone")}>{getText(content, "common.clinic.phone")}</a></dd></div></dl><div className={styles.mapButtons}><ButtonLink href={naverUrl} editId="home.location.naverUrl" target="_blank" rel="noopener noreferrer"><span {...textEditProps("home.location.naver")}>{getText(content, "home.location.naver")}</span></ButtonLink><ButtonLink href={kakaoUrl} editId="home.location.kakaoUrl" target="_blank" rel="noopener noreferrer" variant="outline"><span {...textEditProps("home.location.kakao")}>{getText(content, "home.location.kakao")}</span></ButtonLink><ButtonLink href={googleUrl} editId="home.location.googleUrl" target="_blank" rel="noopener noreferrer" variant="outline"><span {...textEditProps("home.location.google")}>{getText(content, "home.location.google")}</span></ButtonLink></div></div>
       </section>
 
-      <footer className={styles.footer}><div><div className={styles.footerLogo}><span>G</span><b {...textEditProps("common.brand.name")}>{getText(content, "common.brand.name")}</b></div><p><EditableRichText id="home.footer.businessInfo" value={getText(content, "home.footer.businessInfo")} /></p><p {...textEditProps("home.footer.policy")}>{getText(content, "home.footer.policy")}</p><p {...textEditProps("home.footer.notice")}>{getText(content, "home.footer.notice")}</p></div><div><span {...textEditProps("home.footer.links")}>{getText(content, "home.footer.links")}</span><span {...textEditProps("home.footer.sitemap")}>{getText(content, "home.footer.sitemap")}</span></div></footer>
+      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft"><div data-scroll-world-layer="copy"><div className={styles.footerLogo}><span>G</span><b {...textEditProps("common.brand.name")}>{getText(content, "common.brand.name")}</b></div><p><EditableRichText id="home.footer.businessInfo" value={getText(content, "home.footer.businessInfo")} /></p><p {...textEditProps("home.footer.policy")}>{getText(content, "home.footer.policy")}</p><p {...textEditProps("home.footer.notice")}>{getText(content, "home.footer.notice")}</p></div><div data-scroll-world-layer="counter"><span {...textEditProps("home.footer.links")}>{getText(content, "home.footer.links")}</span><span {...textEditProps("home.footer.sitemap")}>{getText(content, "home.footer.sitemap")}</span></div></footer>
 
       <JsonLd value={pageGraph} />
       <FloatingQuickMenu content={content} />
-      <ScrollWorldJourney sceneSelector="#home-hero, #doctor, #vision, #equipment, #latest-column, #gallery, #location" />
       <DevEditorMount page="home" content={content} />
     </main>
   );

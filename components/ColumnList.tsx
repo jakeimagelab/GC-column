@@ -9,7 +9,7 @@ import styles from "./ColumnList.module.css";
 export function ColumnList({ columns }: { columns: Column[] }) {
   if (!columns.length) return <p className={styles.empty}>공개된 칼럼을 준비하고 있습니다.</p>;
   return (
-    <MotionGroup className={styles.grid}>
+    <MotionGroup className={styles.grid} scrollWorldLayer="depth">
       {columns.map((column) => (
         <article className={styles.card} data-motion-item key={column.slug}>
           {column.status === "draft" ? <span className={styles.draft}>비공개 초안</span> : null}

@@ -71,9 +71,10 @@ type KakaoMapProps = {
   lng: string;
   fallbackImage: ImageContentEntry;
   fallbackEditId: string;
+  scrollWorldLayer?: "depth" | "copy" | "counter";
 };
 
-export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackImage, fallbackEditId }: KakaoMapProps) {
+export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackImage, fallbackEditId, scrollWorldLayer }: KakaoMapProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -125,7 +126,7 @@ export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackIm
 
   const showFallback = failed || !ready;
   return (
-    <div className={`${styles.wrap} ${className}`} ref={wrapRef}>
+    <div className={`${styles.wrap} ${className}`} ref={wrapRef} data-scroll-world-layer={scrollWorldLayer}>
       {showFallback ? <ImageSlot className={styles.fallback} label="" alt="" variant="light" editId={fallbackEditId} image={fallbackImage} /> : null}
       {!failed && apiKey ? <div className={styles.canvas} ref={mapRef} hidden={!visible} aria-label={`${address} 카카오맵`} /> : null}
       <div className={styles.coordinates}>

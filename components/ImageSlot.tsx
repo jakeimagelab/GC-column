@@ -18,6 +18,7 @@ type ImageSlotProps = {
   priority?: boolean;
   sizes?: string;
   motionRole?: "doctor-photo";
+  scrollWorldLayer?: "depth" | "copy" | "counter";
 };
 
 export function ImageSlot({
@@ -34,6 +35,7 @@ export function ImageSlot({
   priority = false,
   sizes = "(max-width: 768px) 100vw, 50vw",
   motionRole,
+  scrollWorldLayer,
 }: ImageSlotProps) {
   const desktop = image ? desktopTransform(image) : { x: 50, y: 50, zoom: 100 };
   const mobile = image ? mobileTransform(image) : desktop;
@@ -66,6 +68,7 @@ export function ImageSlot({
       data-placement-name={placement?.slotName}
       data-placement-display={placement?.displayName}
       data-motion-photo={motionRole === "doctor-photo" ? "" : undefined}
+      data-scroll-world-layer={scrollWorldLayer}
     >
       {image?.src ? (
         <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} />

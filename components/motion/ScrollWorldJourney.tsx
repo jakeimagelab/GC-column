@@ -1,31 +1,36 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { isVisualEditingMode } from "@/lib/motion";
 import styles from "./ScrollWorldJourney.module.css";
 
 type ScrollWorldJourneyProps = {
-  sceneSelector: string;
+  sceneSelector?: string;
 };
 
 function clamp(value: number, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function ScrollWorldJourney({ sceneSelector }: ScrollWorldJourneyProps) {
+export function ScrollWorldJourney({ sceneSelector = "[data-scroll-world-scene]" }: ScrollWorldJourneyProps) {
+  const pathname = usePathname();
+
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reducedMotion.matches || isVisualEditingMode()) return;
+    if (
+      reducedMotion.matches ||
+      isVisualEditingMode() ||
+      pathname === "/content-board" ||
+      pathname === "/scroll-world-test" ||
+      document.querySelector(".contentBoardCanvas")
+    ) return;
 
     const scenes = Array.from(document.querySelectorAll<HTMLElement>(sceneSelector));
     if (!scenes.length) return;
 
     const root = document.documentElement;
     let frame = 0;
-
-    scenes.forEach((scene, index) => {
-      scene.dataset.scrollWorldScene = String(index + 1);
-    });
 
     const update = () => {
       frame = 0;
@@ -37,7 +42,9 @@ export function ScrollWorldJourney({ sceneSelector }: ScrollWorldJourneyProps) {
         const progress = clamp((viewportHeight - rect.top) / (viewportHeight + rect.height));
         const centerDistance = (rect.top + rect.height / 2 - viewportHeight / 2) / viewportHeight;
         const proximity = clamp(1 - Math.abs(centerDistance));
-        const drift = clamp(centerDistance, -1.25, 1.25) * 28 * mobileFactor;
+        const strength = scene.dataset.scrollWorldStrength === "soft" ? 0.42 :
+          scene.dataset.scrollWorldStrength === "subtle" ? 0.68 : 1;
+        const drift = clamp(centerDistance, -1.25, 1.25) * 28 * mobileFactor * strength;
 
         scene.style.setProperty("--sw-depth-y", `${drift.toFixed(2)}px`);
         scene.style.setProperty("--sw-copy-y", `${(drift * 0.48).toFixed(2)}px`);
@@ -65,7 +72,6 @@ export function ScrollWorldJourney({ sceneSelector }: ScrollWorldJourneyProps) {
       if (frame) window.cancelAnimationFrame(frame);
       root.classList.remove(styles.ready);
       scenes.forEach((scene) => {
-        delete scene.dataset.scrollWorldScene;
         scene.removeAttribute("data-scroll-world-active");
         scene.style.removeProperty("--sw-depth-y");
         scene.style.removeProperty("--sw-copy-y");
@@ -74,7 +80,7 @@ export function ScrollWorldJourney({ sceneSelector }: ScrollWorldJourneyProps) {
         scene.style.removeProperty("--sw-scene-progress");
       });
     };
-  }, [sceneSelector]);
+  }, [pathname, sceneSelector]);
 
   return null;
 }

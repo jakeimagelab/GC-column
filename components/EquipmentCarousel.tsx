@@ -197,6 +197,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     <section
       ref={sectionRef}
       id="equipment"
+      data-scroll-world-scene
       className={`${styles.section} ${revealing ? styles.revealing : ""} ${flowReady && canRotate && !editMode && !reducedMotion ? styles.flowing : ""} ${paused ? styles.paused : ""}`}
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}

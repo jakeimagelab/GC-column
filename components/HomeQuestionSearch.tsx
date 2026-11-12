@@ -122,12 +122,12 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   };
 
   return (
-    <section className={styles.panel} aria-labelledby="home-question-title">
-      <div className={styles.heading}>
+    <section className={styles.panel} aria-labelledby="home-question-title" data-scroll-world-scene data-scroll-world-strength="soft">
+      <div className={styles.heading} data-scroll-world-layer="copy">
         <div><span {...textEditProps("home.question.eyebrow")}>{getText(content, "home.question.eyebrow")}</span><h2 id="home-question-title" {...textEditProps("home.question.title")}>{getText(content, "home.question.title")}</h2></div>
         <p {...textEditProps("home.question.description")}>{getText(content, "home.question.description")}</p>
       </div>
-      <div className={styles.inputRow}>
+      <div className={styles.inputRow} data-scroll-world-layer="depth">
         <label htmlFor="ask">{getText(content, "home.question.inputLabel")}</label>
         <div className={`${styles.field} ${typingText ? styles.typing : ""}`}>
           {typingText ? <span className={styles.typingGhost} aria-hidden="true">{typingText}<i /></span> : null}
@@ -167,13 +167,13 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
         <button type="button" className={styles.ask} onClick={() => runSearch(query)} data-edit-control>{getText(content, "home.question.ask")}</button>
         {suggestionsOpen ? <SearchAutocomplete id="home-question-suggestions" items={suggestions} query={query} activeIndex={activeSuggestion} onActive={setActiveSuggestion} onSelect={selectSuggestion} /> : null}
       </div>
-      <div className={styles.popular}>
+      <div className={styles.popular} data-scroll-world-layer="counter">
         <span>{getText(content, "home.question.popularLabel")}</span>
         {popular.map((question) => <button type="button" key={question.id} onClick={() => chooseQuery(question.value)} data-edit-control>{question.value}</button>)}
       </div>
 
       {searchQuery ? (
-        <div className={`${styles.resultRegion} ${resultsVisible ? styles.resultRegionVisible : ""}`} aria-live="polite">
+        <div className={`${styles.resultRegion} ${resultsVisible ? styles.resultRegionVisible : ""}`} aria-live="polite" data-scroll-world-layer="depth">
           {top ? (
             <div className={styles.results}>
               <Link className={styles.topResult} href={`/column/${top.slug}`}>

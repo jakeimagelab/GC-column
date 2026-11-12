@@ -20,10 +20,10 @@ export default async function NotFound() {
     <main className="pageFrame">
       <ColumnHeader content={content} />
       <JsonLd value={pageGraph} />
-      <section className={styles.notFound}>
-        <span className={styles.eyebrow}>404</span><h1>페이지를 찾을 수 없습니다</h1><p>주소를 다시 확인하거나 원장 칼럼에서 궁금한 내용을 검색해 주세요.</p>
-        <form className={styles.search} action="/column"><label className="srOnly" htmlFor="not-found-search">칼럼 검색</label><input id="not-found-search" type="search" name="q" placeholder="예: 세르프, 써마지, 리프팅" /><button type="submit">검색</button></form>
-        <div className={styles.popular}>{popular.map((column) => <Link href={`/column/${column.slug}`} key={column.slug}>{column.title}</Link>)}</div>
+      <section className={styles.notFound} data-scroll-world-scene data-scroll-world-strength="soft">
+        <span className={styles.eyebrow} data-scroll-world-layer="counter">404</span><h1 data-scroll-world-layer="copy">페이지를 찾을 수 없습니다</h1><p data-scroll-world-layer="copy">주소를 다시 확인하거나 원장 칼럼에서 궁금한 내용을 검색해 주세요.</p>
+        <form className={styles.search} action="/column" data-scroll-world-layer="depth"><label className="srOnly" htmlFor="not-found-search">칼럼 검색</label><input id="not-found-search" type="search" name="q" placeholder="예: 세르프, 써마지, 리프팅" /><button type="submit">검색</button></form>
+        <div className={styles.popular} data-scroll-world-layer="depth">{popular.map((column) => <Link href={`/column/${column.slug}`} key={column.slug}>{column.title}</Link>)}</div>
         <Link href="/">홈으로 돌아가기 →</Link>
       </section>
       <ColumnFooter content={content} />

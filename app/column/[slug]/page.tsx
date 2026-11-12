@@ -107,13 +107,13 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       <ColumnHeader content={content} />
       {!publishable ? <div className={styles.draftBanner}>비공개 초안</div> : null}
 
-      <section className={styles.titleArea}>
-        <nav className={styles.breadcrumb} aria-label="현재 위치">
+      <section className={styles.titleArea} data-scroll-world-scene data-scroll-world-strength="soft">
+        <nav className={styles.breadcrumb} aria-label="현재 위치" data-scroll-world-layer="counter">
           <Link href="/">홈</Link><span>›</span><Link href="/column">원장 칼럼</Link><span>›</span><Link href={`/column/category/${category.slug}`}>{category.name}</Link><span>›</span><span aria-current="page">{column.title}</span>
         </nav>
-        <Link className={styles.category} href={`/column/category/${category.slug}`}>{category.name}</Link>
-        <h1>{column.title}</h1>
-        <div className={styles.authorLine}>
+        <Link className={styles.category} href={`/column/category/${category.slug}`} data-scroll-world-layer="copy">{category.name}</Link>
+        <h1 data-scroll-world-layer="copy">{column.title}</h1>
+        <div className={styles.authorLine} data-scroll-world-layer="copy">
           <span className={styles.authorAvatar} aria-hidden="true" />
           <span>
             <Link href="/doctor/lee-ho"><b>{column.author}</b></Link>
@@ -123,19 +123,19 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           </span>
           {column.reviewedAt ? <span className={styles.reviewed}>마지막 검토일 <time dateTime={column.reviewedAt}>{formatDateKo(column.reviewedAt)}</time> · <Link href="/doctor/lee-ho">대표원장 이호 검토</Link></span> : null}
         </div>
-        {column.questionSource ? <div className={styles.questionSource}>{column.questionSource}</div> : null}
+        {column.questionSource ? <div className={styles.questionSource} data-scroll-world-layer="copy">{column.questionSource}</div> : null}
         <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
       </section>
 
       <div className={styles.bodyLayout}>
         <article className={styles.article} data-article-body>
-          <section className={styles.summary} id="summary">
+          <section className={styles.summary} id="summary" data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
             <b>{detailContent.coreTitle}</b>
             <p>{column.summary}</p>
             <div className={styles.keyPoints}><b>핵심 포인트</b><ul>{column.keyPoints.map((point) => <li key={point}>{point}</li>)}</ul></div>
           </section>
 
-          <figure className={styles.photoFigure}>
+          <figure className={styles.photoFigure} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
             <ImageSlot className={styles.heroPhoto} label={column.photo.label} alt={column.photo.alt} image={articleImage} sizes="(max-width: 1024px) 100vw, 760px" />
             <figcaption>{column.photo.caption}</figcaption>
           </figure>
@@ -143,7 +143,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <ArticleToc items={tocItems} title={detailContent.tocTitle} compact />
 
           {column.sections.map((section) => (
-            <section className={styles.articleSection} id={section.id} key={section.id}>
+            <section className={styles.articleSection} id={section.id} key={section.id} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy">
               <h2><span>{section.no}</span> {section.heading}</h2>
               {section.body.map((paragraph) => <HighlightedParagraph key={paragraph} value={paragraph} />)}
               {section.figure ? <figure className={styles.diagramFigure}><ImageSlot className={styles.diagram} label={section.figure.label} alt={section.figure.label.replace("\n", " ")} variant="diagram" /><figcaption>{section.figure.caption}</figcaption></figure> : null}
@@ -159,7 +159,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             </section>
           ))}
 
-          <section className={styles.judgement} id="judgement">
+          <section className={styles.judgement} id="judgement" data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy">
             <h2><span>03</span> {detailContent.judgementTitle}</h2>
             <div className={styles.judgementGrid}>
               <div><b>권하는 경우</b><ul>{column.judgement.recommend.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul></div>
@@ -168,24 +168,24 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           </section>
 
           {column.video ? (
-            <section className={styles.videoSection} id="video">
+            <section className={styles.videoSection} id="video" data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
               <h2>{detailContent.videoTitle}</h2>
               <div className={styles.videoSlot} role="img" aria-label={column.video.label}><span className={styles.playButton}>▶</span><span>{column.video.label}</span></div>
               <details className={styles.transcript}><summary>영상 대본 전문</summary><p>{column.video.transcript}</p></details>
             </section>
           ) : null}
 
-          <div id="precautions" className={styles.precautionsGroup}>
-            <section className={styles.precautions}><h2><span>04</span> {detailContent.precautionsTitle}</h2><ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul></section>
-            <section className={styles.faqSection}><h2>{detailContent.faqTitle}</h2><FaqList items={column.faqs.map((faq, index) => ({ ...faq, id: `faq-${index + 1}` }))} /></section>
-            {readerQuestions.length ? <section className={styles.faqSection}><h2>{getText(content, "qna.readerTitle")}</h2><FaqList items={readerQuestions.flatMap((item) => item.answer ? [{ q: item.question, a: item.answer, id: `reader-${item.id}` }] : [])} /></section> : null}
+          <div id="precautions" className={styles.precautionsGroup} data-scroll-world-scene data-scroll-world-strength="soft">
+            <section className={styles.precautions} data-scroll-world-layer="copy"><h2><span>04</span> {detailContent.precautionsTitle}</h2><ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul></section>
+            <section className={styles.faqSection} data-scroll-world-layer="depth"><h2>{detailContent.faqTitle}</h2><FaqList items={column.faqs.map((faq, index) => ({ ...faq, id: `faq-${index + 1}` }))} /></section>
+            {readerQuestions.length ? <section className={styles.faqSection} data-scroll-world-layer="depth"><h2>{getText(content, "qna.readerTitle")}</h2><FaqList items={readerQuestions.flatMap((item) => item.answer ? [{ q: item.question, a: item.answer, id: `reader-${item.id}` }] : [])} /></section> : null}
           </div>
 
           <QuestionForm content={content} columnSlug={column.slug} />
 
-          {column.references.length ? <section className={styles.references}><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
+          {column.references.length ? <section className={styles.references} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy"><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
 
-          <section className={styles.authorBox}>
+          <section className={styles.authorBox} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
             <ImageSlot label="대표원장 이호 프로필 사진" alt="대표원장 이호 프로필 사진" width={120} height={140} image={getImage(content, "home.doctor.photo")} sizes="120px" />
             <div>
               <h2><Link href="/doctor/lee-ho">{detailContent.authorTitle}</Link></h2>
@@ -195,13 +195,13 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             </div>
           </section>
 
-          <section className={styles.treatmentCta}>
+          <section className={styles.treatmentCta} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy">
             <div><b>관련 시술</b><span>{detailContent.treatmentDescription}</span><div className={styles.treatmentLinks}>{column.treatmentSlugs.flatMap((slug) => { const treatment = getTreatment(slug); return treatment ? [<Link href={`/column/category/${treatment.categorySlug}`} key={slug}>{treatment.name}</Link>] : []; })}</div></div>
             <div className={styles.ctaButtons}><ButtonLink href="tel:0269587525" variant="taupe">예약·상담</ButtonLink><ButtonLink href={getText(content, "home.location.kakaoUrl") || "/#location"} variant="lightOutline">카톡 상담</ButtonLink></div>
           </section>
 
           {related.length ? (
-            <section className={styles.related}>
+            <section className={styles.related} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
               <h2>{detailContent.relatedTitle}</h2>
               <div className={styles.relatedGrid}>{related.map((item) => <Link href={`/column/${item.slug}`} key={item.slug}><ImageSlot label="관련 칼럼 이미지" alt={`${item.title} 대표 이미지`} height={120} /><b>{item.title}</b></Link>)}</div>
             </section>
@@ -224,7 +224,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         </aside>
       </div>
 
-      <footer className={styles.footer}><div><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div><p>{getText(content, "column.footer.links")}</p><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
+      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft"><div data-scroll-world-layer="copy"><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div data-scroll-world-layer="counter"><p>{getText(content, "column.footer.links")}</p><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
       <FloatingQuickMenu content={content} compact />
       <DevEditorMount page="column" content={content} />
     </main>

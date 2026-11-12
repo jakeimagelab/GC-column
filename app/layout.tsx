@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ContentBoardPreviewBridge } from "@/components/ContentBoardPreviewBridge";
+import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
 import { SITE_URL } from "@/content/site";
 import { montserrat, nanumPenScript, notoSansKr } from "./fonts";
 import "./globals.css";
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ko" className={`${notoSansKr.variable} ${montserrat.variable} ${nanumPenScript.variable}`}>
       <body>
         {children}
+        <ScrollWorldJourney />
         {process.env.NODE_ENV === "development" ? <ContentBoardPreviewBridge /> : null}
         {process.env.NEXT_PUBLIC_GA_ID ? <SiteAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} /> : null}
       </body>

@@ -37,9 +37,9 @@ export default async function DoctorProfilePage() {
       <ColumnHeader content={content} />
       <JsonLd value={pageGraph} />
       <div className={styles.content}>
-        <section className={styles.profile}>
-          <ImageSlot className={styles.doctorPhoto} label="대표원장 이호 프로필 사진" alt="글로리의원 대표원장 이호" image={getImage(content, "home.doctor.photo")} sizes="(max-width: 820px) 100vw, 440px" />
-          <div className={styles.profileCopy}>
+        <section className={styles.profile} data-scroll-world-scene data-scroll-world-strength="subtle">
+          <ImageSlot className={styles.doctorPhoto} label="대표원장 이호 프로필 사진" alt="글로리의원 대표원장 이호" image={getImage(content, "home.doctor.photo")} sizes="(max-width: 820px) 100vw, 440px" scrollWorldLayer="depth" />
+          <div className={styles.profileCopy} data-scroll-world-layer="copy">
             <span className={styles.eyebrow}>ABOUT THE DIRECTOR</span>
             <h1><small>{getText(content, "doctor.jobTitle")}</small>{getText(content, "doctor.name")}</h1>
             <p>{getText(content, "doctor.philosophy")}</p>
@@ -53,9 +53,9 @@ export default async function DoctorProfilePage() {
           </div>
         </section>
 
-        <section><span className={styles.eyebrow}>DOCTOR&apos;S COLUMN</span><h2>원장이 쓴 칼럼</h2><ColumnList columns={columns} /></section>
+        <section data-scroll-world-scene data-scroll-world-strength="subtle"><span className={styles.eyebrow} data-scroll-world-layer="counter">DOCTOR&apos;S COLUMN</span><h2 data-scroll-world-layer="copy">원장이 쓴 칼럼</h2><ColumnList columns={columns} /></section>
 
-        <section className={styles.clinic}>
+        <section className={styles.clinic} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-self>
           <div><h2>글로리의원 진료 안내</h2><p>{getClinicAddress(content)}</p><p>{phone}</p></div>
           <div className={styles.buttons}><ButtonLink href={phoneHref} variant="taupe">전화 예약</ButtonLink><ButtonLink href="/#location" variant="lightOutline">오시는 길</ButtonLink></div>
         </section>

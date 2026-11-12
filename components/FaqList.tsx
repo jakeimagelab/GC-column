@@ -6,13 +6,14 @@ import styles from "./FaqList.module.css";
 
 type FaqListProps = {
   items: (ColumnFaq & { editId?: string; id?: string })[];
+  scrollWorldLayer?: "depth" | "copy" | "counter";
 };
 
-export function FaqList({ items }: FaqListProps) {
+export function FaqList({ items, scrollWorldLayer }: FaqListProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <div className={styles.list}>
+    <div className={styles.list} data-scroll-world-layer={scrollWorldLayer}>
       {items.map((item, index) => {
         const isOpen = openIndex === index;
         const questionId = item.id ?? `faq-${index + 1}`;

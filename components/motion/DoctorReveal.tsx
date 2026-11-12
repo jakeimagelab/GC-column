@@ -9,6 +9,7 @@ type DoctorRevealProps = {
   id?: string;
   className?: string;
   children: ReactNode;
+  scrollWorldScene?: boolean;
 };
 
 function countToFinal(root: HTMLElement) {
@@ -31,10 +32,15 @@ function countToFinal(root: HTMLElement) {
   requestAnimationFrame(frame);
 }
 
-export function DoctorReveal({ as = "section", id, className = "", children }: DoctorRevealProps) {
+export function DoctorReveal({ as = "section", id, className = "", children, scrollWorldScene = false }: DoctorRevealProps) {
   const ref = useRef<HTMLElement>(null);
   const options = useMemo(() => ({ threshold: 0.2, onPlay: countToFinal }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
 
-  return createElement(as, { ref, id, className: `${styles.root} ${className}` }, children);
+  return createElement(as, {
+    ref,
+    id,
+    className: `${styles.root} ${className}`,
+    "data-scroll-world-scene": scrollWorldScene ? "" : undefined,
+  }, children);
 }

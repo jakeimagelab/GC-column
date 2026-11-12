@@ -42,11 +42,11 @@ export default async function CategoryPage({ params }: Props) {
     <main className="pageFrame">
       <ColumnHeader content={content} />
       <JsonLd value={pageGraph} />
-      <section className={styles.hero}><span className={styles.eyebrow}>{category.nameEn}</span><h1>{category.name} 칼럼</h1><p>{description}</p></section>
+      <section className={styles.hero} data-scroll-world-scene data-scroll-world-strength="subtle"><span className={styles.eyebrow} data-scroll-world-layer="counter">{category.nameEn}</span><h1 data-scroll-world-layer="copy">{category.name} 칼럼</h1><p data-scroll-world-layer="copy">{description}</p></section>
       <div className={styles.content}>
-        <section><h2>원장 칼럼</h2><ColumnList columns={columns} /></section>
-        <section><h2>관련 시술</h2><div className={styles.treatments}>{relatedTreatments.map((treatment) => <Link href={`/column/category/${category.slug}?treatment=${treatment.slug}`} key={treatment.slug}><b>{treatment.name}</b><span>{treatment.desc}</span></Link>)}</div></section>
-        {faqs.length ? <section><h2>자주 묻는 질문</h2><div className={styles.faqList}>{faqs.map((faq, index) => <article id={`faq-${index + 1}`} key={`${faq.q}-${index}`}><h3>{faq.q}</h3><p>{faq.a}</p></article>)}</div></section> : null}
+        <section data-scroll-world-scene data-scroll-world-strength="subtle"><h2 data-scroll-world-layer="copy">원장 칼럼</h2><ColumnList columns={columns} /></section>
+        <section data-scroll-world-scene data-scroll-world-strength="subtle"><h2 data-scroll-world-layer="copy">관련 시술</h2><div className={styles.treatments} data-scroll-world-layer="depth">{relatedTreatments.map((treatment) => <Link href={`/column/category/${category.slug}?treatment=${treatment.slug}`} key={treatment.slug}><b>{treatment.name}</b><span>{treatment.desc}</span></Link>)}</div></section>
+        {faqs.length ? <section data-scroll-world-scene data-scroll-world-strength="soft"><h2 data-scroll-world-layer="copy">자주 묻는 질문</h2><div className={styles.faqList} data-scroll-world-layer="depth">{faqs.map((faq, index) => <article id={`faq-${index + 1}`} key={`${faq.q}-${index}`}><h3>{faq.q}</h3><p>{faq.a}</p></article>)}</div></section> : null}
       </div>
       <ColumnFooter content={content} />
       <FloatingQuickMenu content={content} compact />
