@@ -53,7 +53,7 @@ function editableToMarkdown(root: HTMLElement) {
     if (!(node instanceof HTMLElement)) return "";
     if (node.tagName === "BR") return "\n";
     const children = Array.from(node.childNodes).map(walk).join("");
-    if (node.tagName === "STRONG" || node.tagName === "B") return `**${children}**`;
+    if (node !== root && (node.tagName === "STRONG" || node.tagName === "B")) return `**${children}**`;
     if (node !== root && (node.tagName === "DIV" || node.tagName === "P")) return `${children}\n`;
     return children;
   };

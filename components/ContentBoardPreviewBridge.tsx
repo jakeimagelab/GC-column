@@ -39,7 +39,7 @@ function editableToMarkdown(root: HTMLElement) {
     if (!(node instanceof HTMLElement)) return "";
     if (node.tagName === "BR") return "\n";
     const children = Array.from(node.childNodes).map(walk).join("");
-    if (node.tagName === "STRONG" || node.tagName === "B") return `**${children}**`;
+    if (node !== root && (node.tagName === "STRONG" || node.tagName === "B")) return `**${children}**`;
     if (node !== root && (node.tagName === "DIV" || node.tagName === "P")) return `${children}\n`;
     return children;
   };
@@ -289,7 +289,14 @@ export function ContentBoardPreviewBridge() {
     const onBlur = (event: FocusEvent) => {
       const target = event.target as HTMLElement;
       if (target.dataset.boardEditing !== "true" || !target.dataset.editId) return;
-      const value = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement ? target.value : editableToMarkdown(target);
+      const item = items.current.get(target.dataset.editId);
+      let value = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement ? target.value : editableToMarkdown(target);
+      if (
+        item?.type === "text"
+        && (target.tagName === "STRONG" || target.tagName === "B")
+        && /^\*\*[\s\S]*\*\*$/.test(item.value)
+        && !/^\*\*[\s\S]*\*\*$/.test(value)
+      ) value = `**${value}**`;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) target.contentEditable = "false";
       delete target.dataset.boardEditing;
       post({ type: "content-board:text", id: target.dataset.editId, value });
@@ -396,6 +403,7 @@ export function ContentBoardPreviewBridge() {
       if (target && item?.type === "text" && interactionMode.current === "edit" && !target.dataset.editAttribute) {
         target.dataset.boardEditing = "true";
         if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) target.contentEditable = "true";
+        return;
       }
       const found = imageTarget(event.target);
       if (!found || event.button !== 0 || interactionMode.current !== "edit") return;
