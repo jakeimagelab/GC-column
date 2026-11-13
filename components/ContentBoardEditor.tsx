@@ -106,6 +106,10 @@ function previewPath(slide: BoardSlide) {
   return "/";
 }
 
+function previewPageId(slide: BoardSlide) {
+  return slide.pageId === "common" ? "home" : slide.pageId;
+}
+
 function TextCanvasItem({ item, selected, onSelect, onChange }: {
   item: BoardTextItem;
   selected: boolean;
@@ -315,7 +319,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
       <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>내용 편집: 글자 클릭·사진 크롭 · 위치 이동: 모든 항목 드래그·휠 크기</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
-        key={`${slide.id}-${viewMode}`}
+        key={`${previewPath(slide)}-${viewMode}`}
         title={`${slide.pageTitle} ${slide.title} 실제 디자인 편집 화면`}
         src={`${previewPath(slide)}?content-board-preview=1`}
         style={{ width, height, transform: `translateX(-50%) scale(${scale})` }}
@@ -397,7 +401,34 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const slides = useMemo(() => board.pages.flatMap((page) => page.slides), [board.pages]);
   const activeSlide = findSlide(board, activeSlideId) ?? slides[0];
   const activeIndex = slides.findIndex((slide) => slide.id === activeSlide?.id);
-  const selectedItem = activeSlide?.items.find((item) => item.id === selectedItemId);
+  const previewSlides = useMemo(() => {
+    if (!activeSlide) return [];
+    const pageId = previewPageId(activeSlide);
+    return [
+      activeSlide,
+      ...slides.filter((slide) => slide.id !== activeSlide.id && (slide.pageId === "common" || slide.pageId === pageId)),
+    ];
+  }, [activeSlide, slides]);
+  const previewItems = useMemo(() => {
+    const seen = new Set<string>();
+    return previewSlides.flatMap((slide) => slide.items).filter((item) => {
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
+  }, [previewSlides]);
+  const previewItemSlideIds = useMemo(() => {
+    const owners = new Map<string, string>();
+    previewSlides.forEach((slide) => slide.items.forEach((item) => {
+      if (!owners.has(item.id)) owners.set(item.id, slide.id);
+    }));
+    return owners;
+  }, [previewSlides]);
+  const selectedItemSlide = selectedItemId
+    ? slides.find((slide) => slide.items.some((item) => item.id === selectedItemId))
+    : undefined;
+  const selectedItem = selectedItemSlide?.items.find((item) => item.id === selectedItemId);
+  const selectedSlideId = selectedItemSlide?.id ?? activeSlide?.id ?? "";
   const completed = slides.filter((slide) => slide.status === "작성 완료").length;
 
   useEffect(() => {
@@ -581,21 +612,29 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   };
 
   const saveTextStyle = (item: BoardTextItem, patch: Partial<BoardTextStyle>) => {
-    updateItem(activeSlide!.id, item.id, { style: { ...item.style, ...patch }, styleTouched: true } as Partial<BoardTextItem>, "text");
+    const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
+    if (!slideId) return;
+    updateItem(slideId, item.id, { style: { ...item.style, ...patch }, styleTouched: true } as Partial<BoardTextItem>, "text");
   };
 
   const saveImageTransform = (item: BoardImageItem, next: BoardImageTransform, commit: boolean) => {
-    if (viewMode === "mobile") updateItem(activeSlide!.id, item.id, { mobile: next } as Partial<BoardImageItem>, "image", commit);
-    else updateItem(activeSlide!.id, item.id, { desktop: next } as Partial<BoardImageItem>, "image", commit);
+    const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
+    if (!slideId) return;
+    if (viewMode === "mobile") updateItem(slideId, item.id, { mobile: next } as Partial<BoardImageItem>, "image", commit);
+    else updateItem(slideId, item.id, { desktop: next } as Partial<BoardImageItem>, "image", commit);
   };
 
   const saveElementTransform = (item: BoardItem, next: BoardElementTransform, commit = false) => {
+    const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
+    if (!slideId) return;
     const patch = viewMode === "mobile" ? { layoutMobile: next } : { layoutDesktop: next };
-    updateItem(activeSlide!.id, item.id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", commit);
+    updateItem(slideId, item.id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", commit);
   };
 
   const saveMotion = (item: BoardItem, motion: BoardMotion) => {
-    updateItem(activeSlide!.id, item.id, { motion } as Partial<BoardItem>, item.type === "text" ? "text" : "image");
+    const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
+    if (!slideId) return;
+    updateItem(slideId, item.id, { motion } as Partial<BoardItem>, item.type === "text" ? "text" : "image");
   };
 
   const previewMotion = (itemId?: string) => {
@@ -606,10 +645,12 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   };
 
   const resetImage = (item: BoardImageItem) => {
+    const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
+    if (!slideId) return;
     const effects = { ...item.effects, opacity: 100, overlayOpacity: 0, gradientEnabled: false };
     setBoard((current) => {
       const next = clone(current);
-      const slide = findSlide(next, activeSlide!.id);
+      const slide = findSlide(next, slideId);
       const found = slide?.items.find((value) => value.id === item.id);
       if (found && isBoardImageItem(found)) {
         found.desktop = { x: 50, y: 50, zoom: 100 };
@@ -618,9 +659,9 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       }
       return next;
     });
-    queueSave(`${activeSlide!.id}:${item.id}`, {
+    queueSave(`${slideId}:${item.id}`, {
       kind: "image",
-      slideId: activeSlide!.id,
+      slideId,
       itemId: item.id,
       patch: { desktop: { x: 50, y: 50, zoom: 100 }, mobile: null, effects },
     }, 0);
@@ -628,9 +669,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
 
   const sendPreview = useCallback(() => {
     if (!activeSlide || canvasMode !== "design") return;
-    const items = activeSlide.items.map((item) => {
+    const items = previewItems.map((item) => {
       if (!isBoardImageItem(item)) return item;
-      const previewSrc = temporaryPreviews[previewKey(activeSlide.id, item.id)];
+      const ownerSlideId = previewItemSlideIds.get(item.id) ?? activeSlide.id;
+      const previewSrc = temporaryPreviews[previewKey(ownerSlideId, item.id)];
       return previewSrc ? { ...item, previewSrc } : item;
     });
     iframeRef.current?.contentWindow?.postMessage({
@@ -641,7 +683,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       selectedItemId,
       interactionMode,
     }, window.location.origin);
-  }, [activeSlide, canvasMode, interactionMode, selectedItemId, temporaryPreviews, viewMode]);
+  }, [activeSlide, canvasMode, interactionMode, previewItemSlideIds, previewItems, selectedItemId, temporaryPreviews, viewMode]);
 
   useEffect(() => {
     sendPreview();
@@ -651,34 +693,37 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     const onMessage = (event: MessageEvent<Record<string, unknown>>) => {
       if (event.origin !== window.location.origin || event.source !== iframeRef.current?.contentWindow || !activeSlide) return;
       const id = typeof event.data.id === "string" ? event.data.id : "";
-      const item = activeSlide.items.find((value) => value.id === id);
+      const item = previewItems.find((value) => value.id === id);
+      const ownerSlideId = previewItemSlideIds.get(id);
       if (event.data.type === "content-board:ready") {
         sendPreview();
       } else if (event.data.type === "content-board:error" && typeof event.data.message === "string") {
         setSaveState("error");
         setError(event.data.message);
-      } else if (event.data.type === "content-board:select" && item) {
+      } else if (event.data.type === "content-board:select" && item && ownerSlideId) {
+        const ownerSlide = slides.find((slide) => slide.id === ownerSlideId);
+        if (ownerSlide && previewPath(ownerSlide) === previewPath(activeSlide)) setActiveSlideId(ownerSlideId);
         setSelectedItemId(id);
-      } else if (event.data.type === "content-board:text" && item?.type === "text" && typeof event.data.value === "string") {
-        updateItem(activeSlide.id, id, { value: event.data.value } as Partial<BoardTextItem>, "text", true);
-      } else if (event.data.type === "content-board:image-drop" && item && isBoardImageItem(item) && event.data.file instanceof File) {
+      } else if (event.data.type === "content-board:text" && ownerSlideId && item?.type === "text" && typeof event.data.value === "string") {
+        updateItem(ownerSlideId, id, { value: event.data.value } as Partial<BoardTextItem>, "text", true);
+      } else if (event.data.type === "content-board:image-drop" && ownerSlideId && item && isBoardImageItem(item) && event.data.file instanceof File) {
         setSelectedItemId(id);
-        requestUpload(activeSlide.id, item, event.data.file);
-      } else if (event.data.type === "content-board:image-transform" && item && isBoardImageItem(item) && event.data.value && typeof event.data.value === "object") {
+        requestUpload(ownerSlideId, item, event.data.file);
+      } else if (event.data.type === "content-board:image-transform" && ownerSlideId && item && isBoardImageItem(item) && event.data.value && typeof event.data.value === "object") {
         const value = event.data.value as BoardImageTransform;
         const mode = event.data.viewMode === "mobile" ? "mobile" : "desktop";
-        if (mode === "mobile") updateItem(activeSlide.id, id, { mobile: value } as Partial<BoardImageItem>, "image", true);
-        else updateItem(activeSlide.id, id, { desktop: value } as Partial<BoardImageItem>, "image", true);
-      } else if (event.data.type === "content-board:layout-transform" && item && event.data.value && typeof event.data.value === "object") {
+        if (mode === "mobile") updateItem(ownerSlideId, id, { mobile: value } as Partial<BoardImageItem>, "image", true);
+        else updateItem(ownerSlideId, id, { desktop: value } as Partial<BoardImageItem>, "image", true);
+      } else if (event.data.type === "content-board:layout-transform" && ownerSlideId && item && event.data.value && typeof event.data.value === "object") {
         const value = event.data.value as BoardElementTransform;
         const mode = event.data.viewMode === "mobile" ? "mobile" : "desktop";
         const patch = mode === "mobile" ? { layoutMobile: value } : { layoutDesktop: value };
-        updateItem(activeSlide.id, id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", true);
+        updateItem(ownerSlideId, id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", true);
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [activeSlide, sendPreview, updateItem]);
+  }, [activeSlide, previewItemSlideIds, previewItems, sendPreview, slides, updateItem]);
 
   if (!activeSlide) return <main className={styles.empty}>편집할 슬라이드가 없습니다.</main>;
 
@@ -774,7 +819,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           return <>
             <div className={styles.inspectorHeader}><span>TEXT</span><b>{item.label}</b><small>{item.id}</small></div>
             <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
-            <label className={styles.contentField}>내용<textarea value={item.value} rows={Math.min(8, Math.max(3, item.value.split("\n").length + 1))} onChange={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
+            <label className={styles.contentField}>내용<textarea value={item.value} rows={Math.min(8, Math.max(3, item.value.split("\n").length + 1))} onChange={(event) => updateItem(selectedSlideId, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(selectedSlideId, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <fieldset><legend>글꼴</legend><select value={item.style.fontFamily} onChange={(event) => saveTextStyle(item, { fontFamily: event.target.value })}>{BOARD_FONT_OPTIONS.map((font) => <option key={font.value} value={font.value}>{font.label}</option>)}</select></fieldset>
             <div className={styles.controlGrid}>
               <label>크기<input type="number" min="10" max="120" value={item.style.fontSize} onChange={(event) => saveTextStyle(item, { fontSize: Number(event.target.value) })} /></label>
@@ -785,13 +830,13 @@ export function ContentBoardEditor({ initialBoard }: Props) {
             <label className={styles.rangeLabel}>글자 투명도 <input type="range" min="0" max="100" value={item.style.opacity} onChange={(event) => saveTextStyle(item, { opacity: Number(event.target.value) })} /><output>{item.style.opacity}%</output></label>
             <fieldset><legend>글자색</legend><div className={styles.colorControl}><input type="color" value={item.style.color} onChange={(event) => saveTextStyle(item, { color: event.target.value })} /><code>{item.style.color}</code></div></fieldset>
             <fieldset><legend>정렬</legend><div className={styles.segmented}>{(["left", "center", "right"] as const).map((align) => <button type="button" key={align} className={item.style.textAlign === align ? styles.active : ""} onClick={() => saveTextStyle(item, { textAlign: align })}>{align === "left" ? "왼쪽" : align === "center" ? "가운데" : "오른쪽"}</button>)}</div></fieldset>
-            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
+            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <p className={styles.inspectorHelp}>내용 편집에서는 글자를 한 번 클릭해 바로 입력합니다. 위치 이동에서는 드래그하고, 방향키로 1px·Shift+방향키로 10px씩 움직입니다.</p>
           </>;
         })() : selectedItem && isBoardImageItem(selectedItem) ? (() => {
           const item = selectedItem;
           const value = transformFor(item, viewMode);
-          const updateEffects = (patch: Partial<BoardImageItem["effects"]>) => updateItem(activeSlide.id, item.id, { effects: patch } as Partial<BoardImageItem>, "image");
+          const updateEffects = (patch: Partial<BoardImageItem["effects"]>) => updateItem(selectedSlideId, item.id, { effects: patch } as Partial<BoardImageItem>, "image");
           return <>
             <div className={styles.inspectorHeader}><span>IMAGE</span><b>{item.label}</b><small>{item.id}</small></div>
             <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
@@ -811,10 +856,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
               <div className={styles.colorControl}><input type="color" value={item.effects.gradientColor} onChange={(event) => updateEffects({ gradientColor: event.target.value })} /><code>{item.effects.gradientColor}</code></div>
               <label className={styles.rangeLabel}>농도 <input type="range" min="0" max="100" value={item.effects.gradientOpacity} onChange={(event) => updateEffects({ gradientOpacity: Number(event.target.value) })} /><output>{item.effects.gradientOpacity}%</output></label>
             </fieldset>
-            <label>사진 설명(alt)<input value={item.alt} placeholder="설명 필요" onChange={(event) => updateItem(activeSlide.id, item.id, { alt: event.target.value } as Partial<BoardImageItem>, "image")} /></label>
+            <label>사진 설명(alt)<input value={item.alt} placeholder="설명 필요" onChange={(event) => updateItem(selectedSlideId, item.id, { alt: event.target.value } as Partial<BoardImageItem>, "image")} /></label>
             {!item.alt ? <p className={styles.altWarning}>사진 설명이 비어 있습니다. 검색·접근성을 위해 입력해 주세요.</p> : null}
-            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="사진 처리 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image")} onBlur={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image", true)} /></label>
-            <div className={styles.inspectorButtons}><button type="button" onClick={() => resetImage(item)}>효과 초기화</button><button type="button" className={styles.danger} onClick={() => updateItem(activeSlide.id, item.id, { asset: null, originalFileName: null } as Partial<BoardImageItem>, "image", true)}>새 사진 지우기</button></div>
+            <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="사진 처리 요청을 적으세요" onChange={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image")} onBlur={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image", true)} /></label>
+            <div className={styles.inspectorButtons}><button type="button" onClick={() => resetImage(item)}>효과 초기화</button><button type="button" className={styles.danger} onClick={() => updateItem(selectedSlideId, item.id, { asset: null, originalFileName: null } as Partial<BoardImageItem>, "image", true)}>새 사진 지우기</button></div>
           </>;
         })() : <>
           <div className={styles.inspectorHeader}><span>SECTION</span><b>{activeSlide.title}</b><small>{activeSlide.id}</small></div>
