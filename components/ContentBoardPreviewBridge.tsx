@@ -105,6 +105,10 @@ export function ContentBoardPreviewBridge() {
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
     if (new URLSearchParams(window.location.search).get("content-board-preview") !== "1") return;
+    if (window.parent === window) {
+      window.location.replace("/content-board");
+      return;
+    }
 
     document.body.classList.add("contentBoardCanvas");
 

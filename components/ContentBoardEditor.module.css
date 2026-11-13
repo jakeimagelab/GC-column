@@ -473,13 +473,18 @@
   font-style: normal;
 }
 
-.focusMode .sidebar,
-.focusMode .inspector {
+.focusMode .sidebar {
   display: none;
 }
 
+.focusMode .inspector {
+  display: block;
+  z-index: 40;
+  box-shadow: -18px 0 46px rgba(45, 40, 36, .13);
+}
+
 .focusMode .workspace {
-  margin-right: 0;
+  margin-right: 328px;
   margin-left: 0;
   padding-right: 18px;
   padding-left: 18px;
@@ -1114,6 +1119,10 @@
     margin-right: 300px;
     padding-left: 24px;
     padding-right: 24px;
+  }
+
+  .focusMode .workspace {
+    margin-right: 300px;
   }
 }
 
