@@ -21,7 +21,7 @@ import {
   getVisibleColumns,
   isPublishable,
 } from "@/content/columns";
-import { getImage, getText } from "@/content/site-content-types";
+import { getImage, getText, textEditProps } from "@/content/site-content-types";
 import { detailContent, SITE_URL } from "@/content/site";
 import { getCategory, getTreatment } from "@/content/treatments";
 import type { Column } from "@/content/types";
@@ -89,11 +89,21 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const previous = currentIndex > 0 ? visible[currentIndex - 1] : undefined;
   const next = currentIndex >= 0 && currentIndex < visible.length - 1 ? visible[currentIndex + 1] : undefined;
   const pageUrl = `${SITE_URL}/column/${column.slug}`;
+  const summaryTitle = getText(content, "column.detail.summaryTitle");
+  const visitTitle = getText(content, "column.detail.visit.title");
+  const firstSectionId = column.sections[0]?.id ?? "summary";
+  const readingSteps = ["#summary", `#${firstSectionId}`, "#judgement"].map((href, index) => ({
+    href,
+    time: getText(content, `column.detail.reading.${index}.time`),
+    title: getText(content, `column.detail.reading.${index}.title`),
+    description: getText(content, `column.detail.reading.${index}.description`),
+  }));
   const tocItems: TocItem[] = [
-    { id: "summary", label: detailContent.coreTitle },
+    { id: "summary", label: summaryTitle },
     ...column.sections.map((section) => ({ id: section.id, label: `${section.no} ${section.heading}` })),
     { id: "judgement", label: "권하는 경우 · 다른 선택을 보는 경우" },
     { id: "precautions", label: "시술 전 확인 · FAQ" },
+    { id: "prepare", label: visitTitle },
   ];
   const structured = publishable
     ? articleGraph(content, column, category.name, readerQuestions)
@@ -129,10 +139,27 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
       <div className={styles.bodyLayout}>
         <article className={styles.article} data-article-body>
+          <nav className={styles.readingPath} aria-labelledby="reading-path-title">
+            <div className={styles.readingPathHeading}>
+              <span {...textEditProps("column.detail.reading.eyebrow")}>{getText(content, "column.detail.reading.eyebrow")}</span>
+              <b id="reading-path-title" {...textEditProps("column.detail.reading.title")}>{getText(content, "column.detail.reading.title")}</b>
+            </div>
+            <div className={styles.readingPathGrid}>
+              {readingSteps.map((step, index) => (
+                <Link href={step.href} key={step.href}>
+                  <span {...textEditProps(`column.detail.reading.${index}.time`)}>{step.time}</span>
+                  <b {...textEditProps(`column.detail.reading.${index}.title`)}>{step.title}</b>
+                  <small {...textEditProps(`column.detail.reading.${index}.description`)}>{step.description}</small>
+                </Link>
+              ))}
+            </div>
+          </nav>
+
           <section className={styles.summary} id="summary" data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
-            <b>{detailContent.coreTitle}</b>
+            <b {...textEditProps("column.detail.summaryTitle")}>{summaryTitle}</b>
             <p>{column.summary}</p>
             <div className={styles.keyPoints}><b>핵심 포인트</b><ul>{column.keyPoints.map((point) => <li key={point}>{point}</li>)}</ul></div>
+            <small className={styles.summaryNotice} {...textEditProps("column.detail.summaryNotice")}>{getText(content, "column.detail.summaryNotice")}</small>
           </section>
 
           <figure className={styles.photoFigure} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="depth">
@@ -180,6 +207,23 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             <section className={styles.faqSection} data-scroll-world-layer="depth"><h2>{detailContent.faqTitle}</h2><FaqList items={column.faqs.map((faq, index) => ({ ...faq, id: `faq-${index + 1}` }))} /></section>
             {readerQuestions.length ? <section className={styles.faqSection} data-scroll-world-layer="depth"><h2>{getText(content, "qna.readerTitle")}</h2><FaqList items={readerQuestions.flatMap((item) => item.answer ? [{ q: item.question, a: item.answer, id: `reader-${item.id}` }] : [])} /></section> : null}
           </div>
+
+          <section className={styles.visitPrep} id="prepare">
+            <div>
+              <span {...textEditProps("column.detail.visit.eyebrow")}>{getText(content, "column.detail.visit.eyebrow")}</span>
+              <h2 {...textEditProps("column.detail.visit.title")}>{visitTitle}</h2>
+              <p {...textEditProps("column.detail.visit.description")}>{getText(content, "column.detail.visit.description")}</p>
+            </div>
+            <ol>
+              {[0, 1, 2].map((index) => (
+                <li key={index}>
+                  <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                  <b {...textEditProps(`column.detail.visit.${index}`)}>{getText(content, `column.detail.visit.${index}`)}</b>
+                </li>
+              ))}
+            </ol>
+            <Link href="/consultation" {...textEditProps("column.detail.visit.action")}>{getText(content, "column.detail.visit.action")}</Link>
+          </section>
 
           {column.references.length ? <section className={styles.references} data-scroll-world-scene data-scroll-world-strength="soft" data-scroll-world-layer="copy"><h2>{detailContent.referencesTitle}</h2><ul>{column.references.map((item) => <li key={item}>{item}</li>)}</ul></section> : null}
 

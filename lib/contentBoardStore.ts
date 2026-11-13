@@ -45,6 +45,7 @@ const definitions: SlideDefinition[] = [
 
   { pageId: "home", pageTitle: "홈", id: "home-hero", title: "히어로", description: "슬라이드별 배경 사진과 첫 화면 문구", special: "hero" },
   { pageId: "home", pageTitle: "홈", id: "home-question", title: "질문창", description: "질문 검색 영역의 제목·안내·예시", prefixes: ["home.question."] },
+  { pageId: "home", pageTitle: "홈", id: "home-knowledge", title: "이용 안내", description: "고민에서 판단 기준으로 이어지는 세 단계", prefixes: ["home.knowledge."] },
   { pageId: "home", pageTitle: "홈", id: "home-doctor", title: "원장 소개", description: "대표원장 사진, 제목, 연차와 약력", prefixes: ["home.doctor."] },
   { pageId: "home", pageTitle: "홈", id: "home-vision", title: "진료 철학", description: "비전 문구와 원장 서명", prefixes: ["home.vision."] },
   { pageId: "home", pageTitle: "홈", id: "home-equipment", title: "보유 장비", description: "장비별 누끼 사진·이름·설명", special: "equipment" },
@@ -62,6 +63,7 @@ const definitions: SlideDefinition[] = [
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-location", title: "오시는 길", description: "지도와 예약·상담 문구", prefixes: ["column.location."] },
 
   { pageId: "doctor", pageTitle: "원장 프로필", id: "doctor-profile", title: "프로필 정보", description: "이름·직함·경력·학력·학회·전문 분야", prefixes: ["doctor.", "home.doctor.photo"] },
+  { pageId: "detail", pageTitle: "칼럼 상세 공통", id: "detail-reading", title: "읽기 안내·내원 준비", description: "읽기 깊이와 진료실에서 확인할 내용", prefixes: ["column.detail."] },
   { pageId: "detail", pageTitle: "칼럼 상세 공통", id: "detail-share", title: "공유 영역", description: "공유 버튼과 복사 안내 문구", prefixes: ["column.share."] },
   { pageId: "detail", pageTitle: "칼럼 상세 공통", id: "detail-qna", title: "독자 질문", description: "질문 입력·동의·완료 안내 문구", prefixes: ["qna."] },
 ];

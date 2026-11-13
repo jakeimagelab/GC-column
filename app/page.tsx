@@ -18,7 +18,7 @@ import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
 import { getColumns, homeLatestSlugs, homeSearchSlugs } from "@/content/columns";
-import { getEquipmentItems, getHeroSlides, getImage, getText, textEditProps } from "@/content/site-content-types";
+import { attributeEditProps, getEquipmentItems, getHeroSlides, getImage, getText, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, SITE_URL } from "@/content/site";
 import { getCategory } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
@@ -46,6 +46,13 @@ export default async function HomePage() {
   const latestColumns = getColumns(homeLatestSlugs);
   const slides = getHeroSlides(content);
   const equipment = getEquipmentItems(content);
+  const knowledgeSteps = [0, 1, 2].map((index) => ({
+    id: `home.knowledge.step.${index}`,
+    href: getText(content, `home.knowledge.step.${index}.href`),
+    title: getText(content, `home.knowledge.step.${index}.title`),
+    description: getText(content, `home.knowledge.step.${index}.description`),
+    action: getText(content, `home.knowledge.step.${index}.action`),
+  }));
   const careers = [0, 1, 2, 3, 4, 5].map((index) => ({ id: `home.doctor.career.${index}`, value: getText(content, `home.doctor.career.${index}`) }));
   const address = getClinicAddress(content);
   const lat = getText(content, "home.location.lat");
@@ -63,6 +70,30 @@ export default async function HomePage() {
       </section>
 
       <HomeQuestionSearch columns={searchColumns} content={content} />
+
+      <section className={styles.knowledgePath} aria-labelledby="home-knowledge-title">
+        <div className={styles.knowledgeHeading}>
+          <span {...textEditProps("home.knowledge.eyebrow")}>{getText(content, "home.knowledge.eyebrow")}</span>
+          <div>
+            <h2 id="home-knowledge-title"><EditableRichText id="home.knowledge.title" value={getText(content, "home.knowledge.title")} /></h2>
+            <p {...textEditProps("home.knowledge.description")}>{getText(content, "home.knowledge.description")}</p>
+          </div>
+        </div>
+        <ol className={styles.knowledgeSteps}>
+          {knowledgeSteps.map((step, index) => (
+            <li key={step.id}>
+              <Link href={step.href} {...attributeEditProps(`${step.id}.href`, "href")}>
+                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <b {...textEditProps(`${step.id}.title`)}>{step.title}</b>
+                  <p {...textEditProps(`${step.id}.description`)}>{step.description}</p>
+                </div>
+                <small {...textEditProps(`${step.id}.action`)}>{step.action}</small>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <DoctorReveal className={styles.doctorSection} id="doctor" scrollWorldScene>
         <OutlineWord className={styles.directorOutline} text="DIRECTOR" fill="#fff" scrollWorldLayer="counter" />

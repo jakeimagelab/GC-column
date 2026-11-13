@@ -127,7 +127,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   };
 
   return (
-    <section ref={panelRef} className={styles.panel} aria-labelledby="home-question-title" data-scroll-world-scene data-scroll-world-strength="soft">
+    <section id="question" ref={panelRef} className={styles.panel} aria-labelledby="home-question-title" data-scroll-world-scene data-scroll-world-strength="soft">
       <div className={styles.heading} data-scroll-world-layer="copy">
         <div><span {...textEditProps("home.question.eyebrow")}>{getText(content, "home.question.eyebrow")}</span><h2 id="home-question-title" {...textEditProps("home.question.title")}>{getText(content, "home.question.title")}</h2></div>
         <p {...textEditProps("home.question.description")}>{getText(content, "home.question.description")}</p>
