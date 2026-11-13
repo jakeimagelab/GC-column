@@ -3,10 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import {
   BOARD_FONT_OPTIONS,
+  BOARD_MOTION_OPTIONS,
   isBoardImageItem,
+  type BoardElementTransform,
   type BoardImageItem,
   type BoardImageTransform,
   type BoardItem,
+  type BoardMotion,
   type BoardSlide,
   type BoardStatus,
   type BoardTextItem,
@@ -20,10 +23,12 @@ type Props = { initialBoard: ContentBoard };
 type SaveState = "saved" | "saving" | "error";
 type PendingUpload = { slideId: string; item: BoardImageItem; file: File; objectUrl: string };
 type CanvasMode = "design" | "items";
+type InteractionMode = "edit" | "move";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
 const previewKey = (slideId: string, itemId: string) => `${slideId}:${itemId}`;
+const defaultElementTransform: BoardElementTransform = { x: 0, y: 0, scale: 100, rotate: 0, zIndex: 0 };
 
 function imageMime(file: File) {
   if (["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) return file.type;
@@ -86,6 +91,10 @@ function transformFor(item: BoardImageItem, mode: BoardViewMode) {
   return mode === "mobile" ? item.mobile ?? item.desktop : item.desktop;
 }
 
+function elementTransformFor(item: BoardItem, mode: BoardViewMode) {
+  return mode === "mobile" ? item.layoutMobile ?? item.layoutDesktop : item.layoutDesktop;
+}
+
 function findSlide(board: ContentBoard, slideId: string) {
   return board.pages.flatMap((page) => page.slides).find((slide) => slide.id === slideId);
 }
@@ -115,6 +124,7 @@ function TextCanvasItem({ item, selected, onSelect, onChange }: {
     fontSize: `${item.style.fontSize}px`,
     fontWeight: item.style.fontWeight,
     color: item.style.color,
+    opacity: item.style.opacity / 100,
     lineHeight: item.style.lineHeight,
     letterSpacing: `${item.style.letterSpacing}px`,
     textAlign: item.style.textAlign,
@@ -302,7 +312,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
 
   return (
     <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
-      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭 · 파인더 사진을 점선 박스에 드롭 · 사진 드래그/휠</span><em>{Math.round(scale * 100)}%</em></div>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>내용 편집: 글자 클릭·사진 크롭 · 위치 이동: 모든 항목 드래그·휠 크기</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
         key={`${slide.id}-${viewMode}`}
@@ -315,6 +325,55 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
   );
 }
 
+function ElementControls({ item, viewMode, onViewMode, onLayout, onMotion, onPreview }: {
+  item: BoardItem;
+  viewMode: BoardViewMode;
+  onViewMode: (mode: BoardViewMode) => void;
+  onLayout: (value: BoardElementTransform, commit?: boolean) => void;
+  onMotion: (value: BoardMotion) => void;
+  onPreview: () => void;
+}) {
+  const layout = elementTransformFor(item, viewMode);
+  const nudge = (x: number, y: number) => onLayout({ ...layout, x: layout.x + x, y: layout.y + y }, true);
+  const numberValue = (value: string, fallback: number) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+
+  return <>
+    <div className={styles.inspectorMode} aria-label="반응형 편집 기준">
+      <button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => onViewMode("desktop")}>PC</button>
+      <button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => onViewMode("mobile")}>모바일</button>
+    </div>
+    <fieldset>
+      <legend>배치·크기</legend>
+      <div className={styles.controlGridCompact}>
+        <label>X 이동<input type="number" min="-2000" max="2000" value={Math.round(layout.x)} onChange={(event) => onLayout({ ...layout, x: numberValue(event.target.value, layout.x) })} /></label>
+        <label>Y 이동<input type="number" min="-2000" max="2000" value={Math.round(layout.y)} onChange={(event) => onLayout({ ...layout, y: numberValue(event.target.value, layout.y) })} /></label>
+        <label>회전<input type="number" min="-360" max="360" value={Math.round(layout.rotate)} onChange={(event) => onLayout({ ...layout, rotate: numberValue(event.target.value, layout.rotate) })} /></label>
+        <label>레이어<input type="number" min="-100" max="1000" value={layout.zIndex} onChange={(event) => onLayout({ ...layout, zIndex: Math.round(numberValue(event.target.value, layout.zIndex)) })} /></label>
+      </div>
+      <label className={styles.rangeLabel}>전체 크기 <input type="range" min="10" max="300" value={layout.scale} onChange={(event) => onLayout({ ...layout, scale: Number(event.target.value) })} /><output>{Math.round(layout.scale)}%</output></label>
+      <div className={styles.nudgePad} aria-label="위치 미세 조정">
+        <button type="button" onClick={() => nudge(0, -10)} aria-label="위로 10픽셀">↑</button>
+        <button type="button" onClick={() => nudge(-10, 0)} aria-label="왼쪽으로 10픽셀">←</button>
+        <button type="button" onClick={() => onLayout({ ...layout, x: 0, y: 0 }, true)}>위치 0</button>
+        <button type="button" onClick={() => nudge(10, 0)} aria-label="오른쪽으로 10픽셀">→</button>
+        <button type="button" onClick={() => nudge(0, 10)} aria-label="아래로 10픽셀">↓</button>
+      </div>
+      <button type="button" className={styles.resetWide} onClick={() => onLayout({ ...defaultElementTransform }, true)}>현재 화면 배치 초기화</button>
+    </fieldset>
+    <fieldset>
+      <legend>나타나는 모션</legend>
+      <label>효과<select value={item.motion.preset} onChange={(event) => onMotion({ ...item.motion, preset: event.target.value as BoardMotion["preset"] })}>{BOARD_MOTION_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+      <div className={styles.controlGridCompact}>
+        <label>시간(ms)<input type="number" min="100" max="5000" step="50" value={item.motion.duration} onChange={(event) => onMotion({ ...item.motion, duration: numberValue(event.target.value, item.motion.duration) })} /></label>
+        <label>지연(ms)<input type="number" min="0" max="5000" step="50" value={item.motion.delay} onChange={(event) => onMotion({ ...item.motion, delay: numberValue(event.target.value, item.motion.delay) })} /></label>
+      </div>
+      <label className={styles.rangeLabel}>이동 거리 <input type="range" min="0" max="240" value={item.motion.distance} onChange={(event) => onMotion({ ...item.motion, distance: Number(event.target.value) })} /><output>{Math.round(item.motion.distance)}px</output></label>
+      <label>움직임<select value={item.motion.easing} onChange={(event) => onMotion({ ...item.motion, easing: event.target.value as BoardMotion["easing"] })}><option value="smooth">부드럽게</option><option value="ease-out">차분하게</option><option value="spring">살짝 탄력</option><option value="linear">일정하게</option></select></label>
+      <button type="button" className={styles.motionPreviewButton} onClick={onPreview} disabled={item.motion.preset === "none"}>▶ 선택 항목 모션 보기</button>
+    </fieldset>
+  </>;
+}
+
 export function ContentBoardEditor({ initialBoard }: Props) {
   const [board, setBoard] = useState(() => clone(initialBoard));
   const firstSlide = initialBoard.pages[0]?.slides[0]?.id ?? "";
@@ -322,6 +381,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<BoardViewMode>("desktop");
   const [canvasMode, setCanvasMode] = useState<CanvasMode>("design");
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>("edit");
   const [focusPreview, setFocusPreview] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [error, setError] = useState("");
@@ -529,6 +589,22 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     else updateItem(activeSlide!.id, item.id, { desktop: next } as Partial<BoardImageItem>, "image", commit);
   };
 
+  const saveElementTransform = (item: BoardItem, next: BoardElementTransform, commit = false) => {
+    const patch = viewMode === "mobile" ? { layoutMobile: next } : { layoutDesktop: next };
+    updateItem(activeSlide!.id, item.id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", commit);
+  };
+
+  const saveMotion = (item: BoardItem, motion: BoardMotion) => {
+    updateItem(activeSlide!.id, item.id, { motion } as Partial<BoardItem>, item.type === "text" ? "text" : "image");
+  };
+
+  const previewMotion = (itemId?: string) => {
+    iframeRef.current?.contentWindow?.postMessage({
+      type: "content-board:play-motion",
+      itemId: itemId ?? null,
+    }, window.location.origin);
+  };
+
   const resetImage = (item: BoardImageItem) => {
     const effects = { ...item.effects, opacity: 100, overlayOpacity: 0, gradientEnabled: false };
     setBoard((current) => {
@@ -563,8 +639,9 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       items,
       viewMode,
       selectedItemId,
+      interactionMode,
     }, window.location.origin);
-  }, [activeSlide, canvasMode, selectedItemId, temporaryPreviews, viewMode]);
+  }, [activeSlide, canvasMode, interactionMode, selectedItemId, temporaryPreviews, viewMode]);
 
   useEffect(() => {
     sendPreview();
@@ -592,6 +669,11 @@ export function ContentBoardEditor({ initialBoard }: Props) {
         const mode = event.data.viewMode === "mobile" ? "mobile" : "desktop";
         if (mode === "mobile") updateItem(activeSlide.id, id, { mobile: value } as Partial<BoardImageItem>, "image", true);
         else updateItem(activeSlide.id, id, { desktop: value } as Partial<BoardImageItem>, "image", true);
+      } else if (event.data.type === "content-board:layout-transform" && item && event.data.value && typeof event.data.value === "object") {
+        const value = event.data.value as BoardElementTransform;
+        const mode = event.data.viewMode === "mobile" ? "mobile" : "desktop";
+        const patch = mode === "mobile" ? { layoutMobile: value } : { layoutDesktop: value };
+        updateItem(activeSlide.id, id, patch as Partial<BoardItem>, item.type === "text" ? "text" : "image", true);
       }
     };
     window.addEventListener("message", onMessage);
@@ -637,7 +719,9 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           <div><span>{activeSlide.pageTitle} · {String(activeIndex + 1).padStart(2, "0")}</span><h1>{activeSlide.title}</h1><p>{activeSlide.description}</p></div>
           <div className={styles.headingActions}>
             <div className={styles.canvasSwitch}><button type="button" className={canvasMode === "design" ? styles.active : ""} onClick={() => setCanvasMode("design")}>실제 디자인</button><button type="button" className={canvasMode === "items" ? styles.active : ""} onClick={() => setCanvasMode("items")}>항목 목록</button></div>
+            {canvasMode === "design" ? <div className={styles.interactionSwitch} aria-label="디자인 조작 방식"><button type="button" className={interactionMode === "edit" ? styles.active : ""} onClick={() => setInteractionMode("edit")}>내용 편집</button><button type="button" className={interactionMode === "move" ? styles.active : ""} onClick={() => setInteractionMode("move")}>위치 이동</button></div> : null}
             <div className={styles.viewSwitch}><button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => setViewMode("desktop")}>PC</button><button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => setViewMode("mobile")}>모바일</button></div>
+            {canvasMode === "design" ? <button type="button" className={styles.motionAllButton} onClick={() => previewMotion()}>▶ 전체 모션</button> : null}
             {canvasMode === "design" ? <button type="button" className={styles.focusButton} onClick={() => setFocusPreview((value) => !value)}>{focusPreview ? "패널 보기" : "크게 보기"}</button> : null}
             <select value={activeSlide.status} onChange={(event) => updateSlide(activeSlide.id, { status: event.target.value as BoardStatus }, true)} aria-label="슬라이드 상태">
               <option>작성 중</option><option>확인 필요</option><option>작성 완료</option>
@@ -650,7 +734,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
         ) : (
           <div className={`${styles.stageWrap} ${viewMode === "mobile" ? styles.mobileStage : ""}`}>
             <div className={styles.stage}>
-              <div className={styles.stageMeta}><span>{activeSlide.pageTitle.toUpperCase()}</span><b>{activeSlide.title}</b><small>글자는 직접 클릭 · 사진은 파인더에서 드래그</small></div>
+              <div className={styles.stageMeta}><span>{activeSlide.pageTitle.toUpperCase()}</span><b>{activeSlide.title}</b><small>글자는 직접 클릭 · 사진은 파인더에서 드래그 · 세부 배치는 오른쪽 패널</small></div>
               <div className={styles.itemsGrid}>
                 {activeSlide.items.map((item) => isBoardImageItem(item) ? (
                   <ImageCanvasItem
@@ -689,6 +773,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           const item = selectedItem as BoardTextItem;
           return <>
             <div className={styles.inspectorHeader}><span>TEXT</span><b>{item.label}</b><small>{item.id}</small></div>
+            <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <label className={styles.contentField}>내용<textarea value={item.value} rows={Math.min(8, Math.max(3, item.value.split("\n").length + 1))} onChange={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <fieldset><legend>글꼴</legend><select value={item.style.fontFamily} onChange={(event) => saveTextStyle(item, { fontFamily: event.target.value })}>{BOARD_FONT_OPTIONS.map((font) => <option key={font.value} value={font.value}>{font.label}</option>)}</select></fieldset>
             <div className={styles.controlGrid}>
@@ -697,10 +782,11 @@ export function ContentBoardEditor({ initialBoard }: Props) {
               <label>행간<input type="number" min="0.8" max="2.5" step="0.05" value={item.style.lineHeight} onChange={(event) => saveTextStyle(item, { lineHeight: Number(event.target.value) })} /></label>
               <label>자간<input type="number" min="-5" max="20" step="0.1" value={item.style.letterSpacing} onChange={(event) => saveTextStyle(item, { letterSpacing: Number(event.target.value) })} /></label>
             </div>
+            <label className={styles.rangeLabel}>글자 투명도 <input type="range" min="0" max="100" value={item.style.opacity} onChange={(event) => saveTextStyle(item, { opacity: Number(event.target.value) })} /><output>{item.style.opacity}%</output></label>
             <fieldset><legend>글자색</legend><div className={styles.colorControl}><input type="color" value={item.style.color} onChange={(event) => saveTextStyle(item, { color: event.target.value })} /><code>{item.style.color}</code></div></fieldset>
             <fieldset><legend>정렬</legend><div className={styles.segmented}>{(["left", "center", "right"] as const).map((align) => <button type="button" key={align} className={item.style.textAlign === align ? styles.active : ""} onClick={() => saveTextStyle(item, { textAlign: align })}>{align === "left" ? "왼쪽" : align === "center" ? "가운데" : "오른쪽"}</button>)}</div></fieldset>
             <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(activeSlide.id, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
-            <p className={styles.inspectorHelp}>슬라이드에서 글자를 직접 수정하세요. Enter는 줄바꿈, Cmd+B는 선택 글자 굵게입니다.</p>
+            <p className={styles.inspectorHelp}>내용 편집에서는 글자를 한 번 클릭해 바로 입력합니다. 위치 이동에서는 드래그하고, 방향키로 1px·Shift+방향키로 10px씩 움직입니다.</p>
           </>;
         })() : selectedItem && isBoardImageItem(selectedItem) ? (() => {
           const item = selectedItem;
@@ -708,7 +794,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           const updateEffects = (patch: Partial<BoardImageItem["effects"]>) => updateItem(activeSlide.id, item.id, { effects: patch } as Partial<BoardImageItem>, "image");
           return <>
             <div className={styles.inspectorHeader}><span>IMAGE</span><b>{item.label}</b><small>{item.id}</small></div>
-            <div className={styles.inspectorMode}><button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => setViewMode("desktop")}>PC</button><button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => setViewMode("mobile")}>모바일</button></div>
+            <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <fieldset><legend>크롭·위치</legend>
               <label>비율<select value={item.effects.cropAspect} onChange={(event) => updateEffects({ cropAspect: event.target.value as BoardImageItem["effects"]["cropAspect"] })}><option value="free">자유</option><option value="16:9">16:9</option><option value="4:3">4:3</option><option value="1:1">1:1</option><option value="3:4">3:4</option></select></label>
               <label className={styles.rangeLabel}>확대 <input type="range" min="100" max="300" value={value.zoom} onChange={(event) => saveImageTransform(item, { ...value, zoom: Number(event.target.value) }, false)} onPointerUp={(event) => saveImageTransform(item, { ...value, zoom: Number(event.currentTarget.value) }, true)} /><output>{Math.round(value.zoom)}%</output></label>
@@ -734,7 +820,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           <div className={styles.inspectorHeader}><span>SECTION</span><b>{activeSlide.title}</b><small>{activeSlide.id}</small></div>
           <label>진행 상태<select value={activeSlide.status} onChange={(event) => updateSlide(activeSlide.id, { status: event.target.value as BoardStatus }, true)}><option>작성 중</option><option>확인 필요</option><option>작성 완료</option></select></label>
           <label className={styles.noteField}>섹션 전체 메모<textarea value={activeSlide.note} placeholder="이 섹션 전체에 대한 개발 요청을 적으세요" onChange={(event) => updateSlide(activeSlide.id, { note: event.target.value })} onBlur={(event) => updateSlide(activeSlide.id, { note: event.target.value }, true)} /></label>
-          <div className={styles.guideBox}><b>사용 방법</b><ol><li>글자를 클릭해 직접 수정</li><li>파인더 사진을 원하는 칸에 드래그</li><li>선택한 항목을 오른쪽에서 세부 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
+          <div className={styles.guideBox}><b>사용 방법</b><ol><li>내용 편집에서 글자를 한 번 클릭해 바로 수정</li><li>파인더 사진을 원하는 점선 박스에 드래그</li><li>위치 이동에서 모든 항목을 직접 움직임</li><li>오른쪽에서 배치·크기·회전·레이어·모션 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
         </>}
       </aside>
 

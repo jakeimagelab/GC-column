@@ -201,6 +201,20 @@ svg {
   transition: outline-color 120ms ease, box-shadow 120ms ease !important;
 }
 
+.contentBoardCanvas[data-board-interaction="move"] [data-edit-id] {
+  cursor: move !important;
+  touch-action: none;
+  user-select: none;
+}
+
+.contentBoardCanvas[data-board-interaction="move"] [data-edit-id]:active {
+  cursor: grabbing !important;
+}
+
+.contentBoardCanvas[data-board-interaction="edit"] [data-edit-type="text"] {
+  cursor: text !important;
+}
+
 .contentBoardCanvas [data-edit-id]:hover,
 .contentBoardCanvas [data-board-selected="true"] {
   outline: 2px solid #9a7d65;

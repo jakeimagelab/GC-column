@@ -306,6 +306,8 @@
 .headingActions select,
 .viewSwitch,
 .canvasSwitch,
+.interactionSwitch,
+.motionAllButton,
 .focusButton {
   height: 38px;
   border: 1px solid #d2cbc2;
@@ -329,6 +331,13 @@
   display: flex;
 }
 
+.interactionSwitch {
+  padding: 3px;
+  display: flex;
+  border-color: #bca896;
+  background: #eee7df;
+}
+
 .canvasSwitch button {
   min-width: 68px;
   padding: 0 9px;
@@ -340,14 +349,36 @@
   cursor: pointer;
 }
 
+.interactionSwitch button {
+  min-width: 68px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 5px;
+  color: #74675b;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+}
+
 .canvasSwitch .active {
   color: #fff;
   background: #65584e;
 }
 
+.interactionSwitch .active {
+  color: #fff;
+  background: #947b67;
+}
+
 .focusButton {
   padding: 0 12px;
   color: #5d554e;
+  cursor: pointer;
+}
+
+.motionAllButton {
+  padding: 0 12px;
+  color: #655548;
   cursor: pointer;
 }
 
@@ -809,6 +840,54 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+.controlGridCompact {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.controlGridCompact + .rangeLabel,
+.nudgePad,
+.resetWide,
+.motionPreviewButton {
+  margin-top: 13px;
+}
+
+.nudgePad {
+  display: grid;
+  grid-template-columns: 34px 34px 1fr 34px 34px;
+  gap: 5px;
+}
+
+.nudgePad button,
+.resetWide,
+.motionPreviewButton {
+  min-height: 34px;
+  border: 1px solid #d1c8bf;
+  border-radius: 5px;
+  color: #625a53;
+  background: #fff;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.resetWide,
+.motionPreviewButton {
+  width: 100%;
+}
+
+.motionPreviewButton {
+  color: #fff;
+  border-color: #806b5a;
+  background: #806b5a;
+}
+
+.motionPreviewButton:disabled {
+  opacity: .42;
+  cursor: default;
 }
 
 .colorControl {

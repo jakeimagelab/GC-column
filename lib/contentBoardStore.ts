@@ -7,9 +7,11 @@ import { desktopTransform, mobileTransform } from "@/lib/imagePlacement";
 import type { ImageContentEntry, SiteContent, SiteContentEntry } from "@/content/site-content-types";
 import {
   isBoardImageItem,
+  type BoardElementTransform,
   type BoardImageEffects,
   type BoardImageItem,
   type BoardItem,
+  type BoardMotion,
   type BoardSlide,
   type BoardTextItem,
   type ContentBoard,
@@ -95,6 +97,22 @@ const defaultEffects: BoardImageEffects = {
   gradientOpacity: 55,
 };
 
+const defaultLayout: BoardElementTransform = {
+  x: 0,
+  y: 0,
+  scale: 100,
+  rotate: 0,
+  zIndex: 0,
+};
+
+const defaultMotion: BoardMotion = {
+  preset: "none",
+  duration: 900,
+  delay: 0,
+  distance: 32,
+  easing: "smooth",
+};
+
 function humanLabel(id: string) {
   const parts = id.split(".");
   const last = parts.at(-1) ?? id;
@@ -117,12 +135,23 @@ function textStyle(id: string): BoardTextItem["style"] {
     lineHeight: title ? 1.25 : 1.65,
     letterSpacing: eyebrow ? 1.2 : 0,
     textAlign: "left",
+    opacity: 100,
   };
 }
 
 function fromEntry(id: string, entry: SiteContentEntry, label = humanLabel(id)): BoardItem {
   if (entry.type === "text") {
-    return { id, type: "text", label, value: entry.value, style: textStyle(id), styleTouched: false, note: "" };
+    return {
+      id,
+      type: "text",
+      label,
+      value: entry.value,
+      style: textStyle(id),
+      styleTouched: false,
+      layoutDesktop: { ...defaultLayout },
+      motion: { ...defaultMotion },
+      note: "",
+    };
   }
   const desktop = desktopTransform(entry);
   const mobile = entry.mobile ? mobileTransform(entry) : undefined;
@@ -137,8 +166,27 @@ function fromEntry(id: string, entry: SiteContentEntry, label = humanLabel(id)):
     desktop,
     mobile,
     effects: { ...defaultEffects },
+    layoutDesktop: { ...defaultLayout },
+    motion: { ...defaultMotion },
     note: "",
   };
+}
+
+function mergeItem(seed: BoardItem, saved: BoardItem): BoardItem {
+  const base = {
+    ...seed,
+    ...saved,
+    layoutDesktop: { ...defaultLayout, ...saved.layoutDesktop },
+    ...(saved.layoutMobile ? { layoutMobile: { ...defaultLayout, ...saved.layoutMobile } } : {}),
+    motion: { ...defaultMotion, ...saved.motion },
+  };
+  if (seed.type === "text" && saved.type === "text") {
+    return { ...base, style: { ...seed.style, ...saved.style } } as BoardTextItem;
+  }
+  if (isBoardImageItem(seed) && isBoardImageItem(saved)) {
+    return { ...base, effects: { ...seed.effects, ...saved.effects } } as BoardImageItem;
+  }
+  return seed;
 }
 
 function directItems(content: SiteContent, prefixes: string[]) {
@@ -227,7 +275,10 @@ function mergeBoard(seed: ContentBoard, saved: ContentBoard): ContentBoard {
             ...slide,
             status: savedSlide.status,
             note: savedSlide.note,
-            items: slide.items.map((item) => savedSlide.items.find((value) => value.id === item.id) ?? item),
+            items: slide.items.map((item) => {
+              const savedItem = savedSlide.items.find((value) => value.id === item.id);
+              return savedItem ? mergeItem(item, savedItem) : item;
+            }),
           };
         }),
       };
@@ -285,6 +336,9 @@ export function updateBoardItem(slideId: string, itemId: string, patch: Partial<
       if (isBoardImageItem(current) && "effects" in patch && patch.effects) {
         (merged as BoardImageItem).effects = { ...current.effects, ...patch.effects };
       }
+      if ("layoutDesktop" in patch && patch.layoutDesktop) merged.layoutDesktop = { ...current.layoutDesktop, ...patch.layoutDesktop };
+      if ("layoutMobile" in patch) merged.layoutMobile = patch.layoutMobile ? { ...(current.layoutMobile ?? current.layoutDesktop), ...patch.layoutMobile } : undefined;
+      if ("motion" in patch && patch.motion) merged.motion = { ...current.motion, ...patch.motion };
       slide.items[itemIndex] = merged;
       return writeContentBoard(board);
     }

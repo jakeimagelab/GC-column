@@ -8,7 +8,14 @@ import {
   updateBoardItem,
   updateBoardSlide,
 } from "@/lib/contentBoardStore";
-import type { BoardImageEffects, BoardImageTransform, BoardTextStyle, BoardStatus } from "@/lib/contentBoardTypes";
+import type {
+  BoardElementTransform,
+  BoardImageEffects,
+  BoardImageTransform,
+  BoardMotion,
+  BoardStatus,
+  BoardTextStyle,
+} from "@/lib/contentBoardTypes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -52,9 +59,42 @@ function textStyle(value: unknown): BoardTextStyle {
     fontSize: number(data.fontSize, 10, 120, 17),
     fontWeight: number(data.fontWeight, 300, 900, 400),
     color: /^#[0-9a-f]{6}$/i.test(String(data.color)) ? String(data.color) : "#2b2b2b",
+    opacity: number(data.opacity, 0, 100, 100),
     lineHeight: number(data.lineHeight, 0.8, 2.5, 1.6),
     letterSpacing: number(data.letterSpacing, -5, 20, 0),
     textAlign: alignments.has(String(data.textAlign)) ? data.textAlign as BoardTextStyle["textAlign"] : "left",
+  };
+}
+
+function elementTransform(value: unknown): BoardElementTransform {
+  const data = value && typeof value === "object" ? value as Partial<BoardElementTransform> : {};
+  return {
+    x: number(data.x, -2000, 2000, 0),
+    y: number(data.y, -2000, 2000, 0),
+    scale: number(data.scale, 10, 500, 100),
+    rotate: number(data.rotate, -360, 360, 0),
+    zIndex: Math.round(number(data.zIndex, -100, 1000, 0)),
+  };
+}
+
+function motion(value: unknown): BoardMotion {
+  const data = value && typeof value === "object" ? value as Partial<BoardMotion> : {};
+  const presets = new Set(["none", "fade-up", "fade-down", "fade-left", "fade-right", "zoom-in", "zoom-out", "blur-in", "clip-reveal", "letter-spread"]);
+  const easings = new Set(["smooth", "ease-out", "spring", "linear"]);
+  return {
+    preset: presets.has(String(data.preset)) ? data.preset as BoardMotion["preset"] : "none",
+    duration: number(data.duration, 100, 5000, 900),
+    delay: number(data.delay, 0, 5000, 0),
+    distance: number(data.distance, 0, 500, 32),
+    easing: easings.has(String(data.easing)) ? data.easing as BoardMotion["easing"] : "smooth",
+  };
+}
+
+function commonItemPatch(patch: Record<string, unknown>) {
+  return {
+    ...(patch.layoutDesktop ? { layoutDesktop: elementTransform(patch.layoutDesktop) } : {}),
+    ...(patch.layoutMobile === null ? { layoutMobile: undefined } : patch.layoutMobile ? { layoutMobile: elementTransform(patch.layoutMobile) } : {}),
+    ...(patch.motion ? { motion: motion(patch.motion) } : {}),
   };
 }
 
@@ -127,6 +167,7 @@ export async function PATCH(request: Request) {
     if (kind === "text") {
       const itemId = String(body.itemId ?? "");
       const board = await updateBoardItem(slideId, itemId, {
+        ...commonItemPatch(patch),
         ...(typeof patch.value === "string" ? { value: patch.value.slice(0, 20000) } : {}),
         ...(patch.style ? { style: textStyle(patch.style) } : {}),
         ...(typeof patch.styleTouched === "boolean" ? { styleTouched: patch.styleTouched } : {}),
@@ -137,6 +178,7 @@ export async function PATCH(request: Request) {
     if (kind === "image") {
       const itemId = String(body.itemId ?? "");
       const board = await updateBoardItem(slideId, itemId, {
+        ...commonItemPatch(patch),
         ...(typeof patch.alt === "string" ? { alt: patch.alt.slice(0, 500) } : {}),
         ...(patch.desktop ? { desktop: transform(patch.desktop) } : {}),
         ...(patch.mobile === null ? { mobile: undefined } : patch.mobile ? { mobile: transform(patch.mobile) } : {}),
