@@ -100,7 +100,7 @@ export function ContentBoardPreviewBridge() {
   const interactionMode = useRef<"edit" | "move">("edit");
   const slideId = useRef("");
   const drag = useRef<{ target: HTMLElement; item: BoardImageItem; pointerId: number; startX: number; startY: number; start: BoardImageTransform; latest: BoardImageTransform } | null>(null);
-  const layoutDrag = useRef<{ target: HTMLElement; item: BoardItem; pointerId: number; startX: number; startY: number; start: BoardElementTransform; latest: BoardElementTransform } | null>(null);
+  const layoutDrag = useRef<{ target: HTMLElement; captureTarget: HTMLElement; item: BoardItem; pointerId: number; startX: number; startY: number; start: BoardElementTransform; latest: BoardElementTransform } | null>(null);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
@@ -112,12 +112,37 @@ export function ContentBoardPreviewBridge() {
 
     document.body.classList.add("contentBoardCanvas");
 
+    const moveHandle = document.createElement("button");
+    moveHandle.type = "button";
+    moveHandle.className = "contentBoardMoveHandle";
+    moveHandle.textContent = "↕ 이동";
+    moveHandle.setAttribute("aria-label", "선택한 박스 이동");
+    moveHandle.hidden = true;
+    document.body.append(moveHandle);
+    let selectedTarget: HTMLElement | null = null;
+
+    const updateMoveHandle = () => {
+      if (!selectedTarget?.isConnected) {
+        moveHandle.hidden = true;
+        return;
+      }
+      const rect = selectedTarget.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0 || rect.bottom < 0 || rect.top > window.innerHeight) {
+        moveHandle.hidden = true;
+        return;
+      }
+      moveHandle.hidden = false;
+      moveHandle.style.left = `${Math.max(4, Math.min(window.innerWidth - 66, rect.left))}px`;
+      moveHandle.style.top = `${Math.max(30, rect.top)}px`;
+    };
+
     const applyLayout = (target: HTMLElement, item: BoardItem) => {
       const value = elementTransformFor(item, viewMode.current);
       target.style.translate = value.x || value.y ? `${value.x}px ${value.y}px` : "";
       target.style.scale = value.scale !== 100 ? String(value.scale / 100) : "";
       target.style.rotate = value.rotate ? `${value.rotate}deg` : "";
       target.style.zIndex = value.zIndex ? String(value.zIndex) : "";
+      if (target === selectedTarget) updateMoveHandle();
     };
 
     const applyText = (target: HTMLElement, item: BoardTextItem) => {
@@ -236,7 +261,9 @@ export function ContentBoardPreviewBridge() {
 
     const markSelected = (target?: HTMLElement | null) => {
       document.querySelectorAll("[data-board-selected]").forEach((node) => node.removeAttribute("data-board-selected"));
+      selectedTarget = target ?? null;
       if (target) target.dataset.boardSelected = "true";
+      updateMoveHandle();
     };
 
     const onMessage = (event: MessageEvent<SyncMessage | PlayMotionMessage>) => {
@@ -318,7 +345,6 @@ export function ContentBoardPreviewBridge() {
         }
         return;
       }
-      if (interactionMode.current !== "move") return;
       const selected = document.querySelector<HTMLElement>("[data-board-selected='true']");
       const item = selected?.dataset.editId ? items.current.get(selected.dataset.editId) : null;
       if (!selected || !item) return;
@@ -388,6 +414,17 @@ export function ContentBoardPreviewBridge() {
     };
 
     const onPointerDown = (event: PointerEvent) => {
+      if ((event.target as HTMLElement | null)?.closest(".contentBoardMoveHandle")) {
+        const target = selectedTarget;
+        const item = target?.dataset.editId ? items.current.get(target.dataset.editId) : null;
+        if (!target || !item || event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const start = elementTransformFor(item, viewMode.current);
+        moveHandle.setPointerCapture(event.pointerId);
+        layoutDrag.current = { target, captureTarget: moveHandle, item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
+        return;
+      }
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-edit-id]");
       const item = target?.dataset.editId ? items.current.get(target.dataset.editId) : null;
       if (target && item) {
@@ -401,7 +438,7 @@ export function ContentBoardPreviewBridge() {
         target.focus({ preventScroll: true });
         const start = elementTransformFor(item, viewMode.current);
         target.setPointerCapture(event.pointerId);
-        layoutDrag.current = { target, item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
+        layoutDrag.current = { target, captureTarget: target, item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
         return;
       }
       if (target && item?.type === "text" && interactionMode.current === "edit" && !target.dataset.editAttribute) {
@@ -429,6 +466,7 @@ export function ContentBoardPreviewBridge() {
         const updated = withElementTransform(moving.item, viewMode.current, next);
         items.current.set(updated.id, updated);
         applyLayout(moving.target, updated);
+        updateMoveHandle();
         return;
       }
       const current = drag.current;
@@ -448,9 +486,10 @@ export function ContentBoardPreviewBridge() {
     const finishPointer = (event: PointerEvent) => {
       const moving = layoutDrag.current;
       if (moving && moving.pointerId === event.pointerId) {
-        moving.target.releasePointerCapture(event.pointerId);
+        if (moving.captureTarget.hasPointerCapture(event.pointerId)) moving.captureTarget.releasePointerCapture(event.pointerId);
         post({ type: "content-board:layout-transform", id: moving.item.id, value: moving.latest, viewMode: viewMode.current });
         layoutDrag.current = null;
+        updateMoveHandle();
         return;
       }
       const current = drag.current;
@@ -488,6 +527,14 @@ export function ContentBoardPreviewBridge() {
     };
 
     const onHeroState = () => window.setTimeout(() => applyAll(false), 0);
+    let viewportFrame = 0;
+    const onViewportChange = () => {
+      if (viewportFrame) return;
+      viewportFrame = window.requestAnimationFrame(() => {
+        viewportFrame = 0;
+        updateMoveHandle();
+      });
+    };
     window.addEventListener("message", onMessage);
     window.addEventListener("glory:hero-state", onHeroState);
     document.addEventListener("click", onClick, true);
@@ -503,6 +550,8 @@ export function ContentBoardPreviewBridge() {
     document.addEventListener("pointerup", finishPointer, true);
     document.addEventListener("pointercancel", finishPointer, true);
     document.addEventListener("wheel", onWheel, { capture: true, passive: false });
+    window.addEventListener("scroll", onViewportChange, { capture: true, passive: true });
+    window.addEventListener("resize", onViewportChange);
     post({ type: "content-board:ready" });
 
     return () => {
@@ -523,6 +572,10 @@ export function ContentBoardPreviewBridge() {
       document.removeEventListener("pointerup", finishPointer, true);
       document.removeEventListener("pointercancel", finishPointer, true);
       document.removeEventListener("wheel", onWheel, true);
+      window.removeEventListener("scroll", onViewportChange, true);
+      window.removeEventListener("resize", onViewportChange);
+      if (viewportFrame) window.cancelAnimationFrame(viewportFrame);
+      moveHandle.remove();
     };
   }, []);
 

@@ -222,6 +222,28 @@ svg {
   box-shadow: 0 0 0 4px rgba(154, 125, 101, .13);
 }
 
+.contentBoardCanvas .contentBoardMoveHandle {
+  position: fixed;
+  z-index: 2147483647;
+  width: auto;
+  min-width: 58px;
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid #806b5a;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  background: #806b5a;
+  box-shadow: 0 4px 12px rgba(43, 38, 34, .2);
+  font: 700 11px/1 var(--font-sans);
+  cursor: move;
+  touch-action: none;
+  transform: translateY(calc(-100% - 5px));
+}
+
+.contentBoardCanvas .contentBoardMoveHandle:active {
+  cursor: grabbing;
+}
+
 .contentBoardCanvas [data-edit-type="image"],
 .contentBoardCanvas [data-edit-type="bgImage"] {
   cursor: grab !important;

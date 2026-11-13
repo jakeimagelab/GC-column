@@ -316,7 +316,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
 
   return (
     <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
-      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>내용 편집: 글자 클릭·사진 크롭 · 위치 이동: 모든 항목 드래그·휠 크기</span><em>{Math.round(scale * 100)}%</em></div>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭: 내용 수정 · 선택 박스의 이동 손잡이: 위치 이동 · 방향키: 미세 이동</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
         key={`${previewPath(slide)}-${viewMode}`}
@@ -329,13 +329,11 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
   );
 }
 
-function ElementControls({ item, viewMode, onViewMode, onLayout, onMotion, onPreview }: {
+function LayoutControls({ item, viewMode, onViewMode, onLayout }: {
   item: BoardItem;
   viewMode: BoardViewMode;
   onViewMode: (mode: BoardViewMode) => void;
   onLayout: (value: BoardElementTransform, commit?: boolean) => void;
-  onMotion: (value: BoardMotion) => void;
-  onPreview: () => void;
 }) {
   const layout = elementTransformFor(item, viewMode);
   const nudge = (x: number, y: number) => onLayout({ ...layout, x: layout.x + x, y: layout.y + y }, true);
@@ -364,6 +362,17 @@ function ElementControls({ item, viewMode, onViewMode, onLayout, onMotion, onPre
       </div>
       <button type="button" className={styles.resetWide} onClick={() => onLayout({ ...defaultElementTransform }, true)}>현재 화면 배치 초기화</button>
     </fieldset>
+  </>;
+}
+
+function MotionControls({ item, onMotion, onPreview }: {
+  item: BoardItem;
+  onMotion: (value: BoardMotion) => void;
+  onPreview: () => void;
+}) {
+  const numberValue = (value: string, fallback: number) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+
+  return (
     <fieldset>
       <legend>나타나는 모션</legend>
       <label>효과<select value={item.motion.preset} onChange={(event) => onMotion({ ...item.motion, preset: event.target.value as BoardMotion["preset"] })}>{BOARD_MOTION_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
@@ -375,7 +384,7 @@ function ElementControls({ item, viewMode, onViewMode, onLayout, onMotion, onPre
       <label>움직임<select value={item.motion.easing} onChange={(event) => onMotion({ ...item.motion, easing: event.target.value as BoardMotion["easing"] })}><option value="smooth">부드럽게</option><option value="ease-out">차분하게</option><option value="spring">살짝 탄력</option><option value="linear">일정하게</option></select></label>
       <button type="button" className={styles.motionPreviewButton} onClick={onPreview} disabled={item.motion.preset === "none"}>▶ 선택 항목 모션 보기</button>
     </fieldset>
-  </>;
+  );
 }
 
 export function ContentBoardEditor({ initialBoard }: Props) {
@@ -818,7 +827,6 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           const item = selectedItem as BoardTextItem;
           return <>
             <div className={styles.inspectorHeader}><span>TEXT</span><b>{item.label}</b><small>{item.id}</small></div>
-            <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <label className={styles.contentField}>내용<textarea value={item.value} rows={Math.min(8, Math.max(3, item.value.split("\n").length + 1))} onChange={(event) => updateItem(selectedSlideId, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(selectedSlideId, item.id, { value: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
             <fieldset><legend>글꼴</legend><select value={item.style.fontFamily} onChange={(event) => saveTextStyle(item, { fontFamily: event.target.value })}>{BOARD_FONT_OPTIONS.map((font) => <option key={font.value} value={font.value}>{font.label}</option>)}</select></fieldset>
             <div className={styles.controlGrid}>
@@ -830,8 +838,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
             <label className={styles.rangeLabel}>글자 투명도 <input type="range" min="0" max="100" value={item.style.opacity} onChange={(event) => saveTextStyle(item, { opacity: Number(event.target.value) })} /><output>{item.style.opacity}%</output></label>
             <fieldset><legend>글자색</legend><div className={styles.colorControl}><input type="color" value={item.style.color} onChange={(event) => saveTextStyle(item, { color: event.target.value })} /><code>{item.style.color}</code></div></fieldset>
             <fieldset><legend>정렬</legend><div className={styles.segmented}>{(["left", "center", "right"] as const).map((align) => <button type="button" key={align} className={item.style.textAlign === align ? styles.active : ""} onClick={() => saveTextStyle(item, { textAlign: align })}>{align === "left" ? "왼쪽" : align === "center" ? "가운데" : "오른쪽"}</button>)}</div></fieldset>
+            <LayoutControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} />
+            <MotionControls item={item} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="이 글자에 대한 요청을 적으세요" onChange={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text")} onBlur={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardTextItem>, "text", true)} /></label>
-            <p className={styles.inspectorHelp}>내용 편집에서는 글자를 한 번 클릭해 바로 입력합니다. 위치 이동에서는 드래그하고, 방향키로 1px·Shift+방향키로 10px씩 움직입니다.</p>
+            <p className={styles.inspectorHelp}>글자를 클릭하면 바로 입력할 수 있습니다. 선택 테두리 위의 ‘이동’을 끌거나 방향키로 1px·Shift+방향키로 10px씩 움직입니다.</p>
           </>;
         })() : selectedItem && isBoardImageItem(selectedItem) ? (() => {
           const item = selectedItem;
@@ -839,7 +849,6 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           const updateEffects = (patch: Partial<BoardImageItem["effects"]>) => updateItem(selectedSlideId, item.id, { effects: patch } as Partial<BoardImageItem>, "image");
           return <>
             <div className={styles.inspectorHeader}><span>IMAGE</span><b>{item.label}</b><small>{item.id}</small></div>
-            <ElementControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <fieldset><legend>크롭·위치</legend>
               <label>비율<select value={item.effects.cropAspect} onChange={(event) => updateEffects({ cropAspect: event.target.value as BoardImageItem["effects"]["cropAspect"] })}><option value="free">자유</option><option value="16:9">16:9</option><option value="4:3">4:3</option><option value="1:1">1:1</option><option value="3:4">3:4</option></select></label>
               <label className={styles.rangeLabel}>확대 <input type="range" min="100" max="300" value={value.zoom} onChange={(event) => saveImageTransform(item, { ...value, zoom: Number(event.target.value) }, false)} onPointerUp={(event) => saveImageTransform(item, { ...value, zoom: Number(event.currentTarget.value) }, true)} /><output>{Math.round(value.zoom)}%</output></label>
@@ -856,6 +865,8 @@ export function ContentBoardEditor({ initialBoard }: Props) {
               <div className={styles.colorControl}><input type="color" value={item.effects.gradientColor} onChange={(event) => updateEffects({ gradientColor: event.target.value })} /><code>{item.effects.gradientColor}</code></div>
               <label className={styles.rangeLabel}>농도 <input type="range" min="0" max="100" value={item.effects.gradientOpacity} onChange={(event) => updateEffects({ gradientOpacity: Number(event.target.value) })} /><output>{item.effects.gradientOpacity}%</output></label>
             </fieldset>
+            <LayoutControls item={item} viewMode={viewMode} onViewMode={setViewMode} onLayout={(value, commit) => saveElementTransform(item, value, commit)} />
+            <MotionControls item={item} onMotion={(value) => saveMotion(item, value)} onPreview={() => previewMotion(item.id)} />
             <label>사진 설명(alt)<input value={item.alt} placeholder="설명 필요" onChange={(event) => updateItem(selectedSlideId, item.id, { alt: event.target.value } as Partial<BoardImageItem>, "image")} /></label>
             {!item.alt ? <p className={styles.altWarning}>사진 설명이 비어 있습니다. 검색·접근성을 위해 입력해 주세요.</p> : null}
             <label className={styles.noteField}>개발 메모<textarea value={item.note} placeholder="사진 처리 요청을 적으세요" onChange={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image")} onBlur={(event) => updateItem(selectedSlideId, item.id, { note: event.target.value } as Partial<BoardImageItem>, "image", true)} /></label>
