@@ -9,16 +9,17 @@
 .heading a { margin-top: 18px; color: #fff; display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .heading i { width: 40px; height: 1px; background: #fff; }
 
-.stage { --gallery-drag: 0px; position: absolute; z-index: 4; top: 230px; left: 0; right: 0; height: 390px; cursor: grab; user-select: none; }
+.stage { --gallery-drag: 0px; position: absolute; z-index: 4; top: 230px; left: 0; right: 0; height: 390px; cursor: grab; user-select: none; touch-action: pan-y; contain: layout style; }
 .stageDragging { cursor: grabbing; }
-.room { position: absolute; top: 50%; left: 50%; width: min(462px, 32.0833vw); height: 330px; padding: 0 28px 26px; border: 0; background: #a89a8b; color: #fff; box-shadow: 0 20px 40px rgba(0, 0, 0, .22); cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; transition: transform .9s cubic-bezier(.22,.61,.36,1), opacity .9s cubic-bezier(.22,.61,.36,1), filter .9s cubic-bezier(.22,.61,.36,1); }
+.room { position: absolute; top: 50%; left: 50%; width: min(462px, 32.0833vw); height: 330px; padding: 0 28px 26px; border: 0; background: #a89a8b; color: #fff; box-shadow: 0 20px 40px rgba(0, 0, 0, .22); cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; transition: transform .82s cubic-bezier(.22,.61,.36,1), opacity .82s cubic-bezier(.22,.61,.36,1), filter .82s cubic-bezier(.22,.61,.36,1); will-change: transform, opacity; backface-visibility: hidden; }
 .photoSlot { position: absolute !important; inset: 0 0 70px; width: 100% !important; height: auto !important; background: transparent; color: #f3eee8; }
+.photoSlot img { pointer-events: none; -webkit-user-drag: none; }
 .room b { position: relative; z-index: 2; font-size: 18px; text-align: left; }
-.room[data-position="0"] { z-index: 5; opacity: 1; transform: translate(calc(-50% + var(--gallery-drag)), -56%) scale(1); cursor: grab; }
-.room[data-position="-1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(calc(-128% + var(--gallery-drag)), -44%) scale(.78); }
-.room[data-position="1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate(calc(28% + var(--gallery-drag)), -44%) scale(.78); }
-.room[data-position="-2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(calc(-190% + var(--gallery-drag)), -44%) scale(.6); }
-.room[data-position="2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate(calc(90% + var(--gallery-drag)), -44%) scale(.6); }
+.room[data-position="0"] { z-index: 5; opacity: 1; transform: translate3d(calc(-50% + var(--gallery-drag)), -56%, 0) scale(1); cursor: grab; }
+.room[data-position="-1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate3d(calc(-128% + var(--gallery-drag)), -44%, 0) scale(.78); }
+.room[data-position="1"] { z-index: 3; opacity: .75; filter: saturate(.7); transform: translate3d(calc(28% + var(--gallery-drag)), -44%, 0) scale(.78); }
+.room[data-position="-2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate3d(calc(-190% + var(--gallery-drag)), -44%, 0) scale(.6); }
+.room[data-position="2"] { z-index: 1; opacity: 0; pointer-events: none; transform: translate3d(calc(90% + var(--gallery-drag)), -44%, 0) scale(.6); }
 .room:not([data-position="0"]) b { opacity: 0; }
 .stageDragging .room { transition: none; cursor: grabbing; }
 
@@ -59,10 +60,10 @@
   .blurBackground { display: none; }
   .heading { top: 40px; left: 24px; }
   .heading h2 { font-size: 30px; }
-  .stage { top: 220px; height: 360px; touch-action: pan-y; }
+  .stage { top: 220px; height: 360px; }
   .room { width: 70%; height: 330px; }
-  .room[data-position="-1"] { transform: translate(calc(-112% + var(--gallery-drag)), -44%) scale(.7); }
-  .room[data-position="1"] { transform: translate(calc(12% + var(--gallery-drag)), -44%) scale(.7); }
+  .room[data-position="-1"] { transform: translate3d(calc(-112% + var(--gallery-drag)), -44%, 0) scale(.7); }
+  .room[data-position="1"] { transform: translate3d(calc(12% + var(--gallery-drag)), -44%, 0) scale(.7); }
   .controls { top: 594px; }
   .modal { padding: 62px 14px 28px; }
   .modalArrow { top: auto; bottom: 18px; width: 44px; height: 44px; transform: none; z-index: 2; }

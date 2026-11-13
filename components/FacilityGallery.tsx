@@ -20,10 +20,15 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const [interactionPaused, setInteractionPaused] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const stageTouchStart = useRef<number | null>(null);
   const modalTouchStart = useRef<number | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const stageDrag = useRef({ active: false, startX: 0, moved: false });
+  const stageDrag = useRef({
+    active: false,
+    startX: 0,
+    distance: 0,
+    moved: false,
+    frame: 0,
+  });
   const suppressStageClick = useRef(false);
   const bandRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLElement>(null);
@@ -93,9 +98,10 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   };
   const resetStageDrag = (event: ReactPointerEvent<HTMLDivElement>, commit: boolean) => {
     if (!stageDrag.current.active) return;
-    const distance = event.clientX - stageDrag.current.startX;
+    const distance = stageDrag.current.distance;
     const moved = stageDrag.current.moved;
-    stageDrag.current = { active: false, startX: 0, moved: false };
+    if (stageDrag.current.frame) window.cancelAnimationFrame(stageDrag.current.frame);
+    stageDrag.current = { active: false, startX: 0, distance: 0, moved: false, frame: 0 };
     stageRef.current?.style.removeProperty("--gallery-drag");
     setDragging(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
@@ -105,16 +111,24 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     window.setTimeout(() => { suppressStageClick.current = false; }, 0);
   };
   const startStageDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (editMode || event.pointerType !== "mouse" || event.button !== 0) return;
-    stageDrag.current = { active: true, startX: event.clientX, moved: false };
+    if (editMode || (event.pointerType === "mouse" && event.button !== 0)) return;
+    stageDrag.current = { active: true, startX: event.clientX, distance: 0, moved: false, frame: 0 };
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   };
   const dragStage = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!stageDrag.current.active) return;
     const distance = event.clientX - stageDrag.current.startX;
+    stageDrag.current.distance = distance;
     if (Math.abs(distance) > 5) stageDrag.current.moved = true;
-    event.currentTarget.style.setProperty("--gallery-drag", `${Math.max(-120, Math.min(120, distance))}px`);
+    if (stageDrag.current.frame) return;
+    stageDrag.current.frame = window.requestAnimationFrame(() => {
+      stageDrag.current.frame = 0;
+      stageRef.current?.style.setProperty(
+        "--gallery-drag",
+        `${Math.max(-140, Math.min(140, stageDrag.current.distance))}px`,
+      );
+    });
   };
 
   useEffect(() => {
@@ -152,16 +166,11 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
         onPointerMove={dragStage}
         onPointerUp={(event) => resetStageDrag(event, true)}
         onPointerCancel={(event) => resetStageDrag(event, false)}
+        onDragStart={(event) => event.preventDefault()}
         onClickCapture={(event) => {
           if (!suppressStageClick.current) return;
           event.preventDefault();
           event.stopPropagation();
-        }}
-        onTouchStart={(event) => { stageTouchStart.current = event.changedTouches[0]?.clientX ?? null; }}
-        onTouchEnd={(event) => {
-          if (stageTouchStart.current === null) return;
-          swipe((event.changedTouches[0]?.clientX ?? stageTouchStart.current) - stageTouchStart.current);
-          stageTouchStart.current = null;
         }}
       >
         {roomKeys.map((room, roomIndex) => {

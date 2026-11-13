@@ -74,9 +74,10 @@ export function getImagePlacementMeta(id: string, fallback = "사진") : ImagePl
     slotName = "상담·시술 배경";
   } else if (id.startsWith("column.doctor.")) {
     section = "원장 소개";
-  } else if (id === "column.principles.photo") {
+  } else if (id.startsWith("column.principles.") && (id === "column.principles.photo" || id.endsWith(".image"))) {
     section = "진료 원칙";
-    slotName = "진료 원칙 사진";
+    const slide = id.match(/principles\.(\d+)\.image/)?.[1];
+    slotName = slide ? `진료 원칙 ${Number(slide) + 1} 사진` : "진료 원칙 1 사진";
   }
 
   return { page, section, slotName, displayName: `${page} · ${section} · ${slotName}` };

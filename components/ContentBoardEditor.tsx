@@ -316,7 +316,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
 
   return (
     <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
-      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭: 내용 수정 · 선택 박스의 이동 손잡이: 위치 이동 · 방향키: 미세 이동</span><em>{Math.round(scale * 100)}%</em></div>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭: 내용 수정 · 이동 시 스마트 가이드 자동 정렬 · Option(Alt): 스냅 잠시 해제 · 방향키: 미세 이동</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
         key={`${previewPath(slide)}-${viewMode}`}
@@ -876,7 +876,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           <div className={styles.inspectorHeader}><span>SECTION</span><b>{activeSlide.title}</b><small>{activeSlide.id}</small></div>
           <label>진행 상태<select value={activeSlide.status} onChange={(event) => updateSlide(activeSlide.id, { status: event.target.value as BoardStatus }, true)}><option>작성 중</option><option>확인 필요</option><option>작성 완료</option></select></label>
           <label className={styles.noteField}>섹션 전체 메모<textarea value={activeSlide.note} placeholder="이 섹션 전체에 대한 개발 요청을 적으세요" onChange={(event) => updateSlide(activeSlide.id, { note: event.target.value })} onBlur={(event) => updateSlide(activeSlide.id, { note: event.target.value }, true)} /></label>
-          <div className={styles.guideBox}><b>사용 방법</b><ol><li>내용 편집에서 글자를 한 번 클릭해 바로 수정</li><li>파인더 사진을 원하는 점선 박스에 드래그</li><li>위치 이동에서 모든 항목을 직접 움직임</li><li>오른쪽에서 배치·크기·회전·레이어·모션 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
+          <div className={styles.guideBox}><b>사용 방법</b><ol><li>내용 편집에서 글자를 한 번 클릭해 바로 수정</li><li>파인더 사진을 원하는 점선 박스에 드래그</li><li>위치 이동에서 모든 항목을 직접 움직임(스마트 가이드 자동 정렬)</li><li>오른쪽에서 배치·크기·회전·레이어·모션 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
         </>}
       </aside>
 

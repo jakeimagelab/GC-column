@@ -1,0 +1,236 @@
+.slider {
+  position: relative;
+  width: 100%;
+  height: clamp(600px, 54vw, 760px);
+  overflow: hidden;
+  background: #6e6052;
+  color: #fff;
+  touch-action: pan-y;
+}
+
+.slides,
+.slide,
+.background,
+.shade {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.slide {
+  opacity: 0;
+  transform: scale(1.035);
+  pointer-events: none;
+  transition: opacity 1s cubic-bezier(.22,.61,.36,1), transform 6s cubic-bezier(.22,.61,.36,1);
+}
+
+.activeSlide {
+  z-index: 1;
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.background {
+  padding: 0;
+  background: #8f8173;
+  color: rgba(255, 255, 255, .72);
+}
+
+.shade {
+  background:
+    linear-gradient(90deg, rgba(35, 30, 26, .78) 0%, rgba(35, 30, 26, .48) 48%, rgba(35, 30, 26, .18) 100%),
+    linear-gradient(0deg, rgba(35, 30, 26, .52) 0%, transparent 52%);
+}
+
+.inner {
+  position: relative;
+  z-index: 3;
+  width: min(1440px, 100%);
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(72px, 7vw, 102px) var(--column-gutter) clamp(48px, 5vw, 72px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  box-sizing: border-box;
+}
+
+.heading > span {
+  display: block;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, .66);
+  font-family: var(--font-en);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .28em;
+}
+
+.heading h2 {
+  max-width: 580px;
+  margin: 0;
+  font-size: clamp(28px, 2.5vw, 38px);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.copyStack {
+  position: relative;
+  align-self: end;
+  width: min(610px, 70%);
+  margin-bottom: clamp(54px, 6vw, 82px);
+}
+
+.copy {
+  position: absolute;
+  inset: auto 0 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 24px, 0);
+}
+
+.activeCopy {
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+  animation: copyIn .9s cubic-bezier(.22,.61,.36,1) both;
+}
+
+.number {
+  display: block;
+  margin-bottom: 16px;
+  color: #d8c8b7;
+  font-family: var(--font-en);
+  font-size: 14px;
+  letter-spacing: .16em;
+}
+
+.copy b {
+  display: block;
+  font-size: clamp(30px, 3.2vw, 48px);
+  font-weight: 500;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.copy p {
+  max-width: 560px;
+  margin: 18px 0 0;
+  color: rgba(255, 255, 255, .78);
+  font-size: clamp(15px, 1.25vw, 18px);
+  font-weight: 300;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.controls > button,
+.indexes button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, .66);
+  cursor: pointer;
+}
+
+.controls > button:hover,
+.controls > button:focus-visible,
+.indexes button:hover,
+.indexes button:focus-visible,
+.indexes .activeIndex {
+  color: #fff;
+}
+
+.indexes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.indexes button {
+  position: relative;
+  font-family: var(--font-en);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+.indexes .activeIndex::after {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  left: 8px;
+  height: 1px;
+  content: "";
+  background: #fff;
+}
+
+.progress {
+  position: relative;
+  width: min(280px, 24vw);
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .28);
+}
+
+.progress span {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform-origin: left;
+  animation: progress 6s linear both;
+}
+
+.progress .progressPaused {
+  animation-play-state: paused;
+}
+
+.pause {
+  font-size: 10px;
+}
+
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes copyIn {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide,
+  .copy,
+  .progress span {
+    transition: none;
+    animation: none;
+  }
+}
+
+:global(.devEditActive) .slide,
+:global(.devEditActive) .activeCopy,
+:global(.devEditActive) .progress span {
+  transition: none;
+  animation: none;
+}
+
+@media (max-width: 1024px) {
+  .slider { height: 650px; }
+  .copyStack { width: min(610px, 82%); }
+}
+
+@media (max-width: 640px) {
+  .slider { height: 620px; }
+  .inner { padding: 64px 24px 32px; }
+  .copyStack { width: 100%; margin-bottom: 42px; }
+  .shade { background: linear-gradient(0deg, rgba(35, 30, 26, .82) 0%, rgba(35, 30, 26, .5) 58%, rgba(35, 30, 26, .28) 100%); }
+  .progress { flex: 1; width: auto; }
+  .indexes { display: none; }
+}

@@ -11,6 +11,7 @@ import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
+import { PrinciplesHeroSlider } from "@/components/PrinciplesHeroSlider";
 import { DoctorReveal } from "@/components/motion/DoctorReveal";
 import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
@@ -44,15 +45,15 @@ export default async function ColumnMainPage() {
   const cards = getColumns(mainCardSlugs);
   const treatmentCards = mainTreatmentOrder.flatMap((slug) => {
     const treatment = getTreatment(slug);
-    if (!treatment || containsPlaceholder(treatment)) return [];
-    return [{ ...treatment, displayName: treatment.categorySlug === "filler" ? "스페셜필러" : treatment.name }];
+    if (!treatment) return [];
+    return [{
+      ...treatment,
+      displayName: treatment.categorySlug === "filler" ? "스페셜필러" : treatment.name,
+      displayDescription: containsPlaceholder(treatment.desc) ? getText(content, "column.treatments.description") : treatment.desc,
+      categoryName: getCategory(treatment.categorySlug)?.nameEn ?? "",
+    }];
   });
   const mainFaqs = getVisibleColumns().flatMap((column) => column.faqs.map((faq, index) => ({ ...faq, id: `faq-${column.slug}-${index + 1}` }))).slice(0, 5);
-  const principles = [0, 1, 2].map((index) => ({
-    no: String(index + 1).padStart(2, "0"),
-    titleId: `column.principles.${index}.title`,
-    descriptionId: `column.principles.${index}.description`,
-  }));
   const locationLat = getText(content, "home.location.lat");
   const locationLng = getText(content, "home.location.lng");
   const phone = getText(content, "common.clinic.phone");
@@ -139,23 +140,28 @@ export default async function ColumnMainPage() {
       <section className={styles.treatmentsSection} data-scroll-world-scene data-scroll-world-strength="subtle" data-column-section-motion="treatments">
         <h2 data-scroll-world-layer="copy" {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
         <div className={styles.treatmentGrid} data-scroll-world-layer="depth">
-          {treatmentCards.map((treatment) => (
-            TREATMENT_PAGES_READY ? <Link href={treatment.detailPath} key={treatment.slug}>
-              <b>{treatment.displayName}</b><span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span><small {...textEditProps("column.treatments.links")}>{getText(content, "column.treatments.links")}</small>
-            </Link> : <div key={treatment.slug} role="link" aria-disabled="true">
-              <b>{treatment.displayName}</b><span {...textEditProps("column.treatments.description")}>{getText(content, "column.treatments.description")}</span><small>시술 안내 준비 중</small>
-            </div>
-          ))}
+          {treatmentCards.map((treatment) => {
+            const imageId = `treatments.${treatment.slug}.thumbnail`;
+            const card = <>
+              <ImageSlot className={styles.treatmentPhoto} label="" alt="" editId={imageId} image={getImage(content, imageId)} sizes="(max-width: 640px) 88vw, (max-width: 1024px) 42vw, 25vw" />
+              <span className={styles.treatmentShade} aria-hidden="true" />
+              <div className={styles.treatmentCopy}>
+                <span className={styles.treatmentCategory}>{treatment.categoryName}</span>
+                <b>{treatment.displayName}</b>
+                <span>{treatment.displayDescription}</span>
+                <small>{TREATMENT_PAGES_READY ? getText(content, "column.treatments.links") : "시술 안내 준비 중"}</small>
+              </div>
+            </>;
+            return TREATMENT_PAGES_READY ? (
+              <Link className={styles.treatmentCard} href={treatment.detailPath} key={treatment.slug}>{card}</Link>
+            ) : (
+              <div className={styles.treatmentCard} key={treatment.slug} role="link" aria-disabled="true">{card}</div>
+            );
+          })}
         </div>
       </section>
 
-      <section className={styles.principlesSection} data-scroll-world-scene data-scroll-world-strength="subtle" data-column-section-motion="principles">
-        <ImageSlot className={styles.loungePhoto} label="" alt="" editId="column.principles.photo" image={getImage(content, "column.principles.photo")} scrollWorldLayer="depth" />
-        <div data-scroll-world-layer="copy">
-          <h2 {...textEditProps("column.principles.title")}>{getText(content, "column.principles.title")}</h2>
-          <ol>{principles.map((principle) => <li key={principle.no}><b>{principle.no} <span className={styles.principleTitle} {...textEditProps(principle.titleId)}>{getText(content, principle.titleId)}</span></b><span {...textEditProps(principle.descriptionId)}>{getText(content, principle.descriptionId)}</span></li>)}</ol>
-        </div>
-      </section>
+      <PrinciplesHeroSlider content={content} />
 
       <section className={styles.infoSection} id="location" data-scroll-world-scene data-scroll-world-strength="subtle">
         <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} scrollWorldLayer="depth" />

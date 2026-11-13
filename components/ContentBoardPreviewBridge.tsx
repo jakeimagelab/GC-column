@@ -23,6 +23,16 @@ type SyncMessage = {
 
 type PlayMotionMessage = { type: "content-board:play-motion"; itemId?: string | null };
 
+type SnapCandidate = {
+  value: number;
+  label: string;
+};
+
+type SnapResult = {
+  value: number;
+  guide: SnapCandidate | null;
+};
+
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
 
 function escapeHtml(value: string) {
@@ -100,7 +110,19 @@ export function ContentBoardPreviewBridge() {
   const interactionMode = useRef<"edit" | "move">("edit");
   const slideId = useRef("");
   const drag = useRef<{ target: HTMLElement; item: BoardImageItem; pointerId: number; startX: number; startY: number; start: BoardImageTransform; latest: BoardImageTransform } | null>(null);
-  const layoutDrag = useRef<{ target: HTMLElement; captureTarget: HTMLElement; item: BoardItem; pointerId: number; startX: number; startY: number; start: BoardElementTransform; latest: BoardElementTransform } | null>(null);
+  const layoutDrag = useRef<{
+    target: HTMLElement;
+    captureTarget: HTMLElement;
+    item: BoardItem;
+    pointerId: number;
+    startX: number;
+    startY: number;
+    start: BoardElementTransform;
+    startRect: DOMRect;
+    xCandidates: SnapCandidate[];
+    yCandidates: SnapCandidate[];
+    latest: BoardElementTransform;
+  } | null>(null);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
@@ -119,7 +141,122 @@ export function ContentBoardPreviewBridge() {
     moveHandle.setAttribute("aria-label", "선택한 박스 이동");
     moveHandle.hidden = true;
     document.body.append(moveHandle);
+
+    const verticalGuide = document.createElement("span");
+    verticalGuide.className = "contentBoardSnapGuide contentBoardSnapGuideVertical";
+    verticalGuide.hidden = true;
+    verticalGuide.setAttribute("aria-hidden", "true");
+    document.body.append(verticalGuide);
+
+    const horizontalGuide = document.createElement("span");
+    horizontalGuide.className = "contentBoardSnapGuide contentBoardSnapGuideHorizontal";
+    horizontalGuide.hidden = true;
+    horizontalGuide.setAttribute("aria-hidden", "true");
+    document.body.append(horizontalGuide);
+
     let selectedTarget: HTMLElement | null = null;
+
+    const hideSnapGuides = () => {
+      verticalGuide.hidden = true;
+      horizontalGuide.hidden = true;
+    };
+
+    const showSnapGuide = (guide: HTMLElement, candidate: SnapCandidate | null, axis: "x" | "y") => {
+      if (!candidate) {
+        guide.hidden = true;
+        return;
+      }
+      guide.hidden = false;
+      guide.dataset.boardGuideLabel = candidate.label;
+      if (axis === "x") guide.style.left = `${candidate.value}px`;
+      else guide.style.top = `${candidate.value}px`;
+    };
+
+    const uniqueCandidates = (candidates: SnapCandidate[]) => {
+      const seen = new Set<number>();
+      return candidates.filter((candidate) => {
+        const key = Math.round(candidate.value * 10);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    };
+
+    const snapCandidatesFor = (target: HTMLElement) => {
+      const safeInset = viewMode.current === "mobile" ? 20 : 32;
+      const xCandidates: SnapCandidate[] = [
+        { value: safeInset, label: "안전 여백" },
+        { value: window.innerWidth / 2, label: "화면 중앙" },
+        { value: window.innerWidth - safeInset, label: "안전 여백" },
+      ];
+      const yCandidates: SnapCandidate[] = [
+        { value: safeInset, label: "안전 여백" },
+        { value: window.innerHeight / 2, label: "화면 중앙" },
+        { value: window.innerHeight - safeInset, label: "안전 여백" },
+      ];
+      const scope = target.closest<HTMLElement>("section, header, footer, article, aside, main") ?? document.body;
+      const scopeRect = scope.getBoundingClientRect();
+      if (scope !== target && scopeRect.width > 0 && scopeRect.height > 0) {
+        xCandidates.push(
+          { value: scopeRect.left, label: "섹션 왼쪽" },
+          { value: scopeRect.left + scopeRect.width / 2, label: "섹션 중앙" },
+          { value: scopeRect.right, label: "섹션 오른쪽" },
+        );
+        yCandidates.push(
+          { value: scopeRect.top, label: "섹션 위" },
+          { value: scopeRect.top + scopeRect.height / 2, label: "섹션 중앙" },
+          { value: scopeRect.bottom, label: "섹션 아래" },
+        );
+      }
+
+      scope.querySelectorAll<HTMLElement>("[data-edit-id]").forEach((peer) => {
+        if (
+          peer === target
+          || peer.contains(target)
+          || target.contains(peer)
+          || peer.dataset.editId === target.dataset.editId
+          || peer.offsetParent === null
+        ) return;
+        const rect = peer.getBoundingClientRect();
+        if (
+          rect.width <= 0
+          || rect.height <= 0
+          || rect.right < 0
+          || rect.left > window.innerWidth
+          || rect.bottom < 0
+          || rect.top > window.innerHeight
+        ) return;
+        xCandidates.push(
+          { value: rect.left, label: "박스 왼쪽" },
+          { value: rect.left + rect.width / 2, label: "박스 중앙" },
+          { value: rect.right, label: "박스 오른쪽" },
+        );
+        yCandidates.push(
+          { value: rect.top, label: "박스 위" },
+          { value: rect.top + rect.height / 2, label: "박스 중앙" },
+          { value: rect.bottom, label: "박스 아래" },
+        );
+      });
+
+      return { xCandidates: uniqueCandidates(xCandidates), yCandidates: uniqueCandidates(yCandidates) };
+    };
+
+    const snapAxis = (rawValue: number, anchors: number[], candidates: SnapCandidate[]): SnapResult => {
+      const threshold = 7;
+      let closestDelta: number | null = null;
+      let closestCandidate: SnapCandidate | null = null;
+      for (const anchor of anchors) {
+        for (const candidate of candidates) {
+          const delta = candidate.value - anchor;
+          if (Math.abs(delta) > threshold || (closestDelta !== null && Math.abs(delta) >= Math.abs(closestDelta))) continue;
+          closestDelta = delta;
+          closestCandidate = candidate;
+        }
+      }
+      return closestDelta !== null && closestCandidate
+        ? { value: rawValue + closestDelta, guide: closestCandidate }
+        : { value: rawValue, guide: null };
+    };
 
     const updateMoveHandle = () => {
       if (!selectedTarget?.isConnected) {
@@ -282,6 +419,7 @@ export function ContentBoardPreviewBridge() {
       items.current = new Map(event.data.items.map((item) => [item.id, item]));
       viewMode.current = event.data.viewMode;
       interactionMode.current = event.data.interactionMode;
+      hideSnapGuides();
       document.body.dataset.boardInteraction = event.data.interactionMode;
       applyAll(shouldScroll);
       const selected = event.data.selectedItemId
@@ -421,8 +559,20 @@ export function ContentBoardPreviewBridge() {
         event.preventDefault();
         event.stopPropagation();
         const start = elementTransformFor(item, viewMode.current);
+        const candidates = snapCandidatesFor(target);
         moveHandle.setPointerCapture(event.pointerId);
-        layoutDrag.current = { target, captureTarget: moveHandle, item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
+        layoutDrag.current = {
+          target,
+          captureTarget: moveHandle,
+          item,
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          start,
+          startRect: target.getBoundingClientRect(),
+          ...candidates,
+          latest: start,
+        };
         return;
       }
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-edit-id]");
@@ -437,8 +587,20 @@ export function ContentBoardPreviewBridge() {
         if (!target.matches("a, button, input, textarea, select, [tabindex]")) target.tabIndex = -1;
         target.focus({ preventScroll: true });
         const start = elementTransformFor(item, viewMode.current);
+        const candidates = snapCandidatesFor(target);
         target.setPointerCapture(event.pointerId);
-        layoutDrag.current = { target, captureTarget: target, item, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, start, latest: start };
+        layoutDrag.current = {
+          target,
+          captureTarget: target,
+          item,
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          start,
+          startRect: target.getBoundingClientRect(),
+          ...candidates,
+          latest: start,
+        };
         return;
       }
       if (target && item?.type === "text" && interactionMode.current === "edit" && !target.dataset.editAttribute) {
@@ -457,11 +619,24 @@ export function ContentBoardPreviewBridge() {
     const onPointerMove = (event: PointerEvent) => {
       const moving = layoutDrag.current;
       if (moving && moving.pointerId === event.pointerId) {
-        const next = {
+        const raw = {
           ...moving.start,
           x: clamp(moving.start.x + event.clientX - moving.startX, -2000, 2000),
           y: clamp(moving.start.y + event.clientY - moving.startY, -2000, 2000),
         };
+        const deltaX = raw.x - moving.start.x;
+        const deltaY = raw.y - moving.start.y;
+        const movedLeft = moving.startRect.left + deltaX;
+        const movedTop = moving.startRect.top + deltaY;
+        const xSnap = event.altKey
+          ? { value: raw.x, guide: null }
+          : snapAxis(raw.x, [movedLeft, movedLeft + moving.startRect.width / 2, movedLeft + moving.startRect.width], moving.xCandidates);
+        const ySnap = event.altKey
+          ? { value: raw.y, guide: null }
+          : snapAxis(raw.y, [movedTop, movedTop + moving.startRect.height / 2, movedTop + moving.startRect.height], moving.yCandidates);
+        const next = { ...raw, x: xSnap.value, y: ySnap.value };
+        showSnapGuide(verticalGuide, xSnap.guide, "x");
+        showSnapGuide(horizontalGuide, ySnap.guide, "y");
         moving.latest = next;
         const updated = withElementTransform(moving.item, viewMode.current, next);
         items.current.set(updated.id, updated);
@@ -489,6 +664,7 @@ export function ContentBoardPreviewBridge() {
         if (moving.captureTarget.hasPointerCapture(event.pointerId)) moving.captureTarget.releasePointerCapture(event.pointerId);
         post({ type: "content-board:layout-transform", id: moving.item.id, value: moving.latest, viewMode: viewMode.current });
         layoutDrag.current = null;
+        hideSnapGuides();
         updateMoveHandle();
         return;
       }
@@ -576,6 +752,8 @@ export function ContentBoardPreviewBridge() {
       window.removeEventListener("resize", onViewportChange);
       if (viewportFrame) window.cancelAnimationFrame(viewportFrame);
       moveHandle.remove();
+      verticalGuide.remove();
+      horizontalGuide.remove();
     };
   }, []);
 

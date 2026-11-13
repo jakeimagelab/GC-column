@@ -244,6 +244,54 @@ svg {
   cursor: grabbing;
 }
 
+.contentBoardCanvas .contentBoardSnapGuide {
+  position: fixed;
+  z-index: 2147483646;
+  display: block;
+  pointer-events: none;
+  background: #dc5f82;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .65);
+}
+
+.contentBoardCanvas .contentBoardSnapGuide[hidden] {
+  display: none;
+}
+
+.contentBoardCanvas .contentBoardSnapGuide::after {
+  position: absolute;
+  padding: 4px 6px;
+  border-radius: 3px;
+  content: attr(data-board-guide-label);
+  color: #fff;
+  background: #dc5f82;
+  box-shadow: 0 2px 8px rgba(72, 37, 47, .22);
+  font: 700 10px/1 var(--font-sans);
+  letter-spacing: -.02em;
+  white-space: nowrap;
+}
+
+.contentBoardCanvas .contentBoardSnapGuideVertical {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.contentBoardCanvas .contentBoardSnapGuideVertical::after {
+  top: 8px;
+  left: 6px;
+}
+
+.contentBoardCanvas .contentBoardSnapGuideHorizontal {
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.contentBoardCanvas .contentBoardSnapGuideHorizontal::after {
+  top: 6px;
+  left: 8px;
+}
+
 .contentBoardCanvas [data-edit-type="image"],
 .contentBoardCanvas [data-edit-type="bgImage"] {
   cursor: grab !important;

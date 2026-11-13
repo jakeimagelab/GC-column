@@ -57,7 +57,7 @@ const definitions: SlideDefinition[] = [
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-category", title: "분야별 칼럼", description: "카테고리 섹션 고정 문구", prefixes: ["column.category.title", "column.category.count"] },
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-latest", title: "최신·전체 칼럼", description: "목록 제목과 이동 문구", prefixes: ["column.latest."] },
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-faq", title: "자주 묻는 질문", description: "FAQ 제목과 질문 문구", prefixes: ["column.faq."] },
-  { pageId: "column", pageTitle: "칼럼 메인", id: "column-treatments", title: "시술별 읽어보기", description: "시술 카드 영역의 고정 문구", prefixes: ["column.treatments."] },
+  { pageId: "column", pageTitle: "칼럼 메인", id: "column-treatments", title: "시술별 읽어보기", description: "시술 카드 문구와 장비·주사제 사진", prefixes: ["column.treatments.", "treatments."] },
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-principles", title: "진료 원칙", description: "진료 원칙 사진과 세 가지 설명", prefixes: ["column.principles."] },
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-location", title: "오시는 길", description: "지도와 예약·상담 문구", prefixes: ["column.location."] },
 

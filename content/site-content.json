@@ -794,6 +794,10 @@
     "type": "text",
     "value": "글로리의원은 이렇게 진료합니다"
   },
+  "column.principles.eyebrow": {
+    "type": "text",
+    "value": "GLORY PRINCIPLES"
+  },
   "column.principles.0.title": {
     "type": "text",
     "value": "대표원장 1:1 상담"
@@ -1134,6 +1138,24 @@
     "src": null,
     "label": "글로리의원 라운지와 상담실 사진",
     "alt": "글로리의원 라운지와 상담실",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "column.principles.1.image": {
+    "type": "image",
+    "src": null,
+    "label": "필요한 시술을 설명하는 상담 장면",
+    "alt": "피부 상태를 확인하고 필요한 시술을 설명하는 글로리의원 상담 장면",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "column.principles.2.image": {
+    "type": "image",
+    "src": null,
+    "label": "시술 후 관리 안내 장면",
+    "alt": "시술 후 관리 내용을 안내하는 글로리의원 상담 장면",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
