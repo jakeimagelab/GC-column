@@ -24,6 +24,7 @@ type SaveState = "saved" | "saving" | "error";
 type PendingUpload = { slideId: string; item: BoardImageItem; file: File; objectUrl: string };
 type CanvasMode = "design" | "items";
 type InteractionMode = "edit" | "move";
+type HistoryAvailability = { undo: boolean; redo: boolean };
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value));
@@ -389,6 +390,7 @@ function MotionControls({ item, onMotion, onPreview }: {
 
 export function ContentBoardEditor({ initialBoard }: Props) {
   const [board, setBoard] = useState(() => clone(initialBoard));
+  const boardRef = useRef(board);
   const firstSlide = initialBoard.pages[0]?.slides[0]?.id ?? "";
   const [activeSlideId, setActiveSlideId] = useState(firstSlide);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -406,6 +408,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const pendingPayloads = useRef(new Map<string, Record<string, unknown>>());
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const savingCount = useRef(0);
+  const historyPast = useRef<ContentBoard[]>([]);
+  const historyFuture = useRef<ContentBoard[]>([]);
+  const historyGroup = useRef<{ key: string; at: number } | null>(null);
+  const [historyAvailability, setHistoryAvailability] = useState<HistoryAvailability>({ undo: false, redo: false });
 
   const slides = useMemo(() => board.pages.flatMap((page) => page.slides), [board.pages]);
   const activeSlide = findSlide(board, activeSlideId) ?? slides[0];
@@ -455,6 +461,33 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     setPendingUpload(draft);
   };
 
+  const updateHistoryAvailability = useCallback(() => {
+    setHistoryAvailability({ undo: historyPast.current.length > 0, redo: historyFuture.current.length > 0 });
+  }, []);
+
+  const recordHistory = useCallback((current: ContentBoard, key: string) => {
+    const now = Date.now();
+    const group = historyGroup.current;
+    const grouped = group?.key === key && now - group.at < 800;
+    if (!grouped) {
+      historyPast.current.push(clone(current));
+      if (historyPast.current.length > 60) historyPast.current.shift();
+      historyFuture.current = [];
+    }
+    historyGroup.current = { key, at: now };
+    updateHistoryAvailability();
+  }, [updateHistoryAvailability]);
+
+  const mutateBoard = useCallback((historyKey: string, mutate: (draft: ContentBoard) => boolean) => {
+    const current = boardRef.current;
+    const next = clone(current);
+    if (!mutate(next)) return false;
+    recordHistory(current, historyKey);
+    boardRef.current = next;
+    setBoard(next);
+    return true;
+  }, [recordHistory]);
+
   const performSave = useCallback(async (payload: Record<string, unknown>) => {
     savingCount.current += 1;
     setSaveState("saving");
@@ -503,6 +536,38 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     timers.current.set(key, timer);
   }, [performSave]);
 
+  const clearQueuedSaves = useCallback(() => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current.clear();
+    pendingPayloads.current.clear();
+  }, []);
+
+  const restoreHistorySnapshot = useCallback((snapshot: ContentBoard) => {
+    clearQueuedSaves();
+    historyGroup.current = null;
+    const next = clone(snapshot);
+    boardRef.current = next;
+    setBoard(next);
+    updateHistoryAvailability();
+    void performSave({ kind: "history", board: next });
+  }, [clearQueuedSaves, performSave, updateHistoryAvailability]);
+
+  const undo = useCallback(() => {
+    const previous = historyPast.current.pop();
+    if (!previous) return;
+    historyFuture.current.push(clone(boardRef.current));
+    if (historyFuture.current.length > 60) historyFuture.current.shift();
+    restoreHistorySnapshot(previous);
+  }, [restoreHistorySnapshot]);
+
+  const redo = useCallback(() => {
+    const next = historyFuture.current.pop();
+    if (!next) return;
+    historyPast.current.push(clone(boardRef.current));
+    if (historyPast.current.length > 60) historyPast.current.shift();
+    restoreHistorySnapshot(next);
+  }, [restoreHistorySnapshot]);
+
   useEffect(() => {
     const flushQueuedSaves = () => {
       timers.current.forEach((timer) => window.clearTimeout(timer));
@@ -522,13 +587,30 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     return () => window.removeEventListener("pagehide", flushQueuedSaves);
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey)) return;
+      const key = event.key.toLowerCase();
+      if (key !== "z" && !(event.ctrlKey && key === "y")) return;
+      const target = event.target as HTMLElement | null;
+      const editingText = target instanceof HTMLInputElement
+        || target instanceof HTMLTextAreaElement
+        || target?.isContentEditable;
+      if (editingText) return;
+      event.preventDefault();
+      if (event.shiftKey || (event.ctrlKey && key === "y")) redo();
+      else undo();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [redo, undo]);
+
   const updateItem = useCallback((slideId: string, itemId: string, patch: Partial<BoardItem>, saveKind: "text" | "image", immediate = false) => {
-    setBoard((current) => {
-      const next = clone(current);
+    const changed = mutateBoard(`item:${slideId}:${itemId}`, (next) => {
       const slide = findSlide(next, slideId);
-      if (!slide) return current;
+      if (!slide) return false;
       const index = slide.items.findIndex((item) => item.id === itemId);
-      if (index < 0) return current;
+      if (index < 0) return false;
       const existing = slide.items[index];
       const merged = { ...existing, ...patch } as BoardItem;
       if (existing.type === "text" && "style" in patch && patch.style) {
@@ -537,20 +619,22 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       if (isBoardImageItem(existing) && "effects" in patch && patch.effects) {
         (merged as BoardImageItem).effects = { ...existing.effects, ...patch.effects };
       }
+      if (JSON.stringify(existing) === JSON.stringify(merged)) return false;
       slide.items[index] = merged;
-      return next;
+      return true;
     });
-    queueSave(`${slideId}:${itemId}`, { kind: saveKind, slideId, itemId, patch }, immediate ? 0 : 260);
-  }, [queueSave]);
+    if (changed) queueSave(`${slideId}:${itemId}`, { kind: saveKind, slideId, itemId, patch }, immediate ? 0 : 260);
+  }, [mutateBoard, queueSave]);
 
   const updateSlide = (slideId: string, patch: Partial<Pick<BoardSlide, "status" | "note">>, immediate = false) => {
-    setBoard((current) => {
-      const next = clone(current);
+    const changed = mutateBoard(`slide:${slideId}`, (next) => {
       const slide = findSlide(next, slideId);
-      if (slide) Object.assign(slide, patch);
-      return next;
+      if (!slide) return false;
+      if (Object.entries(patch).every(([key, value]) => slide[key as keyof Pick<BoardSlide, "status" | "note">] === value)) return false;
+      Object.assign(slide, patch);
+      return true;
     });
-    queueSave(`slide:${slideId}`, { kind: "slide", slideId, patch }, immediate ? 0 : 260);
+    if (changed) queueSave(`slide:${slideId}`, { kind: "slide", slideId, patch }, immediate ? 0 : 260);
   };
 
   const uploadImage = async (draft: PendingUpload) => {
@@ -566,15 +650,15 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       const response = await fetch("/api/dev-content-board", { method: "POST", body: form });
       const result = await response.json() as { storedName?: string; error?: string };
       if (!response.ok || !result.storedName) throw new Error(result.error || "사진을 저장하지 못했습니다.");
-      setBoard((current) => {
-        const next = clone(current);
+      mutateBoard(`upload:${draft.slideId}:${draft.item.id}`, (next) => {
         const slide = findSlide(next, draft.slideId);
         const item = slide?.items.find((value) => value.id === draft.item.id);
         if (item && isBoardImageItem(item)) {
           item.asset = result.storedName!;
           item.originalFileName = draft.file.name;
+          return true;
         }
-        return next;
+        return false;
       });
       URL.revokeObjectURL(draft.objectUrl);
       setTemporaryPreviews((current) => {
@@ -657,17 +741,18 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     const slideId = slides.find((slide) => slide.items.some((value) => value.id === item.id))?.id;
     if (!slideId) return;
     const effects = { ...item.effects, opacity: 100, overlayOpacity: 0, gradientEnabled: false };
-    setBoard((current) => {
-      const next = clone(current);
+    const changed = mutateBoard(`item:${slideId}:${item.id}`, (next) => {
       const slide = findSlide(next, slideId);
       const found = slide?.items.find((value) => value.id === item.id);
       if (found && isBoardImageItem(found)) {
         found.desktop = { x: 50, y: 50, zoom: 100 };
         delete found.mobile;
         found.effects = effects;
+        return true;
       }
-      return next;
+      return false;
     });
+    if (!changed) return;
     queueSave(`${slideId}:${item.id}`, {
       kind: "image",
       slideId,
@@ -701,6 +786,11 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   useEffect(() => {
     const onMessage = (event: MessageEvent<Record<string, unknown>>) => {
       if (event.origin !== window.location.origin || event.source !== iframeRef.current?.contentWindow || !activeSlide) return;
+      if (event.data.type === "content-board:history") {
+        if (event.data.direction === "redo") redo();
+        else undo();
+        return;
+      }
       const id = typeof event.data.id === "string" ? event.data.id : "";
       const item = previewItems.find((value) => value.id === id);
       const ownerSlideId = previewItemSlideIds.get(id);
@@ -732,7 +822,7 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [activeSlide, previewItemSlideIds, previewItems, sendPreview, slides, updateItem]);
+  }, [activeSlide, previewItemSlideIds, previewItems, redo, sendPreview, slides, undo, updateItem]);
 
   if (!activeSlide) return <main className={styles.empty}>편집할 슬라이드가 없습니다.</main>;
 
@@ -772,6 +862,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
         <div className={styles.slideHeading}>
           <div><span>{activeSlide.pageTitle} · {String(activeIndex + 1).padStart(2, "0")}</span><h1>{activeSlide.title}</h1><p>{activeSlide.description}</p></div>
           <div className={styles.headingActions}>
+            <div className={styles.historyActions} aria-label="편집 기록">
+              <button type="button" onClick={undo} disabled={!historyAvailability.undo} title="되돌리기 (⌘Z)" aria-label="되돌리기, Command Z">↶ <span>⌘Z</span></button>
+              <button type="button" onClick={redo} disabled={!historyAvailability.redo} title="다시 실행 (⌘⇧Z)" aria-label="다시 실행, Command Shift Z">↷ <span>⌘⇧Z</span></button>
+            </div>
             <div className={styles.canvasSwitch}><button type="button" className={canvasMode === "design" ? styles.active : ""} onClick={() => setCanvasMode("design")}>실제 디자인</button><button type="button" className={canvasMode === "items" ? styles.active : ""} onClick={() => setCanvasMode("items")}>항목 목록</button></div>
             {canvasMode === "design" ? <div className={styles.interactionSwitch} aria-label="디자인 조작 방식"><button type="button" className={interactionMode === "edit" ? styles.active : ""} onClick={() => setInteractionMode("edit")}>내용 편집</button><button type="button" className={interactionMode === "move" ? styles.active : ""} onClick={() => setInteractionMode("move")}>위치 이동</button></div> : null}
             <div className={styles.viewSwitch}><button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => setViewMode("desktop")}>PC</button><button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => setViewMode("mobile")}>모바일</button></div>

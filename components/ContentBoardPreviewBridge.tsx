@@ -483,6 +483,15 @@ export function ContentBoardPreviewBridge() {
         }
         return;
       }
+      const key = event.key.toLowerCase();
+      if ((event.metaKey || event.ctrlKey) && (key === "z" || (event.ctrlKey && key === "y"))) {
+        event.preventDefault();
+        post({
+          type: "content-board:history",
+          direction: event.shiftKey || (event.ctrlKey && key === "y") ? "redo" : "undo",
+        });
+        return;
+      }
       const selected = document.querySelector<HTMLElement>("[data-board-selected='true']");
       const item = selected?.dataset.editId ? items.current.get(selected.dataset.editId) : null;
       if (!selected || !item) return;

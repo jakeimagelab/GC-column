@@ -306,6 +306,10 @@ export async function writeContentBoard(board: ContentBoard) {
   return next;
 }
 
+export function replaceContentBoard(board: ContentBoard) {
+  return enqueueMutation(() => writeContentBoard(board));
+}
+
 export function updateBoardSlide(slideId: string, patch: Partial<Pick<BoardSlide, "status" | "note">>) {
   return enqueueMutation(async () => {
     const board = await readContentBoard();

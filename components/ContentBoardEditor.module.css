@@ -307,6 +307,7 @@
 .viewSwitch,
 .canvasSwitch,
 .interactionSwitch,
+.historyActions,
 .motionAllButton,
 .focusButton {
   height: 38px;
@@ -336,6 +337,40 @@
   display: flex;
   border-color: #bca896;
   background: #eee7df;
+}
+
+.historyActions {
+  padding: 3px;
+  display: flex;
+  gap: 2px;
+}
+
+.historyActions button {
+  min-width: 54px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 5px;
+  color: #5f554d;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.historyActions button:hover:not(:disabled),
+.historyActions button:focus-visible:not(:disabled) {
+  color: #fff;
+  background: #65584e;
+}
+
+.historyActions button:disabled {
+  color: #c3bdb6;
+  cursor: default;
+}
+
+.historyActions span {
+  margin-left: 2px;
+  font-size: 9px;
+  letter-spacing: -.04em;
 }
 
 .canvasSwitch button {

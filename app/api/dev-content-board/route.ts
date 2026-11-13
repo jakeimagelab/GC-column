@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import {
   contentBoardAssetPath,
   readContentBoard,
+  replaceContentBoard,
   saveBoardImage,
   updateBoardItem,
   updateBoardSlide,
@@ -15,6 +16,7 @@ import type {
   BoardMotion,
   BoardStatus,
   BoardTextStyle,
+  ContentBoard,
 } from "@/lib/contentBoardTypes";
 
 export const runtime = "nodejs";
@@ -158,6 +160,11 @@ export async function PATCH(request: Request) {
     const kind = String(body.kind ?? "");
     const slideId = String(body.slideId ?? "");
     const patch = body.patch && typeof body.patch === "object" ? body.patch as Record<string, unknown> : {};
+    if (kind === "history") {
+      const board = body.board as ContentBoard | undefined;
+      if (!board || board.version !== 1 || !Array.isArray(board.pages)) throw new Error("되돌릴 편집 기록을 확인해 주세요.");
+      return NextResponse.json({ board: await replaceContentBoard(board) });
+    }
     if (kind === "slide") {
       const statuses = new Set<BoardStatus>(["작성 중", "확인 필요", "작성 완료"]);
       const status = statuses.has(patch.status as BoardStatus) ? patch.status as BoardStatus : undefined;
