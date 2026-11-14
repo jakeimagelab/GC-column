@@ -103,9 +103,9 @@ export default async function ColumnMainPage() {
       <section className={styles.categorySection} data-scroll-world-scene data-scroll-world-strength="subtle">
         <h2 data-scroll-world-layer="copy" {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
         <div className={styles.categoryGrid} data-scroll-world-layer="depth">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <Link href={`/column/category/${category.slug}`} key={category.slug}>
-              <span>{category.nameEn}</span><b>{category.name}</b><small>{collectionColumns.filter((column) => column.categorySlug === category.slug).length ? `칼럼 ${collectionColumns.filter((column) => column.categorySlug === category.slug).length}편` : getText(content, "column.category.count")}</small>
+              <i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i><span>{category.nameEn}</span><b>{category.name}</b><small>{collectionColumns.filter((column) => column.categorySlug === category.slug).length ? `칼럼 ${collectionColumns.filter((column) => column.categorySlug === category.slug).length}편` : getText(content, "column.category.count")}</small>
             </Link>
           ))}
         </div>

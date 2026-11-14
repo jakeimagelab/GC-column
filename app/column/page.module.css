@@ -29,13 +29,21 @@
 .doctorSignature { display: flex; align-items: center; gap: 5px; }
 .doctorSignatureImage { width: 90px; height: 46px; padding: 0; background: transparent; color: var(--ink); font-size: 30px; font-style: italic; font-weight: 700; line-height: 1.2; }
 
-.categorySection { padding: 40px var(--column-gutter) 60px; }
+.categorySection { padding: 72px var(--column-gutter) 84px; }
 .categorySection h2, .latestSection h2, .treatmentsSection h2, .infoSection h2 { margin: 0; font-size: 26px; }
-.categoryGrid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.categoryGrid a { padding: 28px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; }
+.categorySection > h2 { font-size: clamp(28px, 2.5vw, 36px); font-weight: 500; }
+.categoryGrid { margin-top: 36px; border-block: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.categoryGrid a { position: relative; min-height: 220px; padding: 26px 28px 24px; display: flex; flex-direction: column; gap: 8px; transition: background-color .35s ease; }
+.categoryGrid a + a { border-left: 1px solid var(--line); }
+.categoryGrid i { position: absolute; top: 26px; right: 28px; color: var(--taupe); font-family: var(--font-en); font-size: 12px; font-style: normal; letter-spacing: 1px; }
+.categoryGrid a::after { content: ""; position: absolute; right: 28px; bottom: -1px; left: 28px; height: 2px; background: var(--brown); transform: scaleX(0); transform-origin: left; transition: transform .45s cubic-bezier(.22,.61,.36,1); }
+.categoryGrid a:hover, .categoryGrid a:focus-visible { background: #faf8f5; }
+.categoryGrid a:hover::after, .categoryGrid a:focus-visible::after { transform: scaleX(1); }
 .categoryGrid span { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 2px; }
-.categoryGrid b { font-size: 20px; }
-.categoryGrid small { color: var(--muted); font-size: 13px; }
+.categoryGrid b { margin-top: 44px; font-size: 22px; font-weight: 500; transition: transform .35s cubic-bezier(.22,.61,.36,1); }
+.categoryGrid small { margin-top: auto; color: var(--muted); font-size: 13px; }
+.categoryGrid small::after { content: "  ↗"; }
+.categoryGrid a:hover b, .categoryGrid a:focus-visible b { transform: translateX(4px); }
 
 .latestSection { padding: 60px var(--column-gutter); }
 .sectionHeading { display: flex; align-items: flex-end; justify-content: space-between; }
@@ -97,6 +105,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cardPhoto img { transition: none; }
+  .categoryGrid a, .categoryGrid a::after, .categoryGrid b { transition: none; }
+  .categoryGrid a:hover b, .categoryGrid a:focus-visible b { transform: none; }
   .hero[data-column-hero-ready] .heroPanel, .hero[data-column-hero-ready] .heroContent { clip-path: none; transform: none; transition: none; }
   .treatmentsSection[data-column-motion-ready] .treatmentGrid > * { opacity: 1; transform: none; transition: none; }
   .treatmentPhoto, .treatmentCopy, .treatmentCopy > span, .treatmentCopy small { transition: none; }
@@ -121,6 +131,8 @@
   .doctorInner { gap: 40px; }
   .doctorPhoto { width: 40% !important; }
   .categoryGrid, .treatmentGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .categoryGrid a:nth-child(odd) { border-left: 0; }
+  .categoryGrid a:nth-child(n + 3) { border-top: 1px solid var(--line); }
   .latestGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .faqBand { grid-template-columns: 1fr; gap: 28px; }
 }
@@ -136,6 +148,12 @@
   .doctorPhoto { width: 100% !important; height: 340px; }
   .doctorBackdrop, .outlineTitle { display: none; }
   .categoryGrid, .latestGrid { grid-template-columns: 1fr; }
+  .categoryGrid { margin-top: 28px; }
+  .categoryGrid a { min-height: 158px; padding: 22px 4px 20px; }
+  .categoryGrid a + a { border-top: 1px solid var(--line); border-left: 0; }
+  .categoryGrid i { top: 22px; right: 4px; }
+  .categoryGrid a::after { right: 4px; left: 4px; }
+  .categoryGrid b { margin-top: 28px; }
   .treatmentGrid { grid-template-columns: 1fr; gap: 12px; }
   .treatmentCard { min-height: 420px; }
   .treatmentCopy { transform: none; }

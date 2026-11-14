@@ -19,112 +19,6 @@
 .heroPager i { position: absolute; top: -1px; left: 0; width: 54px; height: 3px; background: #fff; }
 .heroPager em { font-style: normal; }
 
-.knowledgePath {
-  padding: 120px var(--home-gutter) 110px;
-  background: #fff;
-}
-
-.knowledgeHeading {
-  padding-top: 22px;
-  border-top: 1px solid var(--ink);
-  display: grid;
-  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
-  gap: clamp(32px, 5.5556vw, 80px);
-}
-
-.knowledgeHeading > span {
-  padding-top: 8px;
-  color: var(--brown);
-  font-family: var(--font-en);
-  font-size: 12px;
-  letter-spacing: 3px;
-}
-
-.knowledgeHeading > div {
-  max-width: 760px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.knowledgeHeading h2 {
-  margin: 0;
-  font-size: clamp(30px, 2.6389vw, 38px);
-  font-weight: 300;
-  line-height: 1.45;
-}
-
-.knowledgeHeading h2 strong { font-weight: 700; }
-
-.knowledgeHeading p {
-  max-width: 650px;
-  margin: 0;
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.knowledgeSteps {
-  margin: 54px 0 0;
-  padding: 0;
-  border-block: 1px solid var(--line);
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.knowledgeSteps li + li { border-left: 1px solid var(--line); }
-
-.knowledgeSteps a {
-  min-height: 248px;
-  padding: 28px 30px 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  transition: background-color .35s ease, transform .35s ease;
-}
-
-.knowledgeSteps a:hover,
-.knowledgeSteps a:focus-visible {
-  background: var(--paper);
-  transform: translateY(-4px);
-}
-
-.knowledgeSteps a > span {
-  color: var(--taupe);
-  font-family: var(--font-en);
-  font-size: 14px;
-  letter-spacing: 2px;
-}
-
-.knowledgeSteps a > div {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.knowledgeSteps b {
-  font-size: 21px;
-  font-weight: 500;
-}
-
-.knowledgeSteps p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.75;
-}
-
-.knowledgeSteps small {
-  align-self: flex-start;
-  padding-bottom: 3px;
-  border-bottom: 1px solid currentColor;
-  font-size: 13px;
-}
-
-.knowledgeSteps small::after { content: " →"; }
-
 .doctorSection { position: relative; padding: 140px var(--home-gutter) 120px; display: flex; gap: clamp(50px, 6.25vw, 90px); align-items: flex-start; }
 .directorOutline { position: absolute; top: 70px; right: calc(var(--canvas-left) + clamp(24px, 2.7778vw, 40px)); font-size: clamp(110px, 11.8056vw, 170px); letter-spacing: 6px; line-height: 1; }
 .doctorPhotoWrap { position: relative; width: 520px; flex: none; }
@@ -197,19 +91,13 @@
 .footerLogo b { font-size: 16px; font-weight: 400; letter-spacing: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .latestPhoto img,
-  .knowledgeSteps a { transition: none; }
-  .knowledgeSteps a:hover,
-  .knowledgeSteps a:focus-visible { transform: none; }
+  .latestPhoto img { transition: none; }
 }
 
 @media (max-width: 1180px) { .header nav { gap: 24px; } }
 @media (max-width: 1024px) {
   .header nav { display: none; }
   .heroCopy { width: auto; }
-  .knowledgePath { padding-block: 100px 90px; }
-  .knowledgeHeading { grid-template-columns: minmax(150px, 200px) minmax(0, 1fr); }
-  .knowledgeSteps a { padding-inline: 22px; }
   .doctorPhotoWrap { width: 42%; }
   .directorOutline { font-size: 110px; }
   .latestGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -224,14 +112,6 @@
   .heroCopy > span { font-size: 11px; letter-spacing: 3px; }
   .heroCopy h1 { font-size: 38px; }
   .heroPager { left: 24px; bottom: 110px; }
-  .knowledgePath { padding: 84px 24px 76px; }
-  .knowledgeHeading { grid-template-columns: 1fr; gap: 18px; }
-  .knowledgeHeading > span { padding-top: 0; }
-  .knowledgeHeading h2 { font-size: 28px; }
-  .knowledgeHeading p { font-size: 15px; }
-  .knowledgeSteps { margin-top: 36px; grid-template-columns: 1fr; }
-  .knowledgeSteps li + li { border-top: 1px solid var(--line); border-left: 0; }
-  .knowledgeSteps a { min-height: 0; padding: 24px 4px; gap: 18px; }
   .doctorSection { padding: 100px 24px 80px; flex-direction: column; }
   .doctorPhotoWrap { width: 100%; }
   .doctorPhoto { height: 500px; }
