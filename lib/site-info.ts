@@ -46,14 +46,16 @@ export function getSameAs(content: SiteContent) {
 export function getOpeningHoursSpecification(content: SiteContent) {
   return clinicHours.flatMap(([id, dayOfWeek]) => {
     const value = getText(content, `clinic.hours.${id}`).trim();
-    const match = value.match(/^(\d{2}:\d{2})\s*[-–~]\s*(\d{2}:\d{2})$/);
+    const match = value.match(/(\d{2}:\d{2})\s*[-–~]\s*(\d{2}:\d{2})/);
     return match ? [{ "@type": "OpeningHoursSpecification", dayOfWeek, opens: match[1], closes: match[2] }] : [];
   });
 }
 
 export function getDisplayedHours(content: SiteContent) {
+  const summary = getText(content, "home.location.hours").trim();
+  if (summary) return summary;
   const values = clinicHours.map(([id]) => getText(content, `clinic.hours.${id}`).trim()).filter(Boolean);
-  return values.length ? values.join(" · ") : getText(content, "home.location.hours");
+  return values.join(" · ");
 }
 
 export function absoluteAsset(src?: string | null) {

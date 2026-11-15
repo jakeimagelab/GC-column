@@ -16,12 +16,14 @@ type SyncMessage = {
   type: "content-board:sync";
   slideId: string;
   items: BoardItem[];
+  itemScopes: Array<{ slideId: string; itemIds: string[] }>;
   viewMode: BoardViewMode;
   selectedItemId?: string | null;
   interactionMode: "edit" | "move";
 };
 
 type PlayMotionMessage = { type: "content-board:play-motion"; itemId?: string | null };
+type NavigateHeroMessage = { type: "content-board:hero-navigate"; index: number };
 
 type SnapCandidate = {
   value: number;
@@ -104,6 +106,26 @@ function post(message: Record<string, unknown>) {
   window.parent.postMessage(message, window.location.origin);
 }
 
+function heroPreviewSlides(boardItems: BoardItem[]) {
+  const groups = new Map<string, Record<string, BoardItem>>();
+  boardItems.forEach((item) => {
+    const match = item.id.match(/^home\.hero\.slides\.([^.]+)\.(bgImage|eyebrow|title|titleStrong|description)$/);
+    if (!match) return;
+    const fields = groups.get(match[1]) ?? {};
+    fields[match[2]] = item;
+    groups.set(match[1], fields);
+  });
+  return Array.from(groups, ([id, fields]) => ({
+    id,
+    eyebrow: fields.eyebrow?.type === "text" ? fields.eyebrow.value : "",
+    title: fields.title?.type === "text" ? fields.title.value : "",
+    titleStrong: fields.titleStrong?.type === "text" ? fields.titleStrong.value : "",
+    description: fields.description?.type === "text" ? fields.description.value : "",
+    backgroundLabel: isBoardImageItem(fields.bgImage) ? fields.bgImage.label : "글로리의원 브랜딩 이미지",
+    backgroundAlt: isBoardImageItem(fields.bgImage) ? fields.bgImage.alt : "",
+  }));
+}
+
 export function ContentBoardPreviewBridge() {
   const items = useRef(new Map<string, BoardItem>());
   const viewMode = useRef<BoardViewMode>("desktop");
@@ -155,6 +177,43 @@ export function ContentBoardPreviewBridge() {
     document.body.append(horizontalGuide);
 
     let selectedTarget: HTMLElement | null = null;
+
+    const clearVirtualBackgroundTargets = () => {
+      document.querySelectorAll<HTMLElement>('[data-board-virtual-background="true"]').forEach((target) => {
+        target.querySelectorAll(":scope > [data-board-generated]").forEach((node) => node.remove());
+        target.removeAttribute("data-edit-id");
+        target.removeAttribute("data-edit-type");
+        target.removeAttribute("data-board-label");
+        target.removeAttribute("data-board-virtual-background");
+        target.style.isolation = target.dataset.boardOriginalIsolation ?? "";
+        target.style.position = target.dataset.boardOriginalPosition ?? "";
+        delete target.dataset.boardOriginalIsolation;
+        delete target.dataset.boardOriginalPosition;
+      });
+    };
+
+    const prepareVirtualBackgroundTargets = (scopes: SyncMessage["itemScopes"], boardItems: BoardItem[]) => {
+      clearVirtualBackgroundTargets();
+      const itemById = new Map(boardItems.map((item) => [item.id, item]));
+      scopes.forEach((scope) => {
+        const background = scope.itemIds.map((id) => itemById.get(id)).find((item) => item?.id === `board.section.${scope.slideId}.background`);
+        if (!background || !isBoardImageItem(background)) return;
+        const anchor = scope.itemIds
+          .filter((id) => id !== background.id)
+          .flatMap((id) => Array.from(document.querySelectorAll<HTMLElement>(targetSelector(id))))
+          .find((target) => target.offsetParent !== null);
+        const section = anchor?.closest<HTMLElement>("section, header, footer, article, aside") ?? null;
+        if (!section || section.dataset.editId) return;
+        section.dataset.boardOriginalIsolation = section.style.isolation;
+        section.dataset.boardOriginalPosition = section.style.position;
+        if (getComputedStyle(section).position === "static") section.style.position = "relative";
+        section.style.isolation = "isolate";
+        section.dataset.editId = background.id;
+        section.dataset.editType = "bgImage";
+        section.dataset.boardLabel = background.label;
+        section.dataset.boardVirtualBackground = "true";
+      });
+    };
 
     const hideSnapGuides = () => {
       verticalGuide.hidden = true;
@@ -305,7 +364,12 @@ export function ContentBoardPreviewBridge() {
 
     const applyImage = (target: HTMLElement, item: BoardImageItem) => {
       const value = transformFor(item, viewMode.current);
+      const virtualBackground = target.dataset.boardVirtualBackground === "true";
       target.dataset.boardLabel = item.label;
+      // Preview-only images must stay inside their original image slot. Without
+      // a local stacking context, the generated absolute image can escape a
+      // background slot and cover the section's real copy, shade, or controls.
+      target.style.isolation = "isolate";
       target.style.setProperty("--image-scale", String(item.desktop.zoom / 100));
       target.style.setProperty("--image-focus-x", `${item.desktop.x}%`);
       target.style.setProperty("--image-focus-y", `${item.desktop.y}%`);
@@ -314,7 +378,7 @@ export function ContentBoardPreviewBridge() {
       target.style.setProperty("--image-mobile-focus-x", `${mobile.x}%`);
       target.style.setProperty("--image-mobile-focus-y", `${mobile.y}%`);
       target.setAttribute("aria-label", item.alt || "설명 필요");
-      target.querySelectorAll("[data-board-generated]").forEach((node) => node.remove());
+      target.querySelectorAll(":scope > [data-board-generated]").forEach((node) => node.remove());
 
       const source = item.previewSrc ?? (item.asset ? `/api/dev-content-board?asset=${encodeURIComponent(item.asset)}` : null);
       let image = source ? null : target.querySelector<HTMLImageElement>("img:not([data-board-generated])");
@@ -326,13 +390,14 @@ export function ContentBoardPreviewBridge() {
         Object.assign(image.style, {
           position: "absolute",
           inset: "0",
-          zIndex: "18",
+          zIndex: virtualBackground ? "-3" : "0",
           width: "100%",
           height: "100%",
           objectFit: "cover",
           pointerEvents: "none",
         });
-        target.append(image);
+        if (virtualBackground) target.prepend(image);
+        else target.append(image);
       }
       if (image) {
         image.style.objectPosition = `${value.x}% ${value.y}%`;
@@ -344,13 +409,13 @@ export function ContentBoardPreviewBridge() {
       if (item.effects.overlayOpacity > 0) {
         const overlay = document.createElement("span");
         overlay.dataset.boardGenerated = "overlay";
-        Object.assign(overlay.style, { position: "absolute", inset: "0", zIndex: "19", pointerEvents: "none", background: item.effects.overlayColor, opacity: String(item.effects.overlayOpacity / 100) });
+        Object.assign(overlay.style, { position: "absolute", inset: "0", zIndex: virtualBackground ? "-2" : "1", pointerEvents: "none", background: item.effects.overlayColor, opacity: String(item.effects.overlayOpacity / 100) });
         target.append(overlay);
       }
       if (item.effects.gradientEnabled) {
         const gradient = document.createElement("span");
         gradient.dataset.boardGenerated = "gradient";
-        Object.assign(gradient.style, { position: "absolute", inset: "0", zIndex: "20", pointerEvents: "none", background: `linear-gradient(${item.effects.gradientDirection}, ${hexToRgba(item.effects.gradientColor, item.effects.gradientOpacity)}, transparent)` });
+        Object.assign(gradient.style, { position: "absolute", inset: "0", zIndex: virtualBackground ? "-1" : "2", pointerEvents: "none", background: `linear-gradient(${item.effects.gradientDirection}, ${hexToRgba(item.effects.gradientColor, item.effects.gradientOpacity)}, transparent)` });
         target.append(gradient);
       }
     };
@@ -403,8 +468,12 @@ export function ContentBoardPreviewBridge() {
       updateMoveHandle();
     };
 
-    const onMessage = (event: MessageEvent<SyncMessage | PlayMotionMessage>) => {
+    const onMessage = (event: MessageEvent<SyncMessage | PlayMotionMessage | NavigateHeroMessage>) => {
       if (event.origin !== window.location.origin) return;
+      if (event.data?.type === "content-board:hero-navigate") {
+        window.dispatchEvent(new CustomEvent("glory:hero-navigate", { detail: { index: event.data.index } }));
+        return;
+      }
       if (event.data?.type === "content-board:play-motion") {
         const selected = event.data.itemId;
         const candidates = selected ? [items.current.get(selected)].filter(Boolean) as BoardItem[] : Array.from(items.current.values()).filter((item) => item.motion.preset !== "none");
@@ -421,7 +490,16 @@ export function ContentBoardPreviewBridge() {
       interactionMode.current = event.data.interactionMode;
       hideSnapGuides();
       document.body.dataset.boardInteraction = event.data.interactionMode;
-      applyAll(shouldScroll);
+      prepareVirtualBackgroundTargets(event.data.itemScopes ?? [], event.data.items);
+      const projectedHeroSlides = heroPreviewSlides(event.data.items);
+      if (projectedHeroSlides.length) {
+        window.dispatchEvent(new CustomEvent("glory:content-board-hero-sync", { detail: { slides: projectedHeroSlides } }));
+        // React renders board-only hero slides after this event. Re-apply the
+        // editable values and uploaded images once those real design nodes exist.
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => applyAll(shouldScroll)));
+      } else {
+        applyAll(shouldScroll);
+      }
       const selected = event.data.selectedItemId
         ? document.querySelector<HTMLElement>(targetSelector(event.data.selectedItemId))
         : null;
@@ -430,6 +508,10 @@ export function ContentBoardPreviewBridge() {
 
     const onClick = (event: MouseEvent) => {
       const origin = event.target as HTMLElement;
+      // Real-page controls such as gallery pagination and equipment arrows must
+      // remain usable inside the slide editor. They change the visible editing
+      // target but never navigate away from the preview.
+      if (origin.closest("[data-edit-control]")) return;
       const target = origin.closest<HTMLElement>("[data-edit-id]");
       if (!target || !items.current.has(target.dataset.editId ?? "")) {
         if (origin.closest("a, button")) {
@@ -711,7 +793,11 @@ export function ContentBoardPreviewBridge() {
       post({ type: "content-board:image-transform", id: found.item.id, value: next, viewMode: viewMode.current });
     };
 
-    const onHeroState = () => window.setTimeout(() => applyAll(false), 0);
+    const onHeroState = (event: Event) => {
+      const detail = (event as CustomEvent<{ index?: number; count?: number; slideId?: string }>).detail ?? {};
+      post({ type: "content-board:hero-state", ...detail });
+      window.setTimeout(() => applyAll(false), 0);
+    };
     let viewportFrame = 0;
     const onViewportChange = () => {
       if (viewportFrame) return;
@@ -742,6 +828,7 @@ export function ContentBoardPreviewBridge() {
     return () => {
       document.body.classList.remove("contentBoardCanvas");
       document.body.removeAttribute("data-board-interaction");
+      clearVirtualBackgroundTargets();
       window.removeEventListener("message", onMessage);
       window.removeEventListener("glory:hero-state", onHeroState);
       document.removeEventListener("click", onClick, true);

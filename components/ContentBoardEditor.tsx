@@ -22,6 +22,7 @@ import styles from "./ContentBoardEditor.module.css";
 type Props = { initialBoard: ContentBoard };
 type SaveState = "saved" | "saving" | "error";
 type PendingUpload = { slideId: string; item: BoardImageItem; file: File; objectUrl: string };
+type BatchUploadEntry = { id: string; file: File; objectUrl: string; itemId: string };
 type CanvasMode = "design" | "items";
 type InteractionMode = "edit" | "move";
 type HistoryAvailability = { undo: boolean; redo: boolean };
@@ -98,6 +99,29 @@ function elementTransformFor(item: BoardItem, mode: BoardViewMode) {
 
 function findSlide(board: ContentBoard, slideId: string) {
   return board.pages.flatMap((page) => page.slides).find((slide) => slide.id === slideId);
+}
+
+const HERO_ITEM_PATTERN = /^home\.hero\.slides\.([^.]+)\.(bgImage|eyebrow|title|titleStrong|description)$/;
+
+function heroSlideIds(slide?: BoardSlide) {
+  const ids: string[] = [];
+  slide?.items.forEach((item) => {
+    const id = item.id.match(HERO_ITEM_PATTERN)?.[1];
+    if (id && !ids.includes(id)) ids.push(id);
+  });
+  return ids;
+}
+
+function cloneHeroSlideItems(slide: BoardSlide, sourceId: string, nextId: string) {
+  const sourcePrefix = `home.hero.slides.${sourceId}.`;
+  const nextPrefix = `home.hero.slides.${nextId}.`;
+  return slide.items
+    .filter((item) => item.id.startsWith(sourcePrefix))
+    .map((item) => ({
+      ...clone(item),
+      id: `${nextPrefix}${item.id.slice(sourcePrefix.length)}`,
+      label: item.label.replace(sourceId, nextId),
+    } as BoardItem));
 }
 
 function previewPath(slide: BoardSlide) {
@@ -401,9 +425,14 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [error, setError] = useState("");
   const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
+  const [batchUploads, setBatchUploads] = useState<BatchUploadEntry[]>([]);
+  const [batchUploading, setBatchUploading] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0 });
   const [temporaryPreviews, setTemporaryPreviews] = useState<Record<string, string>>({});
   const temporaryPreviewsRef = useRef<Record<string, string>>({});
   const pendingUploadRef = useRef<PendingUpload | null>(null);
+  const batchUploadsRef = useRef<BatchUploadEntry[]>([]);
+  const batchFileInput = useRef<HTMLInputElement>(null);
   const timers = useRef(new Map<string, number>());
   const pendingPayloads = useRef(new Map<string, Record<string, unknown>>());
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -412,10 +441,19 @@ export function ContentBoardEditor({ initialBoard }: Props) {
   const historyFuture = useRef<ContentBoard[]>([]);
   const historyGroup = useRef<{ key: string; at: number } | null>(null);
   const [historyAvailability, setHistoryAvailability] = useState<HistoryAvailability>({ undo: false, redo: false });
+  const [heroEditorIndex, setHeroEditorIndex] = useState(0);
 
   const slides = useMemo(() => board.pages.flatMap((page) => page.slides), [board.pages]);
   const activeSlide = findSlide(board, activeSlideId) ?? slides[0];
   const activeIndex = slides.findIndex((slide) => slide.id === activeSlide?.id);
+  const activeImageItems = useMemo(
+    () => activeSlide?.items.filter(isBoardImageItem) ?? [],
+    [activeSlide],
+  );
+  const activeHeroSlideIds = useMemo(
+    () => activeSlide?.id === "home-hero" ? heroSlideIds(activeSlide) : [],
+    [activeSlide],
+  );
   const previewSlides = useMemo(() => {
     if (!activeSlide) return [];
     const pageId = previewPageId(activeSlide);
@@ -450,10 +488,15 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     temporaryPreviewsRef.current = temporaryPreviews;
   }, [temporaryPreviews]);
 
+  useEffect(() => {
+    batchUploadsRef.current = batchUploads;
+  }, [batchUploads]);
+
   useEffect(() => () => {
     timers.current.forEach((timer) => window.clearTimeout(timer));
     Object.values(temporaryPreviewsRef.current).forEach((url) => URL.revokeObjectURL(url));
     if (pendingUploadRef.current) URL.revokeObjectURL(pendingUploadRef.current.objectUrl);
+    batchUploadsRef.current.forEach((entry) => URL.revokeObjectURL(entry.objectUrl));
   }, []);
 
   const setUploadDraft = (draft: PendingUpload | null) => {
@@ -696,6 +739,161 @@ export function ContentBoardEditor({ initialBoard }: Props) {
     else void uploadImage(draft);
   };
 
+  const closeBatchUpload = () => {
+    if (batchUploading) return;
+    batchUploadsRef.current.forEach((entry) => URL.revokeObjectURL(entry.objectUrl));
+    batchUploadsRef.current = [];
+    setBatchUploads([]);
+    setBatchProgress({ done: 0, total: 0 });
+  };
+
+  const openBatchUpload = (files: File[]) => {
+    if (!activeSlide || activeImageItems.length < 2) return;
+    const accepted = files.filter((file) => imageMime(file) && file.size <= 30 * 1024 * 1024).slice(0, 40);
+    const rejected = files.length - accepted.length;
+    if (!accepted.length) {
+      setSaveState("error");
+      setError("JPG, PNG, WebP, SVG 이미지를 한 장당 30MB 이하로 선택해 주세요.");
+      return;
+    }
+
+    batchUploadsRef.current.forEach((entry) => URL.revokeObjectURL(entry.objectUrl));
+    const empty = (item: BoardImageItem) => !item.asset && !item.sourceSrc;
+    const orderedSlots = [
+      ...activeImageItems.filter((item) => item.type === "image" && empty(item)),
+      ...activeImageItems.filter((item) => item.type === "bgImage" && empty(item)),
+      ...activeImageItems.filter((item) => item.type === "image" && !empty(item)),
+      ...activeImageItems.filter((item) => item.type === "bgImage" && !empty(item)),
+    ];
+    const entries = accepted.map((file, index) => ({
+      id: `${file.name}-${file.lastModified}-${index}`,
+      file,
+      objectUrl: URL.createObjectURL(file),
+      itemId: orderedSlots[index]?.id ?? "",
+    }));
+    batchUploadsRef.current = entries;
+    setBatchUploads(entries);
+    setBatchProgress({ done: 0, total: entries.filter((entry) => entry.itemId).length });
+    setError(rejected > 0 ? `${rejected}개 파일은 형식·용량 제한으로 제외했습니다.` : "");
+    setSaveState(rejected > 0 ? "error" : "saved");
+  };
+
+  const uploadBatchImages = async () => {
+    if (!activeSlide || batchUploading) return;
+    const entries = batchUploads.filter((entry) => entry.itemId);
+    const destinations = entries.map((entry) => entry.itemId);
+    if (!entries.length) {
+      setSaveState("error");
+      setError("배치할 사진 자리를 한 개 이상 선택해 주세요.");
+      return;
+    }
+    if (new Set(destinations).size !== destinations.length) {
+      setSaveState("error");
+      setError("같은 자리에 두 장을 배치할 수 없습니다. 사진마다 다른 자리를 선택해 주세요.");
+      return;
+    }
+
+    setBatchUploading(true);
+    setBatchProgress({ done: 0, total: entries.length });
+    setSaveState("saving");
+    setError("");
+    setTemporaryPreviews((current) => {
+      const next = { ...current };
+      entries.forEach((entry) => { next[previewKey(activeSlide.id, entry.itemId)] = entry.objectUrl; });
+      return next;
+    });
+
+    const uploaded: { itemId: string; storedName: string; originalFileName: string }[] = [];
+    const failures: string[] = [];
+    for (const entry of entries) {
+      const form = new FormData();
+      form.set("slideId", activeSlide.id);
+      form.set("itemId", entry.itemId);
+      form.set("file", entry.file);
+      try {
+        const response = await fetch("/api/dev-content-board", { method: "POST", body: form });
+        const result = await response.json() as { storedName?: string; error?: string };
+        if (!response.ok || !result.storedName) throw new Error(result.error || "저장 실패");
+        uploaded.push({ itemId: entry.itemId, storedName: result.storedName, originalFileName: entry.file.name });
+      } catch {
+        failures.push(entry.file.name);
+      }
+      setBatchProgress((current) => ({ ...current, done: current.done + 1 }));
+    }
+
+    if (uploaded.length) {
+      mutateBoard(`batch-upload:${activeSlide.id}`, (next) => {
+        const slide = findSlide(next, activeSlide.id);
+        if (!slide) return false;
+        uploaded.forEach((result) => {
+          const item = slide.items.find((value) => value.id === result.itemId);
+          if (item && isBoardImageItem(item)) {
+            item.asset = result.storedName;
+            item.originalFileName = result.originalFileName;
+          }
+        });
+        return true;
+      });
+      setSelectedItemId(uploaded.at(-1)?.itemId ?? null);
+    }
+
+    setTemporaryPreviews((current) => {
+      const next = { ...current };
+      entries.forEach((entry) => { delete next[previewKey(activeSlide.id, entry.itemId)]; });
+      return next;
+    });
+    batchUploadsRef.current.forEach((entry) => URL.revokeObjectURL(entry.objectUrl));
+    batchUploadsRef.current = [];
+    setBatchUploads([]);
+    setBatchUploading(false);
+    setSaveState(failures.length ? "error" : "saved");
+    setError(failures.length ? `${failures.length}장 저장 실패: ${failures.join(", ")}` : "");
+  };
+
+  const showHeroSlide = useCallback((nextIndex: number) => {
+    const count = activeHeroSlideIds.length;
+    if (!count) return;
+    const normalized = (nextIndex + count) % count;
+    setHeroEditorIndex(normalized);
+    iframeRef.current?.contentWindow?.postMessage({
+      type: "content-board:hero-navigate",
+      index: normalized,
+    }, window.location.origin);
+  }, [activeHeroSlideIds.length]);
+
+  const addHeroSlide = () => {
+    if (!activeSlide || activeSlide.id !== "home-hero") return;
+    const ids = heroSlideIds(activeSlide);
+    if (ids.length >= 6) {
+      setSaveState("error");
+      setError("히어로 슬라이드는 최대 6장까지 추가할 수 있습니다.");
+      return;
+    }
+    const sourceIndex = Math.min(heroEditorIndex, Math.max(0, ids.length - 1));
+    const sourceId = ids[sourceIndex];
+    if (!sourceId) return;
+    const nextId = `hero-slide-${Date.now().toString(36)}`;
+    const changed = mutateBoard(`hero-add:${nextId}`, (next) => {
+      const slide = findSlide(next, "home-hero");
+      if (!slide) return false;
+      const clonedItems = cloneHeroSlideItems(slide, sourceId, nextId);
+      if (!clonedItems.length) return false;
+      const sourcePrefix = `home.hero.slides.${sourceId}.`;
+      const insertionIndex = slide.items.reduce((last, item, index) => item.id.startsWith(sourcePrefix) ? index + 1 : last, slide.items.length);
+      slide.items.splice(insertionIndex, 0, ...clonedItems);
+      return true;
+    });
+    if (!changed) return;
+    const nextIndex = sourceIndex + 1;
+    setSelectedItemId(`home.hero.slides.${nextId}.title`);
+    setHeroEditorIndex(nextIndex);
+    void performSave({ kind: "history", board: clone(boardRef.current) });
+    window.setTimeout(() => iframeRef.current?.contentWindow?.postMessage({
+      type: "content-board:hero-navigate",
+      index: nextIndex,
+    }, window.location.origin), 120);
+  };
+
   const navigate = (index: number) => {
     const slide = slides[index];
     if (!slide) return;
@@ -773,11 +971,12 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       type: "content-board:sync",
       slideId: activeSlide.id,
       items,
+      itemScopes: previewSlides.map((slide) => ({ slideId: slide.id, itemIds: slide.items.map((item) => item.id) })),
       viewMode,
       selectedItemId,
       interactionMode,
     }, window.location.origin);
-  }, [activeSlide, canvasMode, interactionMode, previewItemSlideIds, previewItems, selectedItemId, temporaryPreviews, viewMode]);
+  }, [activeSlide, canvasMode, interactionMode, previewItemSlideIds, previewItems, previewSlides, selectedItemId, temporaryPreviews, viewMode]);
 
   useEffect(() => {
     sendPreview();
@@ -789,6 +988,10 @@ export function ContentBoardEditor({ initialBoard }: Props) {
       if (event.data.type === "content-board:history") {
         if (event.data.direction === "redo") redo();
         else undo();
+        return;
+      }
+      if (event.data.type === "content-board:hero-state" && typeof event.data.index === "number") {
+        setHeroEditorIndex(Math.max(0, Math.round(event.data.index)));
         return;
       }
       const id = typeof event.data.id === "string" ? event.data.id : "";
@@ -863,9 +1066,24 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           <div><span>{activeSlide.pageTitle} · {String(activeIndex + 1).padStart(2, "0")}</span><h1>{activeSlide.title}</h1><p>{activeSlide.description}</p></div>
           <div className={styles.headingActions}>
             <div className={styles.historyActions} aria-label="편집 기록">
-              <button type="button" onClick={undo} disabled={!historyAvailability.undo} title="되돌리기 (⌘Z)" aria-label="되돌리기, Command Z">↶ <span>⌘Z</span></button>
-              <button type="button" onClick={redo} disabled={!historyAvailability.redo} title="다시 실행 (⌘⇧Z)" aria-label="다시 실행, Command Shift Z">↷ <span>⌘⇧Z</span></button>
+              <button type="button" onClick={undo} disabled={!historyAvailability.undo} title="되돌리기 · ⌘Z" aria-label="되돌리기, Command Z">↶</button>
+              <button type="button" onClick={redo} disabled={!historyAvailability.redo} title="다시 실행 · ⌘⇧Z" aria-label="다시 실행, Command Shift Z">↷</button>
             </div>
+            {activeImageItems.length > 1 ? <>
+              <button type="button" className={styles.batchUploadButton} onClick={() => batchFileInput.current?.click()}>＋ 사진 여러 장 넣기</button>
+              <input
+                ref={batchFileInput}
+                className={styles.fileInput}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                multiple
+                tabIndex={-1}
+                onChange={(event) => {
+                  openBatchUpload(Array.from(event.currentTarget.files ?? []));
+                  event.currentTarget.value = "";
+                }}
+              />
+            </> : null}
             <div className={styles.canvasSwitch}><button type="button" className={canvasMode === "design" ? styles.active : ""} onClick={() => setCanvasMode("design")}>실제 디자인</button><button type="button" className={canvasMode === "items" ? styles.active : ""} onClick={() => setCanvasMode("items")}>항목 목록</button></div>
             {canvasMode === "design" ? <div className={styles.interactionSwitch} aria-label="디자인 조작 방식"><button type="button" className={interactionMode === "edit" ? styles.active : ""} onClick={() => setInteractionMode("edit")}>내용 편집</button><button type="button" className={interactionMode === "move" ? styles.active : ""} onClick={() => setInteractionMode("move")}>위치 이동</button></div> : null}
             <div className={styles.viewSwitch}><button type="button" className={viewMode === "desktop" ? styles.active : ""} onClick={() => setViewMode("desktop")}>PC</button><button type="button" className={viewMode === "mobile" ? styles.active : ""} onClick={() => setViewMode("mobile")}>모바일</button></div>
@@ -876,6 +1094,15 @@ export function ContentBoardEditor({ initialBoard }: Props) {
             </select>
           </div>
         </div>
+
+        {canvasMode === "design" && activeSlide.id === "home-hero" ? <div className={styles.heroSlideToolbar}>
+          <b>히어로 슬라이드</b>
+          <button type="button" onClick={() => showHeroSlide(heroEditorIndex - 1)} aria-label="이전 히어로 슬라이드">‹</button>
+          <span>{String(Math.min(heroEditorIndex + 1, activeHeroSlideIds.length)).padStart(2, "0")} / {String(activeHeroSlideIds.length).padStart(2, "0")}</span>
+          <button type="button" onClick={() => showHeroSlide(heroEditorIndex + 1)} aria-label="다음 히어로 슬라이드">›</button>
+          <button type="button" className={styles.heroAddButton} onClick={addHeroSlide} disabled={activeHeroSlideIds.length >= 6}>＋ 현재 슬라이드 복제</button>
+          <small>사진·문구·효과를 그대로 복사해 바로 뒤에 추가합니다.</small>
+        </div> : null}
 
         {canvasMode === "design" ? (
           <DesignPreview slide={activeSlide} viewMode={viewMode} iframeRef={iframeRef} onLoad={sendPreview} />
@@ -973,6 +1200,46 @@ export function ContentBoardEditor({ initialBoard }: Props) {
           <div className={styles.guideBox}><b>사용 방법</b><ol><li>내용 편집에서 글자를 한 번 클릭해 바로 수정</li><li>파인더 사진을 원하는 점선 박스에 드래그</li><li>위치 이동에서 모든 항목을 직접 움직임(스마트 가이드 자동 정렬)</li><li>오른쪽에서 배치·크기·회전·레이어·모션 조정</li><li>완료되면 상태를 ‘작성 완료’로 변경</li></ol></div>
         </>}
       </aside>
+
+      {batchUploads.length ? <div className={styles.batchLayer} role="dialog" aria-modal="true" aria-label="사진 여러 장 배치">
+        <section className={styles.batchDialog}>
+          <header>
+            <div><span>BATCH IMAGE PLACEMENT</span><h2>{activeSlide.title} 사진 여러 장 넣기</h2><p>파일 순서대로 빈 사진 자리에 먼저 배치했습니다. 아래에서 자리만 확인하거나 바꾼 뒤 한 번에 저장하세요.</p></div>
+            <b>{batchUploads.filter((entry) => entry.itemId).length} / {batchUploads.length}장 배치</b>
+          </header>
+          <div className={styles.batchList}>
+            {batchUploads.map((entry, index) => {
+              const assigned = activeImageItems.find((item) => item.id === entry.itemId);
+              const occupied = Boolean(assigned?.asset || assigned?.sourceSrc);
+              return <article key={entry.id}>
+                <img src={entry.objectUrl} alt="" />
+                <div><b>{entry.file.name}</b><small>{Math.max(.1, entry.file.size / 1024 / 1024).toFixed(1)}MB</small></div>
+                <span aria-hidden="true">→</span>
+                <label>
+                  <span>배치할 자리</span>
+                  <select
+                    value={entry.itemId}
+                    disabled={batchUploading}
+                    onChange={(event) => setBatchUploads((current) => current.map((value, row) => row === index ? { ...value, itemId: event.target.value } : value))}
+                  >
+                    <option value="">배치하지 않음</option>
+                    {activeImageItems.map((item) => {
+                      const usedElsewhere = batchUploads.some((value, row) => row !== index && value.itemId === item.id);
+                      const hasImage = Boolean(item.asset || item.sourceSrc);
+                      return <option key={item.id} value={item.id} disabled={usedElsewhere}>{item.label}{hasImage ? " · 기존 사진 교체" : " · 빈 자리"}</option>;
+                    })}
+                  </select>
+                  {entry.itemId ? <small data-occupied={occupied ? "true" : undefined}>{occupied ? "기존 사진을 교체합니다" : "빈 자리에 추가됩니다"}</small> : <small>이 파일은 업로드하지 않습니다</small>}
+                </label>
+              </article>;
+            })}
+          </div>
+          <footer>
+            <p>{batchUploading ? `${batchProgress.done} / ${batchProgress.total}장 저장 중` : "저장 후 각 사진을 클릭해 위치·확대만 조정하면 됩니다."}</p>
+            <div><button type="button" onClick={closeBatchUpload} disabled={batchUploading}>취소</button><button type="button" onClick={() => void uploadBatchImages()} disabled={batchUploading || !batchUploads.some((entry) => entry.itemId)}>{batchUploading ? "저장 중…" : `${batchUploads.filter((entry) => entry.itemId).length}장 한 번에 배치`}</button></div>
+          </footer>
+        </section>
+      </div> : null}
 
       {pendingUpload ? <div className={styles.confirmLayer} role="dialog" aria-modal="true" aria-label="사진 교체 확인">
         <section><span>REPLACE IMAGE</span><h2>이 사진으로 교체할까요?</h2><img className={styles.confirmPreview} src={pendingUpload.objectUrl} alt="새로 놓은 사진 미리보기" /><p><b>{pendingUpload.item.label}</b><br />{pendingUpload.file.name}</p><div><button type="button" onClick={() => { URL.revokeObjectURL(pendingUpload.objectUrl); setUploadDraft(null); }}>취소</button><button type="button" onClick={() => void uploadImage(pendingUpload)}>교체하기</button></div></section>

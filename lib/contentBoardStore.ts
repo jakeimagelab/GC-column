@@ -50,7 +50,7 @@ const definitions: SlideDefinition[] = [
   { pageId: "home", pageTitle: "홈", id: "home-vision", title: "진료 철학", description: "비전 문구와 원장 서명", prefixes: ["home.vision."] },
   { pageId: "home", pageTitle: "홈", id: "home-equipment", title: "보유 장비", description: "장비별 누끼 사진·이름·설명", special: "equipment" },
   { pageId: "home", pageTitle: "홈", id: "home-latest", title: "최신 칼럼", description: "최신 칼럼 섹션의 고정 문구", prefixes: ["home.latest."] },
-  { pageId: "home", pageTitle: "홈", id: "home-gallery", title: "시설 갤러리", description: "공간 사진 5장과 갤러리 문구", prefixes: ["home.gallery."] },
+  { pageId: "home", pageTitle: "홈", id: "home-gallery", title: "시설 갤러리", description: "공간 사진 6장과 갤러리 문구", prefixes: ["home.gallery."] },
   { pageId: "home", pageTitle: "홈", id: "home-location", title: "오시는 길", description: "지도 이미지, 주소 안내와 지도 링크", prefixes: ["home.location."] },
 
   { pageId: "column", pageTitle: "칼럼 메인", id: "column-hero", title: "칼럼 히어로·검색", description: "첫 화면 배경과 칼럼 검색 문구", prefixes: ["column.hero.", "column.search."] },
@@ -186,7 +186,14 @@ function mergeItem(seed: BoardItem, saved: BoardItem): BoardItem {
     return { ...base, style: { ...seed.style, ...saved.style } } as BoardTextItem;
   }
   if (isBoardImageItem(seed) && isBoardImageItem(saved)) {
-    return { ...base, effects: { ...seed.effects, ...saved.effects } } as BoardImageItem;
+    return {
+      ...base,
+      // sourceSrc mirrors the live site-content entry. Board uploads remain in
+      // `asset`, so newly applied production images must not be shadowed by an
+      // older saved null source in content-board.json.
+      sourceSrc: seed.sourceSrc,
+      effects: { ...seed.effects, ...saved.effects },
+    } as BoardImageItem;
   }
   return seed;
 }
@@ -246,6 +253,20 @@ function createSeedBoard(content: SiteContent): ContentBoard {
   for (const definition of definitions) {
     const page = pages.get(definition.pageId) ?? { id: definition.pageId, title: definition.pageTitle, slides: [] };
     const items = definition.special ? specialItems(content, definition.special) : directItems(content, definition.prefixes ?? []);
+    const hasEditableBackground = items.some((item) => item.type === "bgImage");
+    const slideItems = hasEditableBackground ? items : items.concat(fromEntry(
+      `board.section.${definition.id}.background`,
+      {
+        type: "bgImage",
+        src: null,
+        label: `${definition.title} 섹션 배경`,
+        alt: "",
+        zoom: 100,
+        focusX: 50,
+        focusY: 50,
+      },
+      `${definition.title} 섹션 배경`,
+    ));
     page.slides.push({
       id: definition.id,
       pageId: definition.pageId,
@@ -254,7 +275,7 @@ function createSeedBoard(content: SiteContent): ContentBoard {
       description: definition.description,
       status: "작성 중",
       note: "",
-      items,
+      items: slideItems,
     });
     pages.set(definition.pageId, page);
   }
@@ -280,7 +301,13 @@ function mergeBoard(seed: ContentBoard, saved: ContentBoard): ContentBoard {
             items: slide.items.map((item) => {
               const savedItem = savedSlide.items.find((value) => value.id === item.id);
               return savedItem ? mergeItem(item, savedItem) : item;
-            }),
+            }).concat(
+              // Structural editor actions (for example, adding a hero slide)
+              // create stable item ids that do not exist in site-content yet.
+              // Preserve those board-only items instead of dropping them when
+              // the seed and saved board are reconciled on the next request.
+              savedSlide.items.filter((savedItem) => !slide.items.some((seedItem) => seedItem.id === savedItem.id)),
+            ),
           };
         }),
       };

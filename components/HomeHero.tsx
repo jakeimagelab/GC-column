@@ -9,6 +9,15 @@ import styles from "./HomeHero.module.css";
 
 type HomeHeroProps = { slides: HeroSlide[] };
 type NavigateDetail = { index?: number; delta?: number };
+type BoardHeroSlide = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  titleStrong: string;
+  description: string;
+  backgroundLabel: string;
+  backgroundAlt: string;
+};
 
 export function HomeHero({ slides }: HomeHeroProps) {
   const [editMode, setEditMode] = useState(false);
@@ -17,7 +26,9 @@ export function HomeHero({ slides }: HomeHeroProps) {
   const [userPaused, setUserPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [motionReady, setMotionReady] = useState(false);
+  const [boardSlides, setBoardSlides] = useState<HeroSlide[] | null>(null);
   const indexRef = useRef(index);
+  const activeSlides = boardSlides ?? slides;
 
   indexRef.current = index;
 
@@ -35,23 +46,50 @@ export function HomeHero({ slides }: HomeHeroProps) {
   }, []);
 
   useEffect(() => {
-    if (index < slides.length) return;
-    setIndex(Math.max(0, slides.length - 1));
-  }, [index, slides.length]);
+    if (new URLSearchParams(window.location.search).get("content-board-preview") !== "1") return;
+    const sync = (event: Event) => {
+      const projected = (event as CustomEvent<{ slides?: BoardHeroSlide[] }>).detail?.slides;
+      if (!projected?.length) return;
+      setBoardSlides(projected.map((slide) => ({
+        id: slide.id,
+        type: "image",
+        bgImage: {
+          type: "bgImage",
+          src: null,
+          label: slide.backgroundLabel,
+          alt: slide.backgroundAlt,
+          zoom: 100,
+          focusX: 50,
+          focusY: 50,
+        },
+        eyebrow: slide.eyebrow,
+        title: slide.title,
+        titleStrong: slide.titleStrong,
+        description: slide.description,
+      })));
+    };
+    window.addEventListener("glory:content-board-hero-sync", sync);
+    return () => window.removeEventListener("glory:content-board-hero-sync", sync);
+  }, []);
+
+  useEffect(() => {
+    if (index < activeSlides.length) return;
+    setIndex(Math.max(0, activeSlides.length - 1));
+  }, [activeSlides.length, index]);
 
   useEffect(() => {
     const announce = () => {
-      const current = slides[indexRef.current] ?? slides[0];
+      const current = activeSlides[indexRef.current] ?? activeSlides[0];
       if (!current) return;
       window.dispatchEvent(new CustomEvent("glory:hero-state", {
-        detail: { index: indexRef.current, count: slides.length, slideId: current.id },
+        detail: { index: indexRef.current, count: activeSlides.length, slideId: current.id },
       }));
     };
     const navigate = (event: Event) => {
       const detail = (event as CustomEvent<NavigateDetail>).detail;
       setIndex((current) => {
-        if (typeof detail.index === "number") return Math.min(slides.length - 1, Math.max(0, detail.index));
-        return (current + (detail.delta ?? 0) + slides.length) % slides.length;
+        if (typeof detail.index === "number") return Math.min(activeSlides.length - 1, Math.max(0, detail.index));
+        return (current + (detail.delta ?? 0) + activeSlides.length) % activeSlides.length;
       });
     };
     window.addEventListener("glory:hero-request-state", announce);
@@ -61,17 +99,17 @@ export function HomeHero({ slides }: HomeHeroProps) {
       window.removeEventListener("glory:hero-request-state", announce);
       window.removeEventListener("glory:hero-navigate", navigate);
     };
-  }, [slides]);
+  }, [activeSlides]);
 
   useEffect(() => {
-    const current = slides[index];
+    const current = activeSlides[index];
     if (!current) return;
     window.dispatchEvent(new CustomEvent("glory:hero-state", {
-      detail: { index, count: slides.length, slideId: current.id },
+      detail: { index, count: activeSlides.length, slideId: current.id },
     }));
-  }, [index, slides]);
+  }, [activeSlides, index]);
 
-  const current = slides[index] ?? slides[0];
+  const current = activeSlides[index] ?? activeSlides[0];
   if (!current) return null;
 
   const paused = interactionPaused || userPaused;
@@ -87,7 +125,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
         if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false);
       }}
     >
-      {slides.map((slide, slideIndex) => (
+      {activeSlides.map((slide, slideIndex) => (
         <ImageSlot
           key={slide.id}
           className={`${styles.heroMedia} ${slideIndex === index ? styles.activeMedia : ""} ${slideIndex === index && motionReady ? styles.zoomMedia : ""}`}
@@ -111,24 +149,24 @@ export function HomeHero({ slides }: HomeHeroProps) {
         <p {...textEditProps(`home.hero.slides.${current.id}.description`)}>{current.description}</p>
       </div>
       <div className={styles.heroPager} aria-label="히어로 슬라이드">
-        <button type="button" onClick={() => setIndex(index)} aria-label={`${String(index + 1).padStart(2, "0")} · ${index + 1}번 슬라이드`}>{String(index + 1).padStart(2, "0")}</button>
+        <button type="button" data-edit-control onClick={() => setIndex(index)} aria-label={`${String(index + 1).padStart(2, "0")} · ${index + 1}번 슬라이드`}>{String(index + 1).padStart(2, "0")}</button>
         <span>
           <i
             key={`${current.id}-progress`}
             className={motionReady ? styles.progressFill : ""}
             style={{ animationPlayState: paused ? "paused" : "running" }}
             onAnimationEnd={() => {
-              if (!paused && !editMode && !reducedMotion && slides.length > 1) {
-                setIndex((currentIndex) => (currentIndex + 1) % slides.length);
+              if (!paused && !editMode && !reducedMotion && activeSlides.length > 1) {
+                setIndex((currentIndex) => (currentIndex + 1) % activeSlides.length);
               }
             }}
           />
           <span className={styles.slideTargets}>
-            {slides.map((slide, slideIndex) => <button type="button" aria-label={`${slideIndex + 1}번 슬라이드로 이동`} onClick={() => setIndex(slideIndex)} key={slide.id} />)}
+            {activeSlides.map((slide, slideIndex) => <button type="button" data-edit-control aria-label={`${slideIndex + 1}번 슬라이드로 이동`} onClick={() => setIndex(slideIndex)} key={slide.id} />)}
           </span>
         </span>
-        <button type="button" onClick={() => setIndex(slides.length - 1)} aria-label={`${String(slides.length).padStart(2, "0")} · ${slides.length}번 슬라이드`}>{String(slides.length).padStart(2, "0")}</button>
-        {!editMode && slides.length > 1 ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "히어로 슬라이드 재생" : "히어로 슬라이드 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
+        <button type="button" data-edit-control onClick={() => setIndex(activeSlides.length - 1)} aria-label={`${String(activeSlides.length).padStart(2, "0")} · ${activeSlides.length}번 슬라이드`}>{String(activeSlides.length).padStart(2, "0")}</button>
+        {!editMode && activeSlides.length > 1 ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "히어로 슬라이드 재생" : "히어로 슬라이드 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
       </div>
     </div>
   );

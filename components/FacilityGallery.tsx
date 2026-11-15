@@ -10,12 +10,13 @@ import { ImageSlot } from "./ImageSlot";
 import styles from "./FacilityGallery.module.css";
 
 type FacilityGalleryProps = { content: SiteContent };
-const roomKeys = ["lounge", "laser", "consult", "powder", "treatment"] as const;
+const roomKeys = ["exterior", "lounge", "laser", "consult", "powder", "treatment"] as const;
 
 export function FacilityGallery({ content }: FacilityGalleryProps) {
   const [index, setIndex] = useState(1);
   const [modalIndex, setModalIndex] = useState<number | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [boardPreview, setBoardPreview] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [interactionPaused, setInteractionPaused] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
@@ -39,6 +40,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   useEffect(() => {
     const editing = isVisualEditingMode();
     setEditMode(editing);
+    setBoardPreview(new URLSearchParams(window.location.search).get("content-board-preview") === "1");
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReducedMotion(query.matches);
     update();
@@ -196,6 +198,11 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
 
       <div className={styles.controls}>
         <div className={styles.pages} role="tablist" aria-label="시설 공간 선택">{roomKeys.map((room, roomIndex) => <button type="button" role="tab" aria-selected={roomIndex === index} data-edit-control className={roomIndex === index ? styles.active : ""} aria-label={`${String(roomIndex + 1).padStart(2, "0")} · ${roomName(roomIndex)}`} onClick={() => setIndex(roomIndex)} key={room} />)}</div>
+        {boardPreview ? <div className={styles.boardNavigator} data-edit-control aria-label="편집할 시설 사진 이동">
+          <button type="button" onClick={() => setIndex((current) => (current - 1 + roomKeys.length) % roomKeys.length)} aria-label="이전 시설 사진">‹</button>
+          <span>{String(index + 1).padStart(2, "0")} / {String(roomKeys.length).padStart(2, "0")}</span>
+          <button type="button" onClick={() => setIndex((current) => (current + 1) % roomKeys.length)} aria-label="다음 시설 사진">›</button>
+        </div> : null}
         {!editMode ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "시설 사진 자동 넘김 재생" : "시설 사진 자동 넘김 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
       </div>
 

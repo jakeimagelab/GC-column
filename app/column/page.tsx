@@ -8,6 +8,7 @@ import { DevEditorMount } from "@/components/DevEditorMount";
 import { EditableRichText } from "@/components/EditableRichText";
 import { FaqList } from "@/components/FaqList";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
+import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
@@ -176,7 +177,7 @@ export default async function ColumnMainPage() {
 
       <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft">
         <div data-scroll-world-layer="copy"><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><p {...textEditProps("column.footer.notice")}>{getText(content, "column.footer.notice")}</p><p {...textEditProps("column.footer.business")}>{getText(content, "column.footer.business")}</p></div>
-        <div data-scroll-world-layer="counter"><p {...textEditProps("column.footer.links")}>{getText(content, "column.footer.links")}</p><p {...textEditProps("column.footer.sitemap")}>{getText(content, "column.footer.sitemap")}</p></div>
+        <div data-scroll-world-layer="counter"><p {...textEditProps("column.footer.links")}>{getText(content, "column.footer.links")}</p><FooterPolicyLinks content={content} /><p {...textEditProps("column.footer.sitemap")}>{getText(content, "column.footer.sitemap")}</p></div>
       </footer>
 
       <FloatingQuickMenu content={content} compact />

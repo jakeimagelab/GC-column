@@ -11,6 +11,7 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { HighlightedParagraph } from "@/components/motion/HighlightedText";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
+import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
 import { QuestionForm } from "@/components/QuestionForm";
 import { ShareButtons } from "@/components/ShareButtons";
 import {
@@ -267,7 +268,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         </aside>
       </div>
 
-      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft"><div data-scroll-world-layer="copy"><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div data-scroll-world-layer="counter"><p>{getText(content, "column.footer.links")}</p><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
+      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft"><div data-scroll-world-layer="copy"><b>{getText(content, "column.footer.brand")}</b><p>{getText(content, "column.footer.notice")}</p><p>{getText(content, "column.footer.business")}</p></div><div data-scroll-world-layer="counter"><p>{getText(content, "column.footer.links")}</p><FooterPolicyLinks content={content} /><p>{getText(content, "column.footer.sitemap")}</p></div></footer>
       <FloatingQuickMenu content={content} compact />
       <DevEditorMount page="column" content={content} />
     </main>
