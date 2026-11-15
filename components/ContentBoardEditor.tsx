@@ -209,6 +209,7 @@ function ImageCanvasItem({ item, selected, mode, temporary, onSelect, onDropFile
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const drag = useRef<{ pointerId: number; x: number; y: number; start: BoardImageTransform; latest: BoardImageTransform } | null>(null);
+  const wheel = useRef<{ latest: BoardImageTransform; timer: number } | null>(null);
   const value = transformFor(item, mode);
   const imageUrl = itemImageUrl(item, temporary);
   const aspect = item.effects.cropAspect === "free" ? "4 / 3" : item.effects.cropAspect.replace(":", " / ");
@@ -227,17 +228,31 @@ function ImageCanvasItem({ item, selected, mode, temporary, onSelect, onDropFile
   };
 
   const handleWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
-    if (!imageUrl) return;
+    if (!imageUrl || !selected) return;
     event.preventDefault();
-    onSelect();
-    onTransform({ ...value, zoom: clamp(value.zoom + (event.deltaY < 0 ? 5 : -5), 100, 300) }, true);
+    const current = wheel.current?.latest ?? value;
+    const step = clamp(Math.abs(event.deltaY) / 20, 1, 5);
+    const zoom = Math.round(clamp(current.zoom + (event.deltaY < 0 ? step : -step), 100, 300) * 10) / 10;
+    const next = { ...current, zoom };
+    if (wheel.current?.timer) window.clearTimeout(wheel.current.timer);
+    onTransform(next, false);
+    const timer = window.setTimeout(() => {
+      onTransform(next, true);
+      wheel.current = null;
+    }, 160);
+    wheel.current = { latest: next, timer };
   };
+
+  useEffect(() => () => {
+    if (wheel.current?.timer) window.clearTimeout(wheel.current.timer);
+  }, []);
 
   return (
     <article className={`${styles.imageItem} ${selected ? styles.selectedItem : ""}`} onClick={onSelect}>
       <header><span>{item.label}</span><small>{item.type === "bgImage" ? "배경" : "사진"}</small></header>
       <div
         className={styles.imageViewport}
+        data-selected={selected ? "true" : undefined}
         style={{ aspectRatio: aspect }}
         role="group"
         tabIndex={0}
@@ -252,7 +267,7 @@ function ImageCanvasItem({ item, selected, mode, temporary, onSelect, onDropFile
         }}
         onPointerDown={(event) => {
           onSelect();
-          if (!imageUrl || event.button !== 0) return;
+          if (!selected || !imageUrl || event.button !== 0) return;
           event.preventDefault();
           event.currentTarget.setPointerCapture(event.pointerId);
           drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, start: value, latest: value };
@@ -295,7 +310,7 @@ function ImageCanvasItem({ item, selected, mode, temporary, onSelect, onDropFile
         /> : <div className={styles.dropEmpty}><b>사진을 여기에 놓으세요</b><span>파인더에서 바로 드래그</span></div>}
         <span className={styles.colorOverlay} style={{ background: item.effects.overlayColor, opacity: item.effects.overlayOpacity / 100 }} />
         {item.effects.gradientEnabled ? <span className={styles.gradientOverlay} style={{ background: `linear-gradient(${item.effects.gradientDirection}, ${hexToRgba(item.effects.gradientColor, item.effects.gradientOpacity)}, transparent)` }} /> : null}
-        {imageUrl ? <div className={styles.imageHint}>드래그 이동 · 휠 확대</div> : null}
+        {imageUrl ? <div className={styles.imageHint}>{selected ? "드래그 이동 · 휠 확대" : "클릭해 활성화"}</div> : null}
       </div>
       <footer>
         <span>{item.originalFileName || item.sourceSrc?.split("/").at(-1) || "사진 미지정"}</span>
@@ -341,7 +356,7 @@ function DesignPreview({ slide, viewMode, iframeRef, onLoad }: {
 
   return (
     <div ref={frame} className={styles.designPreview} style={{ height: `${height * scale + 48}px` }}>
-      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>글자 클릭: 내용 수정 · 이동 시 스마트 가이드 자동 정렬 · Option(Alt): 스냅 잠시 해제 · 방향키: 미세 이동</span><em>{Math.round(scale * 100)}%</em></div>
+      <div className={styles.previewGuide}><b>실제 홈페이지 디자인</b><span>사진·박스는 클릭해 활성화한 뒤 확대·이동 · 스마트 가이드 자동 정렬 · Option(Alt): 스냅 잠시 해제</span><em>{Math.round(scale * 100)}%</em></div>
       <iframe
         ref={iframeRef}
         key={`${previewPath(slide)}-${viewMode}`}

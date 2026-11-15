@@ -51,6 +51,9 @@
 
 :global(.devEditActive) .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
 :global(.devEditActive) .benefitPanel { display: none; }
+:global(.contentBoardCanvas) .card:hover .equipmentSlot,
+:global(.contentBoardCanvas) .card:focus-within .equipmentSlot { transform: none; box-shadow: 0 16px 24px rgba(58, 51, 45, .18); }
+:global(.contentBoardCanvas) .benefitPanel { display: none; }
 
 @media (max-width: 1024px) {
   .section { height: auto; padding-bottom: 70px; background: linear-gradient(to bottom, #fff 280px, var(--taupe-band) 280px); }

@@ -177,6 +177,19 @@ export function ContentBoardPreviewBridge() {
     document.body.append(horizontalGuide);
 
     let selectedTarget: HTMLElement | null = null;
+    let wheelCommitTimer = 0;
+    let pendingWheelCommit: Record<string, unknown> | null = null;
+
+    const scheduleWheelCommit = (message: Record<string, unknown>) => {
+      pendingWheelCommit = message;
+      if (wheelCommitTimer) window.clearTimeout(wheelCommitTimer);
+      wheelCommitTimer = window.setTimeout(() => {
+        wheelCommitTimer = 0;
+        if (!pendingWheelCommit) return;
+        post(pendingWheelCommit);
+        pendingWheelCommit = null;
+      }, 160);
+    };
 
     const clearVirtualBackgroundTargets = () => {
       document.querySelectorAll<HTMLElement>('[data-board-virtual-background="true"]').forEach((target) => {
@@ -668,11 +681,13 @@ export function ContentBoardPreviewBridge() {
       }
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-edit-id]");
       const item = target?.dataset.editId ? items.current.get(target.dataset.editId) : null;
-      if (target && item) {
+      const wasSelected = Boolean(target && target === selectedTarget);
+      if (target && item && !wasSelected) {
         markSelected(target);
         post({ type: "content-board:select", id: item.id });
       }
       if (target && item && interactionMode.current === "move" && event.button === 0) {
+        if (!wasSelected) return;
         event.preventDefault();
         event.stopPropagation();
         if (!target.matches("a, button, input, textarea, select, [tabindex]")) target.tabIndex = -1;
@@ -701,6 +716,7 @@ export function ContentBoardPreviewBridge() {
       }
       const found = imageTarget(event.target);
       if (!found || event.button !== 0 || interactionMode.current !== "edit") return;
+      if (!wasSelected || found.target !== selectedTarget) return;
       event.preventDefault();
       const start = transformFor(found.item, viewMode.current);
       found.target.setPointerCapture(event.pointerId);
@@ -769,28 +785,27 @@ export function ContentBoardPreviewBridge() {
     const onWheel = (event: WheelEvent) => {
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-edit-id]");
       const item = target?.dataset.editId ? items.current.get(target.dataset.editId) : null;
-      if (target && item && interactionMode.current === "move") {
+      if (target && item && target === selectedTarget && interactionMode.current === "move") {
         event.preventDefault();
         const current = elementTransformFor(item, viewMode.current);
-        const next = { ...current, scale: clamp(current.scale + (event.deltaY < 0 ? 5 : -5), 10, 500) };
+        const step = clamp(Math.abs(event.deltaY) / 20, 1, 5);
+        const next = { ...current, scale: Math.round(clamp(current.scale + (event.deltaY < 0 ? step : -step), 10, 500) * 10) / 10 };
         const updated = withElementTransform(item, viewMode.current, next);
         items.current.set(updated.id, updated);
         applyLayout(target, updated);
-        markSelected(target);
-        post({ type: "content-board:select", id: item.id });
-        post({ type: "content-board:layout-transform", id: item.id, value: next, viewMode: viewMode.current });
+        scheduleWheelCommit({ type: "content-board:layout-transform", id: item.id, value: next, viewMode: viewMode.current });
         return;
       }
       const found = imageTarget(event.target);
-      if (!found) return;
+      if (!found || found.target !== selectedTarget) return;
       event.preventDefault();
       const current = transformFor(found.item, viewMode.current);
-      const next = { ...current, zoom: clamp(current.zoom + (event.deltaY < 0 ? 5 : -5), 100, 300) };
+      const step = clamp(Math.abs(event.deltaY) / 20, 1, 5);
+      const next = { ...current, zoom: Math.round(clamp(current.zoom + (event.deltaY < 0 ? step : -step), 100, 300) * 10) / 10 };
       const updated = { ...found.item, ...(viewMode.current === "mobile" ? { mobile: next } : { desktop: next }) };
       items.current.set(updated.id, updated);
       applyImage(found.target, updated);
-      post({ type: "content-board:select", id: found.item.id });
-      post({ type: "content-board:image-transform", id: found.item.id, value: next, viewMode: viewMode.current });
+      scheduleWheelCommit({ type: "content-board:image-transform", id: found.item.id, value: next, viewMode: viewMode.current });
     };
 
     const onHeroState = (event: Event) => {
@@ -846,6 +861,8 @@ export function ContentBoardPreviewBridge() {
       document.removeEventListener("wheel", onWheel, true);
       window.removeEventListener("scroll", onViewportChange, true);
       window.removeEventListener("resize", onViewportChange);
+      if (wheelCommitTimer) window.clearTimeout(wheelCommitTimer);
+      if (pendingWheelCommit) post(pendingWheelCommit);
       if (viewportFrame) window.cancelAnimationFrame(viewportFrame);
       moveHandle.remove();
       verticalGuide.remove();

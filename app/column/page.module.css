@@ -117,6 +117,8 @@
 :global(.devEditActive) .heroPanel { clip-path: none; transform: none; }
 :global(.devEditActive) .doctorSection { margin-top: 0; }
 :global(.devEditActive) .treatmentCard:hover .treatmentPhoto { transform: none; }
+:global(.contentBoardCanvas) .treatmentCard:hover .treatmentPhoto,
+:global(.contentBoardCanvas) .treatmentCard:focus-visible .treatmentPhoto { transform: none; }
 
 @media (max-width: 1180px) {
   .heroContent { width: min(840px, calc(100% - var(--column-inner-gutter) - var(--column-inner-gutter))); }

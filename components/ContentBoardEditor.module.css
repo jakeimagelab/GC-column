@@ -621,8 +621,6 @@
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 
-.textItem:hover,
-.imageItem:hover,
 .selectedItem {
   border-color: #947b67;
   box-shadow: 0 0 0 2px rgba(148, 123, 103, .13);
@@ -682,11 +680,15 @@
   min-height: 180px;
   overflow: hidden;
   background: #ece8e2;
-  cursor: grab;
+  cursor: pointer;
   touch-action: none;
 }
 
-.imageViewport:active {
+.imageViewport[data-selected="true"] {
+  cursor: grab;
+}
+
+.imageViewport[data-selected="true"]:active {
   cursor: grabbing;
 }
 

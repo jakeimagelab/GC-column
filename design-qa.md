@@ -19,6 +19,7 @@
 | 히어로 비교 | `output/design-qa/hero-actual-vs-editor.png` | 왼쪽 공개 화면 / 오른쪽 편집 중인 초안 이미지 |
 | 편집기 전체 | `output/design-qa/content-board-hero-editor.png` | 1280×720, 히어로 1번 및 우측 도구 패널 |
 | 사진 일괄 배치 | `output/design-qa/content-board-batch-upload.png` | 시설 갤러리 사진 2장 선택, 저장 전 확인 단계 |
+| 클릭 활성화 | `output/playwright/content-board-click-active.png` | Chrome, 히어로 배경을 클릭해 선택한 상태 |
 | 모바일 히어로 | `output/design-qa/mobile-home-hero.png` | iPhone 15, 393 CSS px / DPR 3 |
 | 모바일 갤러리 | `output/design-qa/mobile-gallery-loaded.png` | iPhone 15, 레이저실 사진 로드 완료 |
 | 모바일 오시는 길 | `output/design-qa/mobile-location.png` | iPhone 15, 제공된 SVG 약도 표시 |
@@ -39,6 +40,7 @@
 | 약도 | 통과 | 제공된 `글로리의원_오시는길_약도_v5.svg`를 변형 없이 `/uploads/gloryclinic-location-map.svg`로 연결했고 PC·모바일에서 확인했다. |
 | 진료시간·정책 | 통과 | 평일·토요일·휴무 시간이 표시되며 개인정보처리방침과 비급여 진료비 링크가 지정 URL로 연결된다. |
 | 접근성 | 통과 | 편집·슬라이더 버튼 이름, 탭 선택 상태, 일시정지 상태, 이미지 대체 텍스트, 키보드 조작을 확인했다. |
+| 선택·확대 안정성 | 통과 | 선택하지 않은 이미지 위의 휠은 페이지를 스크롤하며 확대값을 바꾸지 않는다. 클릭한 항목만 이동·확대가 가능하고, 편집 캔버스에서는 사이트의 호버 확대와 이미지 전환 지연을 제거했다. |
 | 반응형 오버플로 | 통과 | 실제 화면 393px·1440px와 편집 화면 1280px에서 `scrollWidth === innerWidth`를 확인했다. |
 | 브라우저 오류 | 통과 | 실제 화면과 편집 화면 모두 콘솔 오류 0건. 개발 모드 CSS preload 경고만 반복되며 기능에는 영향이 없다. |
 
@@ -48,6 +50,7 @@
 - 갤러리 드래그 중 빈번한 좌표는 ref와 `requestAnimationFrame`으로 처리한다.
 - 이미지 일괄 업로드의 Object URL을 취소·언마운트 시 해제한다.
 - 전역 키보드 이벤트는 텍스트 입력 중 실행 취소를 가로채지 않는다.
+- 연속 휠 값은 ref에서 즉시 반영하고 160ms 단위로 한 번만 저장해 불필요한 React 재렌더링을 줄인다.
 - TypeScript `tsc --noEmit` 통과.
 
 ## 빌드 메모
@@ -63,6 +66,7 @@
 4. 이미지가 없는 섹션에도 가상 배경 드롭 대상을 추가했다.
 5. 제공 사진·공식 장비 이미지·약도·진료시간·정책 링크를 반영했다.
 6. PC·모바일 실화면 비교 후 이미지 라벨과 대체 텍스트를 정리했다.
+7. 호버·스크롤만으로 확대되던 P1 편집 회귀를 수정했다. 비선택 상태의 휠은 `scrollY 0→400`, 확대값은 `100%` 유지로 확인했고, 클릭 후 휠은 선택 상태를 유지한 채 `100→104%`로 한 번만 반영됐다. 장비 카드 호버 전후 슬롯 크기 `150×310px`도 동일했다.
 
 ## 최종 결과
 

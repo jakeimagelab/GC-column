@@ -191,6 +191,8 @@ svg {
 .contentBoardCanvas *::after {
   animation-duration: 0s !important;
   animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
   scroll-behavior: auto !important;
 }
 
@@ -202,12 +204,16 @@ svg {
 }
 
 .contentBoardCanvas[data-board-interaction="move"] [data-edit-id] {
-  cursor: move !important;
+  cursor: pointer !important;
   touch-action: none;
   user-select: none;
 }
 
-.contentBoardCanvas[data-board-interaction="move"] [data-edit-id]:active {
+.contentBoardCanvas[data-board-interaction="move"] [data-board-selected="true"] {
+  cursor: move !important;
+}
+
+.contentBoardCanvas[data-board-interaction="move"] [data-board-selected="true"]:active {
   cursor: grabbing !important;
 }
 
@@ -215,7 +221,6 @@ svg {
   cursor: text !important;
 }
 
-.contentBoardCanvas [data-edit-id]:hover,
 .contentBoardCanvas [data-board-selected="true"] {
   outline: 2px solid #9a7d65;
   outline-offset: 3px;
@@ -294,9 +299,14 @@ svg {
 
 .contentBoardCanvas [data-edit-type="image"],
 .contentBoardCanvas [data-edit-type="bgImage"] {
-  cursor: grab !important;
+  cursor: pointer !important;
   outline: 2px dashed rgba(154, 125, 101, .6);
   outline-offset: -2px;
+}
+
+.contentBoardCanvas[data-board-interaction="edit"] [data-board-selected="true"][data-edit-type="image"],
+.contentBoardCanvas[data-board-interaction="edit"] [data-board-selected="true"][data-edit-type="bgImage"] {
+  cursor: grab !important;
 }
 
 .contentBoardCanvas [data-edit-type="image"]::after,
