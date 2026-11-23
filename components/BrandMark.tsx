@@ -37,9 +37,7 @@ export function BrandMark({ image, name, compact = false, plain = false }: Brand
         <Image className={styles.image} src={image.src} alt={image.alt} fill sizes="150px" unoptimized />
       ) : (
         <span className={styles.wordmark}>
-          <span className={styles.monogram} aria-hidden="true">
-            <svg viewBox="0 0 54 54" focusable="false"><text x="2" y="45">G</text><text x="0" y="47">G</text><text x="3" y="44">G</text></svg>
-          </span>
+          <span className={styles.monogram} aria-hidden="true">G</span>
           <b data-edit-id="common.brand.name" data-edit-type="text">{name}</b>
         </span>
       )}

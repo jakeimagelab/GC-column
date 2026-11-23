@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isVisualEditingMode } from "@/lib/motion";
-import { getText, getTypingExamples, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { attributeEditProps, getConcernItems, getText, getTypingExamples, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { useMotionOnce } from "./motion/useMotionOnce";
+import { MotionGroup } from "./motion/MotionGroup";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import { QuestionForm } from "./QuestionForm";
 import styles from "./HomeQuestionSearch.module.css";
@@ -37,6 +38,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   const composing = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const popular = [0, 1, 2, 3].map((index) => ({ id: `home.question.popular.${index}`, value: getText(content, `home.question.popular.${index}`) }));
+  const concernItems = getConcernItems(content);
   const suggestionIndex = useMemo<SearchSuggestion[]>(() => columns.flatMap((column) => [
     { id: `column-${column.slug}`, type: "column" as const, label: column.title, href: `/column/${column.slug}` },
     ...column.faqs.map((faq) => ({ id: `faq-${column.slug}-${faq.id}`, type: "faq" as const, label: faq.q, href: `/column/${column.slug}#${faq.id}` })),
@@ -66,6 +68,17 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
 
   useEffect(() => () => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
+  }, []);
+
+  useEffect(() => {
+    const openQuestion = () => {
+      setQuestionOpen(true);
+      setQuery("");
+      setSearchQuery("");
+      setResultsVisible(false);
+    };
+    window.addEventListener("glory:open-home-question", openQuestion);
+    return () => window.removeEventListener("glory:open-home-question", openQuestion);
   }, []);
 
   useEffect(() => {
@@ -123,6 +136,10 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   };
   const selectSuggestion = (suggestion: SearchSuggestion) => {
     setInputFocused(false);
+    if (suggestion.href.startsWith("/column")) {
+      const transitionEvent = new CustomEvent("glory:column-navigate", { cancelable: true, detail: { href: suggestion.href } });
+      if (!window.dispatchEvent(transitionEvent)) return;
+    }
     router.push(suggestion.href);
   };
 
@@ -176,6 +193,24 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
         <span>{getText(content, "home.question.popularLabel")}</span>
         {popular.map((question) => <button type="button" key={question.id} onClick={() => chooseQuery(question.value)} data-edit-control>{question.value}</button>)}
       </div>
+      <MotionGroup className={styles.concernSection} scrollWorldLayer="copy">
+        <div className={styles.concernHeading} data-motion-item>
+          <b {...textEditProps("home.concern.title")}>{getText(content, "home.concern.title")}</b>
+          <span {...textEditProps("home.concern.eyebrow")}>{getText(content, "home.concern.eyebrow")}</span>
+        </div>
+        <div className={styles.concernGrid}>
+          {concernItems.map((item) => {
+            const prefix = `home.concern.items.${item.num}`;
+            return (
+              <Link href={item.link} key={item.num} data-motion-item {...attributeEditProps(`${prefix}.link`, "href")}>
+                <small {...textEditProps(`${prefix}.num`)}>{item.num}</small>
+                <b {...textEditProps(`${prefix}.name`)}>{item.name}</b>
+                <span {...textEditProps(`${prefix}.desc`)}>{item.desc}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </MotionGroup>
       <Link className={styles.guideLink} href="/consultation" data-scroll-world-layer="copy">
         <span>{getText(content, "home.question.guideEyebrow")}</span>
         <b>{getText(content, "home.question.guideTitle")}</b>
@@ -201,13 +236,14 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
               </div>
             </div>
           ) : (
-            <><div className={styles.empty}>
+            <div className={styles.empty}>
               <div><b {...textEditProps("home.question.noResult")}>{getText(content, "home.question.noResult")}</b><span {...textEditProps("home.question.emptyDescription")}>{getText(content, "home.question.emptyDescription")}</span></div>
               <button type="button" onClick={() => setQuestionOpen((value) => !value)} aria-expanded={questionOpen} data-edit-control>{getText(content, "home.question.emptyAction")}</button>
-            </div>{questionOpen ? <QuestionForm content={content} columnSlug={null} compact /> : null}</>
+            </div>
           )}
         </div>
       ) : null}
+      {questionOpen ? <div className={styles.questionForm} id="home-question-form"><QuestionForm content={content} columnSlug={null} compact /></div> : null}
     </section>
   );
 }

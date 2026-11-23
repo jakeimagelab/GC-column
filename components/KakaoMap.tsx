@@ -77,9 +77,11 @@ type KakaoMapProps = {
 export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackImage, fallbackEditId, scrollWorldLayer }: KakaoMapProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
+  const fallbackViewportRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(!apiKey);
+  const [fallbackZoom, setFallbackZoom] = useState(100);
 
   useEffect(() => {
     const element = wrapRef.current;
@@ -102,7 +104,7 @@ export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackIm
         if (cancelled) return;
         const position = new maps.LatLng(latitude, longitude);
         const map = new maps.Map(container, { center: position, level: 3 });
-        map.setZoomable(false);
+        map.setZoomable(true);
         map.addControl(new maps.ZoomControl(), maps.ControlPosition.RIGHT);
         new maps.Marker({ map, position });
         setReady(true);
@@ -124,11 +126,40 @@ export function KakaoMap({ className = "", apiKey, address, lat, lng, fallbackIm
     return () => { cancelled = true; };
   }, [address, apiKey, lat, lng, visible]);
 
+  useEffect(() => {
+    const viewport = fallbackViewportRef.current;
+    if (!viewport) return;
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setFallbackZoom((value) => Math.min(180, Math.max(100, value + (event.deltaY < 0 ? 4 : -4))));
+    };
+    viewport.addEventListener("wheel", handleWheel, { passive: false });
+    return () => viewport.removeEventListener("wheel", handleWheel);
+  }, []);
+
   const showFallback = failed || !ready;
   return (
     <div className={`${styles.wrap} ${className}`} ref={wrapRef} data-scroll-world-layer={scrollWorldLayer}>
       <div className={styles.stage}>
-        {showFallback ? <ImageSlot className={styles.fallback} label="" alt="" variant="light" editId={fallbackEditId} image={fallbackImage} /> : null}
+        {showFallback ? (
+          <div
+            className={styles.fallbackViewport}
+            ref={fallbackViewportRef}
+            tabIndex={0}
+            aria-label="글로리의원 약도. 마우스 휠이나 더하기·빼기 키로 확대 또는 축소할 수 있습니다."
+            onDoubleClick={() => setFallbackZoom(100)}
+            onKeyDown={(event) => {
+              if (event.key === "+" || event.key === "=") setFallbackZoom((value) => Math.min(180, value + 10));
+              if (event.key === "-") setFallbackZoom((value) => Math.max(100, value - 10));
+              if (event.key === "0") setFallbackZoom(100);
+            }}
+          >
+            <div className={styles.fallbackCanvas} style={{ transform: `scale(${fallbackZoom / 100})` }}>
+              <ImageSlot className={styles.fallback} label="" alt="" variant="light" editId={fallbackEditId} image={fallbackImage} />
+            </div>
+          </div>
+        ) : null}
         {!failed && apiKey ? <div className={styles.canvas} ref={mapRef} hidden={!visible} aria-label={`${address} 카카오맵`} /> : null}
       </div>
       <div className={styles.coordinates}>

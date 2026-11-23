@@ -17,6 +17,7 @@ type ImageSlotProps = {
   image?: ImageContentEntry;
   priority?: boolean;
   sizes?: string;
+  unoptimized?: boolean;
   motionRole?: "doctor-photo";
   scrollWorldLayer?: "depth" | "copy" | "counter";
 };
@@ -34,6 +35,7 @@ export function ImageSlot({
   image,
   priority = false,
   sizes = "(max-width: 768px) 100vw, 50vw",
+  unoptimized = false,
   motionRole,
   scrollWorldLayer,
 }: ImageSlotProps) {
@@ -71,7 +73,7 @@ export function ImageSlot({
       data-scroll-world-layer={scrollWorldLayer}
     >
       {image?.src ? (
-        <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} />
+        <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} unoptimized={unoptimized || image.src.startsWith("http")} />
       ) : resolvedLabel}
       {process.env.NODE_ENV === "development" && image?.type === "bgImage" ? (
         <span className={styles.bgEditHint} data-bg-edit-hint>배경 이미지 변경</span>

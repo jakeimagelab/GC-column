@@ -3,7 +3,7 @@ import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ContentBoardPreviewBridge } from "@/components/ContentBoardPreviewBridge";
 import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
 import { SITE_URL } from "@/content/site";
-import { montserrat, nanumPenScript, notoSansKr } from "./fonts";
+import { cormorantGaramond, montserrat, nanumPenScript, notoSansKr, notoSerifKr } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko" className={`${notoSansKr.variable} ${montserrat.variable} ${nanumPenScript.variable}`}>
+    <html lang="ko" className={`${notoSansKr.variable} ${montserrat.variable} ${nanumPenScript.variable} ${notoSerifKr.variable} ${cormorantGaramond.variable}`}>
       <body>
         {children}
         <ScrollWorldJourney />

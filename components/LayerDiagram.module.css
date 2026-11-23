@@ -1,0 +1,58 @@
+.figure {
+  margin: 42px 0 0;
+}
+
+.viewport {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.diagram {
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  display: block;
+}
+
+.diagram text {
+  font-family: var(--font-sans);
+}
+
+.figure figcaption {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #766e66;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.figure figcaption b {
+  padding: 2px 7px;
+  border: 1px dashed #e06f63;
+  border-radius: 999px;
+  color: #c9574d;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .figure {
+    width: 100vw;
+    margin: 40px 0 0 calc(50% - 50vw);
+  }
+
+  .viewport { overflow: hidden; }
+
+  .diagram { width: 100%; min-width: 0; }
+
+  .figure figcaption {
+    padding: 0 22px;
+    font-size: 12px;
+  }
+}

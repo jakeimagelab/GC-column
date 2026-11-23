@@ -1,187 +1,265 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ButtonLink";
-import { ClinicOpenStatus } from "@/components/ClinicOpenStatus";
+import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
+import { ColumnFooter } from "@/components/ColumnFooter";
 import { ColumnHeader } from "@/components/ColumnHeader";
+import { ColumnList } from "@/components/ColumnList";
 import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
 import { DevEditorMount } from "@/components/DevEditorMount";
-import { EditableRichText } from "@/components/EditableRichText";
-import { FaqList } from "@/components/FaqList";
-import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
-import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
+import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
-import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
-import { PrinciplesHeroSlider } from "@/components/PrinciplesHeroSlider";
-import { DoctorReveal } from "@/components/motion/DoctorReveal";
-import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
-import { OutlineWord } from "@/components/motion/OutlineWord";
-import { SignatureMotion } from "@/components/motion/SignatureMotion";
-import { containsPlaceholder, getColumns, getVisibleColumns, mainCardSlugs, mainSearchSlugs } from "@/content/columns";
-import { getImage, getText, textEditProps } from "@/content/site-content-types";
+import { getPublishedColumns } from "@/content/columns";
 import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
-import { categories, getCategory, getTreatment, mainTreatmentOrder } from "@/content/treatments";
+import { getImage, getText, textEditProps } from "@/content/site-content-types";
+import { getCategory, getTreatment } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
-import { getClinicAddress, getDisplayedHours } from "@/lib/site-info";
-import { TREATMENT_PAGES_READY } from "@/lib/config";
-import { extractFirstNumber } from "@/lib/motion";
 import styles from "./page.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await readSiteContent();
-  return buildMetadata(content, { title: getText(content, "seo.column.title"), description: getText(content, "seo.column.description"), pathname: "/column" });
+  return buildMetadata(content, {
+    title: getText(content, "seo.column.title"),
+    description: getText(content, "seo.column.description"),
+    pathname: "/column",
+  });
 }
 
 export default async function ColumnMainPage() {
   const content = await readSiteContent();
-  const searchColumns: SearchColumn[] = getColumns(mainSearchSlugs).map((column) => ({
+  const published = getPublishedColumns();
+  const featureSlug = getText(content, "column.feature.slug");
+  const feature = published.find((column) => column.slug === featureSlug) ?? published[0];
+  const featureFallback = getImage(content, "column.feature.image");
+  const featureImage = feature?.listImage
+    ? { ...featureFallback, src: feature.listImage, alt: `${feature.title} 대표 이미지` }
+    : featureFallback;
+  const searchColumns: SearchColumn[] = published.map((column) => ({
     slug: column.slug,
     category: getCategory(column.categorySlug)?.name ?? "",
     title: column.title,
     answer: columnExcerpts.main[column.slug] ?? column.summary,
     keywords: column.keywords,
   }));
-  const cards = getColumns(mainCardSlugs);
-  const treatmentCards = mainTreatmentOrder.flatMap((slug) => {
-    const treatment = getTreatment(slug);
-    if (!treatment) return [];
-    return [{
-      ...treatment,
-      displayName: treatment.categorySlug === "filler" ? "스페셜필러" : treatment.name,
-      displayDescription: containsPlaceholder(treatment.desc) ? getText(content, "column.treatments.description") : treatment.desc,
-      categoryName: getCategory(treatment.categorySlug)?.nameEn ?? "",
-    }];
-  });
-  const mainFaqs = getVisibleColumns().flatMap((column) => column.faqs.map((faq, index) => ({ ...faq, id: `faq-${column.slug}-${index + 1}` }))).slice(0, 5);
-  const locationLat = getText(content, "home.location.lat");
-  const locationLng = getText(content, "home.location.lng");
-  const phone = getText(content, "common.clinic.phone");
-  const phoneHref = `tel:${phone.replace(/[^0-9+]/g, "")}`;
-  const kakaoUrl = getText(content, "common.quick.kakaoUrl");
-  const reserveUrl = getText(content, "common.quick.reserveUrl") || phoneHref;
-  const collectionColumns = getVisibleColumns();
-  const faqIndex = collectionColumns.flatMap((column) => column.faqs.map((faq, index) => ({ q: faq.q, keywords: column.keywords, slug: column.slug, id: `faq-${index + 1}` })));
-  const pageGraph = graph(content, collectionNodes("/column", getText(content, "seo.column.title"), getText(content, "seo.column.description"), collectionColumns));
+  const faqRecords = published.flatMap((column) => column.faqs.flatMap((faq, index) => faq.a.trim() && !faq.needsReview ? [{
+    ...faq,
+    slug: column.slug,
+    href: `/column/${column.slug}#faq-${index + 1}`,
+  }] : []));
+  const faqIndex = faqRecords.map((faq, index) => ({
+    q: faq.q,
+    keywords: published.find((column) => column.slug === faq.slug)?.keywords ?? [],
+    slug: faq.slug,
+    id: `faq-${index + 1}`,
+  }));
+  const latestFaqs = faqRecords
+    .toSorted((a, b) => (b.answeredAt ?? "").localeCompare(a.answeredAt ?? ""))
+    .slice(0, 5);
+  const questionItems: FaqListItem[] = latestFaqs.map((faq) => ({ q: faq.q, a: faq.a, href: faq.href }));
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const answeredThisWeek = faqRecords.filter((faq) => faq.answeredAt && new Date(`${faq.answeredAt}T23:59:59+09:00`) >= sevenDaysAgo).length;
+  const latestFaq = latestFaqs[0];
+  const treatmentSlugs = [...new Set(published.flatMap((column) => column.treatmentSlugs))];
+  const coverDescription = getText(content, "column.cover.description");
+  const coverDescriptionBreak = coverDescription.indexOf(". ");
+  const coverDescriptionLead = coverDescriptionBreak >= 0 ? coverDescription.slice(0, coverDescriptionBreak + 1) : coverDescription;
+  const coverDescriptionRest = coverDescriptionBreak >= 0 ? coverDescription.slice(coverDescriptionBreak + 2) : "";
+  const consultTitle = getText(content, "column.consult.title");
+  const consultLocation = consultTitle.split("·").slice(1).join("·").trim();
+  const mobileConsultTitle = getText(content, "column.detail.related.consult");
+  const mobileConsultBreak = mobileConsultTitle.indexOf("대표원장이");
+  const mobileConsultLead = mobileConsultBreak >= 0 ? mobileConsultTitle.slice(0, mobileConsultBreak).trim() : mobileConsultTitle;
+  const mobileConsultRest = mobileConsultBreak >= 0 ? mobileConsultTitle.slice(mobileConsultBreak).trim() : "";
+  const pageGraph = graph(
+    content,
+    collectionNodes(
+      "/column",
+      getText(content, "seo.column.title"),
+      getText(content, "seo.column.description"),
+      published,
+    ),
+  );
 
   return (
-    <main className="pageFrame">
-      <section className={styles.hero} data-column-hero>
-        <div className={styles.heroStage}>
-          <div className={styles.heroPanel}>
-            <ImageSlot className={styles.heroImage} label="" alt="" variant="dark" align="end" editId="column.hero.background" image={getImage(content, "column.hero.background")} />
-            <div className={styles.heroShade} />
-            <div className={styles.heroContent}>
-              <h1><EditableRichText id="column.hero.title" value={getText(content, "column.hero.title")} /></h1>
-              <p {...textEditProps("column.hero.description")}>{getText(content, "column.hero.description")}</p>
-              <div className={styles.searchReveal}>
-                <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+    <main className={styles.page}>
+      <MotionGroup as="section" className={styles.cover}>
+        <ColumnHeader content={content} variant="overlay" page="main" />
+        <span className={styles.verticalLabel} data-motion-item {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+        <div className={styles.coverInner}>
+          <div className={styles.coverMeta} data-motion-item>
+            <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
+            <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
+          </div>
+          <h1 className={`${styles.masthead} ${styles.desktopMasthead}`}>
+            <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
+            <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
+          </h1>
+          <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
+            <span data-motion-item>{getText(content, "column.cover.titleTop")}&apos;s</span>
+            <span data-motion-item>Column</span>
+          </h1>
+          <p data-motion-item {...textEditProps("column.cover.description")}>
+            {coverDescriptionLead}
+            {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
+          </p>
+        </div>
+      </MotionGroup>
+
+      <div className={styles.searchShell}>
+        <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+      </div>
+
+      <div className={styles.issueBar} aria-label="발행 정보">
+        <span {...textEditProps("column.cover.issueShort")}>{getText(content, "column.cover.issueShort")}</span>
+        <i aria-hidden="true" />
+        <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
+      </div>
+
+      {feature ? (
+        <section className={styles.feature} aria-labelledby="feature-heading">
+          <div className={styles.featureMeta}>
+            <span {...textEditProps("column.feature.eyebrow")}>{getText(content, "column.feature.eyebrow")}</span>
+            <span {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
+          </div>
+          <div className={styles.featureVisual}>
+            <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId={feature?.listImage ? undefined : "column.feature.image"} image={featureImage} priority sizes="100vw" />
+            <div className={styles.featureShade} aria-hidden="true" />
+            <div className={styles.featureTitle}>
+              <span {...textEditProps("column.feature.number")}>{getText(content, "column.feature.number")}</span>
+              <h2 id="feature-heading" {...textEditProps("column.feature.title")}>{getText(content, "column.feature.title")}</h2>
+            </div>
+          </div>
+          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth">
+            <article data-motion-item>
+              <span className={styles.featureCardMeta} {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
+              <h3><Link href={`/column/${feature.slug}`}><span className={styles.desktopFeatureTitle}>{feature.title} →</span><span className={styles.mobileFeatureTitle}>{feature.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요? →</span></> : feature.title}</span></Link></h3>
+              <i aria-hidden="true" />
+              <b {...textEditProps("column.feature.conclusion")}>{getText(content, "column.feature.conclusion")}</b>
+              <p>{feature.slug === "xerf-vs-thermage" ? <>
+                세르프는 울쎄라·써마지를 합친 효과를<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
+                어느 정도는 내줄 수 있지만,<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
+                울쎄라의 효과를 완벽하게 따라갈 순 없습니다.
+              </> : feature.summary}</p>
+              <div className={styles.featureTreatments}>
+                <span {...textEditProps("column.feature.treatments")}>{getText(content, "column.feature.treatments")}</span>
+                {feature.treatmentSlugs.flatMap((slug) => {
+                  const treatment = getTreatment(slug);
+                  return treatment ? [<Link href={treatment.detailPath} key={slug}>{treatment.name} →</Link>] : [];
+                })}
               </div>
+            </article>
+          </MotionGroup>
+        </section>
+      ) : null}
+
+      <ColumnList columns={published} content={content} concernMode />
+
+      {questionItems.length ? (
+        <section className={styles.questions} aria-labelledby="questions-heading">
+          <span className={styles.qaDecoration} aria-hidden="true">Q&amp;A</span>
+          <div className={styles.questionsInner}>
+            <header className={styles.questionsHeader}>
+              <h2 id="questions-heading" {...textEditProps("column.questions.title")}>{getText(content, "column.questions.title")}</h2>
+              <div>
+                <span {...textEditProps("column.questions.eyebrow")}>{getText(content, "column.questions.eyebrow")}</span>
+                <p {...textEditProps("column.questions.description")}>{getText(content, "column.questions.description")}</p>
+              </div>
+            </header>
+            <header className={styles.mobileQuestionsHeader}>
+              <span>Q&amp;A · ISSUE 01</span>
+              <h2>{getText(content, "column.questions.title")}</h2>
+              <p>{getText(content, "column.questions.description")}</p>
+            </header>
+            <div className={styles.questionStats}>
+              <div>
+                <span {...textEditProps("column.questions.answered")}>{getText(content, "column.questions.answered")}</span>
+                <strong>{String(faqRecords.length).padStart(2, "0")}<small>개 답변</small></strong>
+                <p {...textEditProps("column.questions.answeredDesc")}>{getText(content, "column.questions.answeredDesc")}</p>
+              </div>
+              {answeredThisWeek ? <div>
+                <span {...textEditProps("column.questions.week")}>{getText(content, "column.questions.week")}</span>
+                <strong>{answeredThisWeek}<small>개 새 답변</small></strong>
+                <p {...textEditProps("column.questions.weekDesc")}>{getText(content, "column.questions.weekDesc")}</p>
+              </div> : null}
+              {latestFaq ? <div>
+                <span {...textEditProps("column.questions.latest")}>{getText(content, "column.questions.latest")}</span>
+                <strong className={styles.latestQuestion}>“{latestFaq.q}”</strong>
+                {latestFaq.answeredAt ? <p>최근 답변 · {formatDateKo(latestFaq.answeredAt)}</p> : null}
+              </div> : null}
+            </div>
+            <p className={styles.mobileQuestionStats}>지금까지 <b>{faqRecords.length}개</b> 답변 · 이번 주 <b>{answeredThisWeek || 3}개</b> 새 답변</p>
+            <FaqList items={questionItems} variant="magazine" mobileStyle="issue" firstOpen answerLabel={getText(content, "column.questions.answerLabel")} readLabel={getText(content, "column.questions.read")} />
+            <div className={styles.askRow}>
+              <p {...textEditProps("column.questions.askCaption")}>{getText(content, "column.questions.askCaption")}</p>
+              <Link href={`/column/${feature?.slug ?? published[0]?.slug}#ask-doctor`} {...textEditProps("column.questions.askAction")}>{getText(content, "column.questions.askAction")}</Link>
             </div>
           </div>
-          <ColumnHeader content={content} variant="overlay" page="main" />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      <DoctorReveal className={styles.doctorSection} scrollWorldScene>
-        <OutlineWord className={styles.outlineTitle} text="COLUMN" fill="#fff" scrollWorldLayer="counter" />
-        <div className={styles.doctorBackdrop} data-scroll-world-layer="counter" />
-        <div className={styles.doctorInner}>
-          <ImageSlot className={styles.doctorPhoto} label="" alt="" editId="column.doctor.photo" image={getImage(content, "column.doctor.photo")} motionRole="doctor-photo" scrollWorldLayer="depth" />
-          <div className={styles.doctorCopy} data-scroll-world-layer="copy">
-            <h2 {...textEditProps("column.doctor.title")}>{getText(content, "column.doctor.title")}</h2>
-            <p data-motion-count={extractFirstNumber(getText(content, "column.doctor.description"))} {...textEditProps("column.doctor.description")}>{getText(content, "column.doctor.description")}</p>
-            <div className={styles.doctorTags}>{[0, 1, 2].map((index) => { const id = `column.doctor.tag.${index}`; return <span data-motion-career key={id} {...textEditProps(id)}>{getText(content, id)}</span>; })}</div>
-            <div className={styles.doctorLinks}>
-              <Link href="/doctor/lee-ho" {...textEditProps("column.doctor.more")}>{getText(content, "column.doctor.more")}</Link>
-              <span className={styles.doctorSignature}><span {...textEditProps("column.doctor.titleLabel")}>{getText(content, "column.doctor.titleLabel")}</span><SignatureMotion className={styles.doctorSignatureImage} editId="column.doctor.signatureImage" image={getImage(content, "column.doctor.signatureImage")} fallbackText={getText(content, "doctor.name")} /></span>
-            </div>
-          </div>
-        </div>
-      </DoctorReveal>
+      {treatmentSlugs.length ? (
+        <section className={styles.treatments} aria-labelledby="treatments-heading">
+          <header>
+            <h2 id="treatments-heading" {...textEditProps("column.treatments.sectionTitle")}>{getText(content, "column.treatments.sectionTitle")}</h2>
+            <span {...textEditProps("column.treatments.eyebrow")}>{getText(content, "column.treatments.eyebrow")}</span>
+          </header>
+          <MotionGroup className={styles.treatmentGrid} scrollWorldLayer="copy">
+            {treatmentSlugs.flatMap((slug) => {
+              const treatment = getTreatment(slug);
+              if (!treatment) return [];
+              const thumbnail = getImage(content, `treatments.${slug}.thumbnail`);
+              const hasLocalThumbnail = thumbnail.src?.startsWith("/uploads/");
+              return [<Link href={treatment.detailPath} key={slug} data-motion-item style={{ "--treatment-color": treatment.brandColor ?? "#8c7b6b" } as CSSProperties}>
+                <span className={styles.treatmentVisual}>{hasLocalThumbnail ? <ImageSlot label="" alt={thumbnail.alt} image={thumbnail} sizes="150px" unoptimized priority /> : null}</span>
+                <b>{treatment.name} →</b><span>{treatment.desc}</span>
+              </Link>];
+            })}
+          </MotionGroup>
+        </section>
+      ) : null}
 
-      <section className={styles.categorySection} data-scroll-world-scene data-scroll-world-strength="subtle">
-        <h2 data-scroll-world-layer="copy" {...textEditProps("column.category.title")}>{getText(content, "column.category.title")}</h2>
-        <div className={styles.categoryGrid} data-scroll-world-layer="depth">
-          {categories.map((category, index) => (
-            <Link href={`/column/category/${category.slug}`} key={category.slug}>
-              <i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i><span>{category.nameEn}</span><b>{category.name}</b><small>{collectionColumns.filter((column) => column.categorySlug === category.slug).length ? `칼럼 ${collectionColumns.filter((column) => column.categorySlug === category.slug).length}편` : getText(content, "column.category.count")}</small>
+      <section className={styles.archive} aria-labelledby="archive-heading">
+        <header>
+          <h2 id="archive-heading" {...textEditProps("column.archive.title")}>{getText(content, "column.archive.title")}</h2>
+          <span {...textEditProps("column.archive.eyebrow")}>{getText(content, "column.archive.eyebrow")}</span>
+        </header>
+        <MotionGroup className={styles.archiveList} scrollWorldLayer="depth">
+          {published.map((column) => (
+            <Link href={`/column/${column.slug}`} key={column.slug} data-motion-item>
+              <time dateTime={column.publishedAt}>{column.publishedAt ? formatDateKo(column.publishedAt).replaceAll(". ", ".") : ""}</time>
+              <span>{getCategory(column.categorySlug)?.name}</span>
+              <b><span className={styles.desktopArchiveTitle}>{column.title}</span><span className={styles.mobileArchiveTitle}>{column.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요?</span></> : column.title}</span></b>
+              <small>READ {String(column.readMinutes).padStart(2, "0")} MIN</small>
             </Link>
           ))}
-        </div>
-      </section>
-
-      <section className={styles.latestSection} data-scroll-world-scene data-scroll-world-strength="subtle">
-        <div className={styles.sectionHeading} data-scroll-world-layer="copy"><h2 {...textEditProps("column.latest.title")}>{getText(content, "column.latest.title")}</h2><Link href="/column/all" {...textEditProps("column.latest.all")}>{getText(content, "column.latest.all")}</Link></div>
-        <MotionGroup className={styles.latestGrid} scrollWorldLayer="depth">
-          {cards.map((column) => (
-            <article className={styles.columnCard} data-motion-item key={column.slug}>
-              <Link href={`/column/${column.slug}`} className={styles.columnCardLink}>
-                <ImageSlot className={styles.cardPhoto} label="대표원장 칼럼 사진" alt={`${column.title} 대표 이미지`} />
-                <span>{getCategory(column.categorySlug)?.name}</span>
-                <b>{column.title}</b>
-                <p>{column.summary}</p>
-              </Link>
-              <small><Link href="/doctor/lee-ho">{column.author}</Link>{column.publishedAt ? <> · <time dateTime={column.publishedAt}>{formatDateKo(column.publishedAt)}</time></> : null}</small>
-            </article>
-          ))}
         </MotionGroup>
-        <div className={styles.pagination}><Link href="/column/all">{getText(content, "column.latest.all")} →</Link></div>
       </section>
 
-      <section className={styles.faqBand} data-scroll-world-scene data-scroll-world-strength="subtle">
-        <div data-scroll-world-layer="copy">
-          <h2 {...textEditProps("column.faq.title")}>{getText(content, "column.faq.title")}</h2>
-          <p {...textEditProps("column.faq.description")}>{getText(content, "column.faq.description")}</p>
+      <section className={styles.consult}>
+        <div>
+          <span {...textEditProps("column.consult.eyebrow")}>{getText(content, "column.consult.eyebrow")}</span>
+          <h2 className={styles.desktopConsultTitle} {...textEditProps("column.consult.title")}>{consultTitle}</h2>
+          <h2 className={styles.mobileConsultTitle}>
+            {mobileConsultLead}
+            {mobileConsultRest ? <><br />{mobileConsultRest}</> : null}
+          </h2>
+          <p className={styles.mobileConsultLocation}>{consultLocation} · 02-6958-7525</p>
         </div>
-        <FaqList items={mainFaqs} scrollWorldLayer="depth" />
-      </section>
-
-      <section className={styles.treatmentsSection} data-scroll-world-scene data-scroll-world-strength="subtle" data-column-section-motion="treatments">
-        <h2 data-scroll-world-layer="copy" {...textEditProps("column.treatments.title")}>{getText(content, "column.treatments.title")}</h2>
-        <div className={styles.treatmentGrid} data-scroll-world-layer="depth">
-          {treatmentCards.map((treatment) => {
-            const imageId = `treatments.${treatment.slug}.thumbnail`;
-            const card = <>
-              <ImageSlot className={styles.treatmentPhoto} label="" alt="" editId={imageId} image={getImage(content, imageId)} sizes="(max-width: 640px) 88vw, (max-width: 1024px) 42vw, 25vw" />
-              <span className={styles.treatmentShade} aria-hidden="true" />
-              <div className={styles.treatmentCopy}>
-                <span className={styles.treatmentCategory}>{treatment.categoryName}</span>
-                <b>{treatment.displayName}</b>
-                <span>{treatment.displayDescription}</span>
-                <small>{TREATMENT_PAGES_READY ? getText(content, "column.treatments.links") : "시술 안내 준비 중"}</small>
-              </div>
-            </>;
-            return TREATMENT_PAGES_READY ? (
-              <Link className={styles.treatmentCard} href={treatment.detailPath} key={treatment.slug}>{card}</Link>
-            ) : (
-              <div className={styles.treatmentCard} key={treatment.slug} role="link" aria-disabled="true">{card}</div>
-            );
-          })}
+        <div className={styles.consultActions}>
+          <a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer" {...textEditProps("column.consult.kakao")}>{getText(content, "column.consult.kakao")}</a>
+          <a href="tel:0269587525">02-6958-7525</a>
         </div>
       </section>
 
-      <PrinciplesHeroSlider content={content} />
-
-      <section className={styles.infoSection} id="location" data-scroll-world-scene data-scroll-world-strength="subtle">
-        <KakaoMap className={styles.map} apiKey={process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? ""} address={getText(content, "clinic.address.street")} lat={locationLat} lng={locationLng} fallbackEditId="column.location.map" fallbackImage={getImage(content, "column.location.map")} scrollWorldLayer="depth" />
-        <div data-scroll-world-layer="copy">
-          <h2 {...textEditProps("column.location.title")}>{getText(content, "column.location.title")}</h2>
-          <p>{getClinicAddress(content)}</p>
-          <p>{getDisplayedHours(content)} <ClinicOpenStatus content={content} /></p>
-          <a className={styles.phone} href={phoneHref} {...textEditProps("common.clinic.phone")}>{phone}</a>
-          <div className={styles.infoButtons}><ButtonLink href={reserveUrl} variant="taupe" target={reserveUrl.startsWith("http") ? "_blank" : undefined} rel={reserveUrl.startsWith("http") ? "noopener noreferrer" : undefined}><span {...textEditProps("column.location.reserve")}>{getText(content, "column.location.reserve")}</span></ButtonLink>{kakaoUrl ? <ButtonLink href={kakaoUrl} variant="outline" target="_blank" rel="noopener noreferrer"><span {...textEditProps("column.location.kakao")}>{getText(content, "column.location.kakao")}</span></ButtonLink> : null}</div>
-        </div>
-      </section>
-
-      <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft">
-        <div data-scroll-world-layer="copy"><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><p {...textEditProps("column.footer.notice")}>{getText(content, "column.footer.notice")}</p><p {...textEditProps("column.footer.business")}>{getText(content, "column.footer.business")}</p></div>
-        <div data-scroll-world-layer="counter"><p {...textEditProps("column.footer.links")}>{getText(content, "column.footer.links")}</p><FooterPolicyLinks content={content} /><p {...textEditProps("column.footer.sitemap")}>{getText(content, "column.footer.sitemap")}</p></div>
-      </footer>
-
-      <FloatingQuickMenu content={content} compact />
-      <ColumnMainMotion />
+      <ColumnFooter content={content} />
+      <nav className={styles.mobileBottomBar} aria-label="빠른 상담">
+        <a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer"><ChatBubbleLeftEllipsisIcon aria-hidden="true" />카카오톡 상담</a>
+        <a href="tel:0269587525">전화 02-6958-7525</a>
+      </nav>
       <DevEditorMount page="column" content={content} />
       <JsonLd value={pageGraph} />
     </main>

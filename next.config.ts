@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
   skipTrailingSlashRedirect: true,
-  images: { formats: ["image/avif", "image/webp"] },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async redirects() {
     return [
       { source: "/en", destination: "/", permanent: true },

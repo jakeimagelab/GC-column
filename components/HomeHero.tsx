@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { HeroSlide } from "@/content/site-content-types";
 import { textEditProps } from "@/content/site-content-types";
 import { isVisualEditingMode } from "@/lib/motion";
@@ -28,7 +28,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
   const [motionReady, setMotionReady] = useState(false);
   const [boardSlides, setBoardSlides] = useState<HeroSlide[] | null>(null);
   const indexRef = useRef(index);
-  const activeSlides = boardSlides ?? slides;
+  const activeSlides = useMemo(() => (boardSlides ?? slides).slice(0, 1), [boardSlides, slides]);
 
   indexRef.current = index;
 
@@ -148,7 +148,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
         </h1>
         <p {...textEditProps(`home.hero.slides.${current.id}.description`)}>{current.description}</p>
       </div>
-      <div className={styles.heroPager} aria-label="히어로 슬라이드">
+      {activeSlides.length > 1 ? <div className={styles.heroPager} aria-label="히어로 슬라이드">
         <button type="button" data-edit-control onClick={() => setIndex(index)} aria-label={`${String(index + 1).padStart(2, "0")} · ${index + 1}번 슬라이드`}>{String(index + 1).padStart(2, "0")}</button>
         <span>
           <i
@@ -167,7 +167,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
         </span>
         <button type="button" data-edit-control onClick={() => setIndex(activeSlides.length - 1)} aria-label={`${String(activeSlides.length).padStart(2, "0")} · ${activeSlides.length}번 슬라이드`}>{String(activeSlides.length).padStart(2, "0")}</button>
         {!editMode && activeSlides.length > 1 ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "히어로 슬라이드 재생" : "히어로 슬라이드 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
-      </div>
+      </div> : null}
     </div>
   );
 }

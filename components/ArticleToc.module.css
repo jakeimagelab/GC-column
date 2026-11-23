@@ -1,28 +1,36 @@
 .toc {
-  border: 1px solid var(--line);
-  padding: 22px;
+  padding: 24px;
+  background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   font-size: 14px;
 }
 
 .toc b {
-  font-size: 15px;
+  margin-bottom: 18px;
+  color: #766e66;
+  font-family: var(--font-en);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .28em;
+  white-space: nowrap;
 }
 
 .toc a {
-  color: var(--ink);
-  padding-left: 12px;
-  border-left: 2px solid transparent;
+  min-height: 38px;
+  padding: 8px 0 8px 14px;
+  border-left: 1px solid #ddd7ce;
+  color: #766e66;
+  line-height: 1.55;
   transition: color 300ms ease, border-color 300ms ease;
 }
 
 .toc a:hover,
 .toc .active {
-  color: var(--brown);
-  font-weight: 500;
-  border-left-color: var(--taupe);
+  border-left: 2px solid #3a3028;
+  color: #3a3028;
+  font-weight: 700;
 }
 
 .compact {
@@ -31,8 +39,81 @@
   font-size: 15px;
 }
 
+.mobileToc { display: none; }
+
 @media (max-width: 640px) {
   .compact a {
     padding: 4px 0;
   }
+
+  .mobileToc {
+    position: sticky;
+    z-index: 1180;
+    top: 56px;
+    width: 100%;
+    height: 47px;
+    margin-top: 56px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(31, 24, 19, .08);
+    display: block;
+  }
+
+  .progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #eee8e1;
+    overflow: hidden;
+  }
+
+  .progress i {
+    width: 100%;
+    height: 100%;
+    background: #ff4714;
+    display: block;
+    transform-origin: left center;
+  }
+
+  .mobileToc > button {
+    width: 100%;
+    height: 47px;
+    padding: 2px 22px 0;
+    border: 0;
+    background: transparent;
+    color: #3a3028;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) 14px;
+    align-items: center;
+    gap: 11px;
+    text-align: left;
+  }
+
+  .mobileToc > button span { color: #766e66; font-size: 12px; white-space: nowrap; }
+  .mobileToc > button b { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+  .mobileToc > button svg { width: 14px; transition: transform .2s ease; }
+  .mobileToc > button[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+  .mobileSheet,
+  .mobileSheetOpen {
+    position: absolute;
+    top: 47px;
+    left: 0;
+    right: 0;
+    max-height: min(62vh, 430px);
+    padding: 10px 22px 18px;
+    background: #fff;
+    box-shadow: 0 16px 30px rgba(31, 24, 19, .14);
+    overflow-y: auto;
+    display: none;
+  }
+
+  .mobileSheetOpen { display: flex; flex-direction: column; }
+  .mobileSheetOpen a { padding: 10px 0; border-bottom: 1px solid #eee8e1; color: #766e66; font-size: 13px; line-height: 1.5; }
+  .mobileSheetOpen .active { color: #3a3028; font-weight: 700; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileToc > button svg { transition: none; }
 }

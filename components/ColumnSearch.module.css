@@ -1,41 +1,108 @@
-.search { position: relative; width: 100%; min-width: 0; }
-.inputRow { height: 68px; padding: 0 12px 0 24px; background: #fff; color: var(--ink); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25); display: flex; align-items: center; gap: 12px; }
-.inputRow label { color: var(--brown); font-size: 14px; font-weight: 700; white-space: nowrap; }
-.inputRow input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 19px; }
-.inputRow button { border: 0; cursor: pointer; }
-.clear { padding: 10px 12px; background: none; color: var(--muted-2); font-size: 14px; }
-.submit { padding: 14px 22px; background: var(--ink); color: #fff; font-size: 15px; }
-.resultRegion { opacity: 0; transition: opacity 0.2s ease; }
+.search {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: #3a3028;
+}
+
+.inputRow {
+  position: relative;
+  height: 80px;
+  padding: 10px 10px 10px 30px;
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(31, 24, 19, .18);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.inputRow label {
+  flex: none;
+  color: #3a3028;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.searchIcon { display: none; }
+
+.inputRow input {
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #3a3028;
+  font-size: 18px;
+}
+
+.inputRow input::placeholder { color: #8b837b; opacity: 1; }
+.inputRow button { border: 0; cursor: pointer; white-space: nowrap; }
+.clear { padding: 10px 4px; background: none; color: #766e66; font-size: 13px; }
+.submit { width: 96px; height: 58px; background: #2b2520; color: #fff; font-size: 15px; }
+.resultRegion { opacity: 0; transition: opacity .2s ease; }
 .resultRegionVisible { opacity: 1; }
-.results, .empty { position: absolute; top: 76px; left: 0; width: 100%; z-index: 30; background: #fff; color: var(--ink); box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25); }
+
+.results,
+.empty {
+  position: absolute;
+  z-index: 40;
+  top: 88px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  color: #3a3028;
+  box-shadow: 0 24px 48px rgba(31, 24, 19, .2);
+}
+
 .results { display: grid; grid-template-columns: 240px minmax(0, 1fr); }
-.related { padding: 24px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
+.related { padding: 24px; background: #f2ede6; display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
 .related > div { display: flex; flex-wrap: wrap; gap: 8px; }
-.related button { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-size: 13px; }
-.related small { margin-top: 6px; color: var(--muted); font-size: 12px; }
+.related button { padding: 6px 12px; border: 1px solid #d6cec3; border-radius: 999px; background: #fff; color: #3a3028; font-size: 13px; }
+.related small { margin-top: 6px; color: #766e66; font-size: 12px; }
 .resultContent { padding: 24px 28px; display: flex; flex-direction: column; gap: 16px; }
-.columnResults, .faqResults { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
-.columnResults > a { padding: 10px 0; border-bottom: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 2px; }
-.columnResults small { color: var(--brown); font-size: 12px; }
+.columnResults,
+.faqResults { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.columnResults > a { padding: 10px 0; border-bottom: 1px solid #eee8e1; display: flex; flex-direction: column; gap: 2px; }
+.columnResults small { color: #8c7b6b; font-size: 12px; }
 .columnResults strong { font-size: 16px; }
-.columnResults span { color: var(--muted); font-size: 13px; }
+.columnResults span { color: #766e66; font-size: 13px; }
 .faqResults { gap: 6px; }
-.treatmentLine { padding-top: 12px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 13px; }
-.treatmentLine b { color: var(--ink); }
+.treatmentLine { padding-top: 12px; border-top: 1px solid #eee8e1; color: #766e66; font-size: 13px; }
+.treatmentLine b { color: #3a3028; }
 .empty { padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .empty > div { display: flex; flex-direction: column; gap: 4px; }
 .empty > div b { font-size: 16px; }
-.empty > div span { color: var(--muted); font-size: 14px; }
-.empty button { padding: 12px 18px; border: 0; background: var(--taupe); color: #fff; font-size: 14px; white-space: nowrap; }
-.popular { margin-top: 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
-.popular span { color: #ede7e0; }
-.popular button { padding: 6px 12px; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 13px; }
+.empty > div span { color: #766e66; font-size: 14px; }
+.empty button { padding: 12px 18px; background: #3a3028; color: #fff; font-size: 14px; }
+
+.popular {
+  min-height: 58px;
+  padding-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.popular span { padding: 8px 10px 0 0; color: #766e66; white-space: nowrap; }
+.popular button { min-height: 34px; padding: 6px 16px; border: 1px solid #d6cec3; border-radius: 999px; background: #fff; color: #3a3028; font-size: 12px; }
 
 @media (max-width: 640px) {
-  .inputRow { height: 60px; padding-left: 16px; }
-  .inputRow label, .submit { display: none; }
-  .inputRow input { font-size: 16px; }
+  .inputRow { height: 56px; padding: 6px 6px 6px 16px; gap: 9px; }
+  .inputRow label { display: none; }
+  .searchIcon { width: 17px; height: 17px; color: #766e66; display: block; flex: none; }
+  .inputRow input { font-size: 14px; }
+  .submit { width: 62px; height: 44px; }
+  .clear { display: none; }
   .results { grid-template-columns: 1fr; max-height: 470px; overflow: auto; }
   .related, .resultContent { padding: 18px; }
   .empty { align-items: stretch; flex-direction: column; }
+  .popular { min-height: 88px; padding-top: 12px; flex-wrap: nowrap; gap: 6px; overflow: hidden; }
+  .popular span { display: none; }
+  .popular button { min-height: 34px; padding: 0 10px; font-size: 12px; flex: 0 1 auto; }
 }
+
+@media (prefers-reduced-motion: reduce) { .resultRegion { transition-duration: .01ms; } }

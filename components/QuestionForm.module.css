@@ -19,15 +19,16 @@
 .compact .heading h2 { font-size: 19px; }
 .compact textarea { min-height: 120px; }
 .compact .count { top: 88px; }
-.sidebar { padding: 20px; gap: 15px; }
-.sidebar .heading h2 { font-size: 18px; line-height: 1.45; }
+.sidebar { padding: 24px; gap: 15px; }
+.sidebar .heading h2 { font-family: var(--font-magazine); font-size: 20px; font-weight: 400; letter-spacing: -.03em; line-height: 1.45; }
 .sidebar .heading p { margin-top: 5px; font-size: 12px; line-height: 1.6; }
 .sidebar form { gap: 10px; }
 .sidebar textarea { min-height: 112px; padding: 13px 14px 30px; font-size: 13px; resize: vertical; }
-.sidebar .count { top: 82px; right: 11px; }
-.sidebar .notice { padding: 9px 10px; font-size: 11px; line-height: 1.55; }
+.sidebar .count { display: none; }
+.sidebar .notice { padding: 0; background: transparent; font-size: 11px; line-height: 1.55; }
 .sidebar .check { gap: 7px; font-size: 11px; line-height: 1.55; }
 .sidebar .actions { align-items: stretch; flex-direction: column; gap: 8px; }
-.sidebar .actions button { width: 100%; min-height: 44px; }
+.sidebar .actions button { width: 100%; min-height: 48px; background: #3a3028; }
+.sidebar .actions button:disabled { opacity: 1; }
 .sidebar .actions span { line-height: 1.5; }
 @media (max-width: 640px) { .section { padding: 22px 20px; } .actions { align-items: flex-start; flex-direction: column; } .actions button { width: 100%; } }

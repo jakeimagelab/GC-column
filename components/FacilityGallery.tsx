@@ -18,8 +18,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const [editMode, setEditMode] = useState(false);
   const [boardPreview, setBoardPreview] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [interactionPaused, setInteractionPaused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
+  const [rotationActive, setRotationActive] = useState(false);
   const [dragging, setDragging] = useState(false);
   const modalTouchStart = useRef<number | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -35,7 +34,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   const galleryRef = useRef<HTMLElement>(null);
   const roomName = (roomIndex: number) => getText(content, `home.gallery.room.${roomKeys[roomIndex]}`);
   const roomImage = (roomIndex: number) => getImage(content, `home.gallery.${roomKeys[roomIndex]}`);
-  const paused = interactionPaused || userPaused || editMode || reducedMotion || dragging;
+  const rotating = rotationActive && !editMode && !reducedMotion && !dragging;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -49,10 +48,10 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
   }, []);
 
   useEffect(() => {
-    if (paused || roomKeys.length <= 1) return;
-    const timer = window.setTimeout(() => setIndex((current) => (current + 1) % roomKeys.length), 4000);
-    return () => window.clearTimeout(timer);
-  }, [index, paused]);
+    if (!rotating || roomKeys.length <= 1) return;
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % roomKeys.length), 2200);
+    return () => window.clearInterval(timer);
+  }, [rotating]);
 
   useEffect(() => {
     if (editMode || reducedMotion) return;
@@ -104,12 +103,16 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     const moved = stageDrag.current.moved;
     if (stageDrag.current.frame) window.cancelAnimationFrame(stageDrag.current.frame);
     stageDrag.current = { active: false, startX: 0, distance: 0, moved: false, frame: 0 };
-    stageRef.current?.style.removeProperty("--gallery-drag");
-    setDragging(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-    if (!commit || !moved) return;
+    if (!commit || !moved) {
+      stageRef.current?.style.removeProperty("--gallery-drag");
+      setDragging(false);
+      return;
+    }
     suppressStageClick.current = true;
     swipe(distance);
+    setDragging(false);
+    window.requestAnimationFrame(() => stageRef.current?.style.removeProperty("--gallery-drag"));
     window.setTimeout(() => { suppressStageClick.current = false; }, 0);
   };
   const startStageDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -151,10 +154,10 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
       className={styles.gallery}
       id="gallery"
       data-scroll-world-scene
-      onMouseEnter={() => setInteractionPaused(true)}
-      onMouseLeave={() => setInteractionPaused(false)}
-      onFocusCapture={() => setInteractionPaused(true)}
-      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false); }}
+      onMouseEnter={() => setRotationActive(true)}
+      onMouseLeave={() => setRotationActive(false)}
+      onFocusCapture={() => setRotationActive(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setRotationActive(false); }}
     >
       <div ref={bandRef} className={styles.leftBand} />
       <ImageSlot className={styles.blurBackground} label="" alt="" editId="home.gallery.background" image={getImage(content, "home.gallery.background")} />
@@ -203,7 +206,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
           <span>{String(index + 1).padStart(2, "0")} / {String(roomKeys.length).padStart(2, "0")}</span>
           <button type="button" onClick={() => setIndex((current) => (current + 1) % roomKeys.length)} aria-label="다음 시설 사진">›</button>
         </div> : null}
-        {!editMode ? <button type="button" className={styles.pauseButton} aria-pressed={userPaused} aria-label={userPaused ? "시설 사진 자동 넘김 재생" : "시설 사진 자동 넘김 멈춤"} onClick={() => setUserPaused((value) => !value)}>{userPaused ? "▶" : "Ⅱ"}</button> : null}
       </div>
 
       {modalIndex !== null && roomImage(modalIndex).src ? <div className={styles.modal} role="dialog" aria-modal="true" aria-label={`${roomName(modalIndex)} 크게 보기`} onMouseDown={(event) => { if (event.target === event.currentTarget) setModalIndex(null); }} onTouchStart={(event) => { modalTouchStart.current = event.changedTouches[0]?.clientX ?? null; }} onTouchEnd={(event) => { if (modalTouchStart.current === null) return; const distance = (event.changedTouches[0]?.clientX ?? modalTouchStart.current) - modalTouchStart.current; if (Math.abs(distance) > 50) setModalIndex(nextAvailable(modalIndex, distance > 0 ? -1 : 1)); modalTouchStart.current = null; }}>

@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-*/
 out/
 output/
 .next-qa/
@@ -7,8 +8,15 @@ output/
 *.log
 *.tsbuildinfo
 .playwright-cli/
+.playwright-cli-daemon/
+.playwright-daemon/
 .git-local/
-.env.local
-.env*.local
+.vercel/
+.env*
+!.env.example
 photos-inbox/
 content-brief/
+backup/
+docs/compare/photo-audit/
+public/generated/
+public/uploads/archive/

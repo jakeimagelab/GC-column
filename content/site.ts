@@ -14,6 +14,11 @@ export const doctor: Doctor = {
     "前 에이스의원 원장",
     "[학회·자격]",
   ],
+  promises: [
+    "가족에게 권하지 못하는 시술이라면 환자에게도 권하지 않겠습니다.",
+    "상담을 진행한 원장이 직접 시술하여 시술 퀄리티를 보장드리겠습니다.",
+    "시술 후 불편감이 생길 시 철저한 사후관리를 약속드리겠습니다.",
+  ],
 };
 
 export const columnExcerpts: Record<"home" | "main", Record<string, string>> = {

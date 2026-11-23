@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import styles from "./ColumnSearch.module.css";
@@ -104,6 +105,7 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
     <div className={styles.search} id="search">
       <div className={styles.inputRow}>
         <label htmlFor="column-search" {...textEditProps("column.search.label")}>{getText(content, "column.search.label")}</label>
+        <MagnifyingGlassIcon className={styles.searchIcon} aria-hidden="true" />
         <input
           ref={inputRef}
           id="column-search"
@@ -135,7 +137,7 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
           placeholder={getText(content, "column.search.placeholder")}
           data-edit-control
         />
-        <button type="button" className={styles.clear} aria-label="검색어 지우기" onClick={() => chooseQuery("")} data-edit-control>{getText(content, "column.search.clear")}</button>
+        {query ? <button type="button" className={styles.clear} aria-label="검색어 지우기" onClick={() => chooseQuery("")} data-edit-control>{getText(content, "column.search.clear")}</button> : null}
         <button type="button" className={styles.submit} onClick={() => runSearch(query)} data-edit-control>{getText(content, "column.search.submit")}</button>
         {suggestionsOpen ? <SearchAutocomplete id="column-search-suggestions" items={suggestions} query={query} activeIndex={activeSuggestion} onActive={setActiveSuggestion} onSelect={selectSuggestion} /> : null}
       </div>

@@ -11,7 +11,8 @@ export default async function ColumnOpenGraphImage({ params }: { params: Promise
   const { slug } = await params;
   const column = getVisibleColumn(slug);
   if (!column) notFound();
-  const background = column.photo.src ? (column.photo.src.startsWith("http") ? column.photo.src : `${SITE_URL}${column.photo.src}`) : undefined;
+  const image = column.listImage ?? column.heroImage ?? column.photo.src;
+  const background = image ? (image.startsWith("http") ? image : `${SITE_URL}${image}`) : undefined;
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", padding: "68px 78px", background: background ? `linear-gradient(rgba(43,43,43,.72),rgba(43,43,43,.72)),url(${background}) center/cover` : "#BAAB9C", color: "#fff", fontFamily: "Noto Sans KR, sans-serif" }}>
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: "100%" }}>

@@ -7,9 +7,15 @@ export function isVisualEditingMode() {
 }
 
 const HIGHLIGHT_PATTERN = /==([^=\n]+)==/g;
+const BOLD_PATTERN = /\*\*([^*\n]+)\*\*/g;
+const REVIEW_MARKER_PATTERN = /\s*\[(?:원장 확인|광고 검토)\]/g;
 
 export function stripMotionMarkup(value: string) {
-  return value.replace(HIGHLIGHT_PATTERN, "$1");
+  return value
+    .replace(HIGHLIGHT_PATTERN, "$1")
+    .replace(BOLD_PATTERN, "$1")
+    .replace(REVIEW_MARKER_PATTERN, "")
+    .trim();
 }
 
 export function extractFirstNumber(value: string, fallback = 0) {

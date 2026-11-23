@@ -1,29 +1,51 @@
-.list {
-  border-bottom: 1px solid var(--slot);
-}
+.list { border-top: 1px solid #ddd7ce; }
+.item { border-bottom: 1px solid #ddd7ce; }
+.summary { width: 100%; min-height: 76px; padding: 0; border: 0; background: transparent; color: inherit; display: grid; grid-template-columns: 62px minmax(0, 1fr) 44px; align-items: center; gap: 20px; text-align: left; cursor: pointer; }
+.number { color: #8c7b6b; font-family: var(--font-en); font-size: 28px; font-weight: 300; }
+.question { font-family: var(--font-magazine); font-size: 23px; font-weight: 400; letter-spacing: -.03em; line-height: 1.45; text-wrap: pretty; }
+.toggle { width: 36px; height: 36px; border: 1px solid currentColor; border-radius: 50%; display: grid; place-items: center; font-size: 21px; font-weight: 300; }
+.answerWrap { padding: 0 64px 28px 82px; }
+.answer { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.answer > span { padding: 5px 10px; background: #3a3028; color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.answer p { margin: 0; font-size: 16px; line-height: 1.85; text-wrap: pretty; }
+.firstSentence { font-weight: inherit; }
+.answerRest { font-weight: 400; }
+.answer a { color: inherit; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; }
 
-.item {
-  border-top: 1px solid var(--slot);
-}
+.magazine { border-color: rgb(255 255 255 / 25%); }
+.magazine .item { border-color: rgb(255 255 255 / 20%); }
+.magazine .summary { min-height: 124px; grid-template-columns: 126px minmax(0, 1fr) 48px; gap: 18px; }
+.magazine .number { color: transparent; font-size: 64px; -webkit-text-stroke: 1px rgb(255 255 255 / 48%); }
+.magazine .open .number { color: #fff; -webkit-text-stroke: 0; }
+.magazine .question { font-size: 32px; }
+.magazine .toggle { width: 44px; height: 44px; border-color: rgb(255 255 255 / 60%); }
+.magazine .answerWrap { padding: 0 72px 40px 144px; }
+.magazine .answer > span { background: #fff; color: #6e6157; }
+.magazine .answer p { max-width: 900px; font-size: 17px; }
 
-.question {
-  width: 100%;
-  min-height: 56px;
-  padding: 14px 0;
-  background: none;
-  border: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 16px;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-}
-
-.answer {
-  padding: 0 0 18px;
-  color: #444;
-  font-size: 15px;
+@media (max-width: 720px) {
+  .summary { min-height: 72px; grid-template-columns: 38px minmax(0, 1fr) 34px; gap: 10px; }
+  .number { font-size: 20px; }
+  .question { font-size: 18px; }
+  .toggle { width: 32px; height: 32px; }
+  .answerWrap { padding: 0 44px 24px 48px; }
+  .magazine .summary { min-height: 90px; grid-template-columns: 54px minmax(0, 1fr) 38px; gap: 10px; }
+  .magazine .number { font-size: 30px; }
+  .magazine .question { font-size: 18px; line-height: 1.5; }
+  .magazine .toggle { width: 36px; height: 36px; }
+  .magazine .answerWrap { padding: 0 42px 30px 64px; }
+  .magazine .answer p { font-size: 15px; }
+  .magazine .firstSentence { font-weight: 700; }
+  .magazine .answerRest { font-weight: 400; }
+  .magazine .issueItem .summary { min-height: 78px; grid-template-columns: 18px minmax(0, 1fr) 16px; gap: 10px; }
+  .magazine .issueItem .number { color: rgb(255 255 255 / 72%); font-size: 0; -webkit-text-stroke: 0; }
+  .magazine .issueItem .number::after { font-family: var(--font-en); font-size: 13px; font-weight: 500; content: "Q"; }
+  .magazine .issueItem .question { font-family: var(--font-sans); font-size: 16px; font-weight: 500; letter-spacing: -.02em; line-height: 1.55; }
+  .magazine .issueItem .toggle { width: 16px; height: 16px; border: 0; font-size: 16px; transition: transform .2s ease; }
+  .magazine .issueItem.open .toggle { transform: rotate(45deg); }
+  .magazine .issueItem .answerWrap { padding: 0 16px 30px 28px; }
+  .magazine .issueItem .answer { gap: 12px; }
+  .magazine .issueItem .answer > span { display: none; }
+  .magazine .issueItem .answer p { font-size: 14px; line-height: 1.85; }
+  .magazine .issueItem:nth-child(n+4) { display: none; }
 }

@@ -8,7 +8,7 @@ import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { JsonLd } from "@/components/JsonLd";
 import { containsPlaceholder, getVisibleColumns } from "@/content/columns";
 import { getText } from "@/content/site-content-types";
-import { categories, getCategory, treatments } from "@/content/treatments";
+import { categories, getCategory, isTreatmentPageVisible, treatments } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, graph } from "@/lib/seo";
 import styles from "@/app/seo-pages.module.css";
@@ -34,7 +34,7 @@ export default async function CategoryPage({ params }: Props) {
   const content = await readSiteContent();
   const description = getText(content, `column.category.${category.slug}.intro`);
   const columns = getVisibleColumns().filter((column) => column.categorySlug === category.slug);
-  const relatedTreatments = treatments.filter((treatment) => treatment.categorySlug === category.slug && !containsPlaceholder(treatment));
+  const relatedTreatments = treatments.filter((treatment) => treatment.categorySlug === category.slug && isTreatmentPageVisible(treatment.slug) && !containsPlaceholder(treatment));
   const faqs = columns.flatMap((column) => column.faqs);
   const pageGraph = graph(content, collectionNodes(`/column/category/${category.slug}`, `${category.name} 칼럼`, description, columns));
 

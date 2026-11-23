@@ -196,36 +196,48 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
   const categoryUrl = `${SITE_URL}/column/category/${column.categorySlug}`;
   const procedures = column.treatmentSlugs.flatMap((slug) => {
     const treatment = getTreatment(slug);
-    return treatment && publicText(treatment.name) ? [{ "@type": "MedicalProcedure", name: treatment.name }] : [];
+    return treatment && publicText(treatment.name) ? [{
+      "@type": "MedicalProcedure",
+      "@id": `${SITE_URL}${treatment.detailPath}#procedure`,
+      name: treatment.name,
+    }] : [];
   });
   const faqId = `${url}#faq`;
-  const image = absoluteAsset(column.photo.src);
-  const faq = {
-    "@type": "FAQPage",
-    "@id": faqId,
-    mainEntity: [
-      ...column.faqs.map((item, index) => ({
+  const image = absoluteAsset(column.heroImage ?? column.listImage ?? column.photo.src);
+  const publicFaqs = column.faqs.flatMap((item, index) => {
+    if (item.needsReview || !publicText(item.q) || !publicText(item.a)) return [];
+    return [{
       "@type": "Question",
       "@id": `${url}#faq-${index + 1}`,
       name: stripMotionMarkup(item.q),
       acceptedAnswer: { "@type": "Answer", text: stripMotionMarkup(item.a) },
-      })),
-      ...readerQuestions.flatMap((item) => item.answer ? [{
-        "@type": "Question",
-        "@id": `${url}#reader-${item.id}`,
-        name: stripMotionMarkup(item.question),
-        acceptedAnswer: { "@type": "Answer", text: stripMotionMarkup(item.answer) },
-      }] : []),
+    }];
+  });
+  const publicFaqQuestions = new Set(publicFaqs.map((item) => String(item.name).replace(/\s+/g, "").replace(/[?？]/g, "")));
+  const faq = {
+    "@type": "FAQPage",
+    "@id": faqId,
+    mainEntity: [
+      ...publicFaqs,
+      ...readerQuestions.flatMap((item) => {
+        const normalized = item.question.replace(/\s+/g, "").replace(/[?？]/g, "");
+        if (!item.answer || publicFaqQuestions.has(normalized)) return [];
+        return [{
+          "@type": "Question",
+          "@id": `${url}#reader-${item.id}`,
+          name: stripMotionMarkup(item.question),
+          acceptedAnswer: { "@type": "Answer", text: stripMotionMarkup(item.answer) },
+        }];
+      }),
     ],
   };
-  const video = column.video && publicText(column.video.transcript) && publicText(column.video.name) ? {
+  const video = column.video && publicText(column.video.transcript) && publicText(column.video.src) ? {
     "@type": "VideoObject",
-    name: column.video.name,
-    description: publicText(column.video.description),
-    thumbnailUrl: publicText(column.video.thumbnailUrl),
+    name: column.title,
+    description: sentenceDescription(column.summary),
+    thumbnailUrl: absoluteAsset(column.video.poster),
     uploadDate: publicText(column.video.uploadDate),
-    contentUrl: publicText(column.video.contentUrl),
-    embedUrl: publicText(column.video.embedUrl),
+    contentUrl: absoluteAsset(column.video.src),
     transcript: stripMotionMarkup(column.video.transcript),
   } : undefined;
 
@@ -239,7 +251,7 @@ export function articleGraph(content: SiteContent, column: Column, categoryName:
       inLanguage: "ko-KR",
       datePublished: column.publishedAt,
       dateModified: column.updatedAt,
-      lastReviewed: column.reviewedAt,
+      lastReviewed: column.reviewedAtNeedsReview ? undefined : column.reviewedAt,
       author: { "@id": `${SITE_URL}/doctor/lee-ho#physician` },
       reviewedBy: { "@id": `${SITE_URL}/doctor/lee-ho#physician` },
       publisher: { "@id": `${SITE_URL}/#clinic` },

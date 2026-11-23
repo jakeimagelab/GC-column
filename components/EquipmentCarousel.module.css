@@ -9,11 +9,13 @@
 .heading > div:last-child > span { color: var(--muted); font-size: 13px; }
 .heading button { width: 36px; height: 36px; border: 1px solid var(--line); background: #fff; color: var(--muted-2); font-size: 14px; cursor: pointer; }
 .heading button:disabled { cursor: default; opacity: 0.42; }
-.viewport { position: absolute; top: 150px; left: var(--home-gutter); right: var(--home-gutter); overflow-x: auto; overflow-y: hidden; cursor: grab; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x pan-y; }
+.viewport { position: absolute; top: 150px; left: var(--home-gutter); right: var(--home-gutter); overflow-x: auto; overflow-y: hidden; cursor: grab; scroll-behavior: smooth; scroll-padding-inline-start: 0; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x pan-y; }
+.viewportAuto { scroll-behavior: auto; scroll-snap-type: none; }
 .viewport::-webkit-scrollbar { display: none; }
 .viewportDragging { cursor: grabbing; scroll-behavior: auto; scroll-snap-type: none; user-select: none; }
-.track { display: flex; gap: var(--equipment-gap); width: max-content; }
+.track { width: max-content; padding-inline-start: 0; display: flex; gap: var(--equipment-gap); }
 .manualTrack .card { scroll-snap-align: start; }
+.viewportAuto .manualTrack .card { scroll-snap-align: none; }
 .editTrack { gap: var(--equipment-gap); transform: translate3d(var(--equipment-x), 0, 0); }
 .moving { transition: transform 0.6s ease; }
 .card { position: relative; width: calc((100vw - var(--home-gutter) - var(--home-gutter) - (var(--equipment-gap) * 4)) / 5); flex: 0 0 auto; outline: none; }
@@ -21,8 +23,9 @@
 .card > a, .disabledCard { color: #fff; display: flex; flex-direction: column; gap: 12px; }
 .card > a, .disabledCard { cursor: inherit; }
 .imageWrap { position: relative; height: 330px; display: flex; align-items: flex-end; justify-content: center; }
-.equipmentSlot { width: min(150px, 100%) !important; height: 310px; border: 1px dashed #b9b1a7; border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, 0.55); color: var(--brown); box-shadow: 0 16px 24px rgba(58, 51, 45, .18); font-size: 12px; transition: transform .5s cubic-bezier(.22,.61,.36,1), box-shadow .5s cubic-bezier(.22,.61,.36,1); }
-.card:hover .equipmentSlot, .card:focus-within .equipmentSlot { transform: translateY(-14px) scale(1.04); box-shadow: 0 30px 36px rgba(58, 51, 45, .3); }
+.equipmentSlot { width: min(150px, 100%) !important; height: 310px; border: 0; border-radius: 0; background: transparent; color: var(--brown); box-shadow: none; filter: drop-shadow(0 16px 12px rgba(58, 51, 45, .18)); font-size: 12px; transition: transform .5s cubic-bezier(.22,.61,.36,1), filter .5s cubic-bezier(.22,.61,.36,1); }
+.equipmentSlot img { object-fit: contain; }
+.card:hover .equipmentSlot, .card:focus-within .equipmentSlot { transform: translateY(-14px) scale(1.04); box-shadow: none; filter: drop-shadow(0 26px 18px rgba(58, 51, 45, .28)); }
 .benefitPanel { position: absolute; z-index: 4; left: 50%; bottom: 18px; width: min(180px, calc(100% - 16px)); padding: 13px 14px 14px; border: 1px solid rgba(255,255,255,.28); background: rgba(58,52,46,.92); color: #fff; opacity: 0; transform: translate(-50%, 18px) scale(.96); clip-path: inset(100% 0 0); box-shadow: 0 18px 34px rgba(43,43,43,.2); pointer-events: none; transition: opacity .28s ease, transform .6s cubic-bezier(.22,.61,.36,1), clip-path .6s cubic-bezier(.22,.61,.36,1); }
 .benefitPanel small { display: block; margin-bottom: 7px; color: #ddd5cb; font-family: var(--font-en); font-size: 9px; letter-spacing: 2px; }
 .benefitPanel span { display: block; font-size: 12px; line-height: 1.55; white-space: pre-line; }
@@ -51,8 +54,10 @@
 
 :global(.devEditActive) .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
 :global(.devEditActive) .benefitPanel { display: none; }
+:global(.devEditActive) .equipmentSlot,
+:global(.contentBoardCanvas) .equipmentSlot { border: 1px dashed #b9b1a7; background: rgba(255, 255, 255, 0.3); }
 :global(.contentBoardCanvas) .card:hover .equipmentSlot,
-:global(.contentBoardCanvas) .card:focus-within .equipmentSlot { transform: none; box-shadow: 0 16px 24px rgba(58, 51, 45, .18); }
+:global(.contentBoardCanvas) .card:focus-within .equipmentSlot { transform: none; box-shadow: none; filter: drop-shadow(0 16px 12px rgba(58, 51, 45, .18)); }
 :global(.contentBoardCanvas) .benefitPanel { display: none; }
 
 @media (max-width: 1024px) {

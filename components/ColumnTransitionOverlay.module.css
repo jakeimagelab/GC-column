@@ -1,0 +1,24 @@
+.layer { position: fixed; z-index: 10000; inset: 0; pointer-events: all; }
+.dimmer { position: absolute; inset: 0; background: rgba(20, 16, 12, .45); animation: transitionDim .8s cubic-bezier(.7,0,.2,1) both; }
+.cover { position: absolute; inset: 0; overflow: hidden; background: #3a3028; display: flex; align-items: center; justify-content: center; animation: transitionCover .8s cubic-bezier(.7,0,.2,1) both; }
+.masthead { color: #fff; display: flex; align-items: baseline; gap: clamp(22px, 3vw, 46px); font-family: var(--font-en); font-size: clamp(76px, 10.4167vw, 150px); line-height: .88; letter-spacing: -.055em; white-space: nowrap; }
+.masthead strong { font-weight: 700; }
+.masthead span { font-weight: 300; }
+.masthead i { font-size: .58em; font-style: normal; font-weight: 300; }
+
+:global(html[data-column-transition="active"]),
+:global(html[data-column-transition="active"] body) { overflow: hidden; }
+:global(html[data-column-transition="active"] main.pageFrame) { transform: translateX(-8%); transition: transform .8s cubic-bezier(.7,0,.2,1); }
+
+@keyframes transitionCover { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes transitionDim { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .layer { display: none; }
+  :global(html[data-column-transition="active"] main.pageFrame) { transform: none; transition: none; }
+}
+
+@media (max-width: 640px) {
+  .masthead { flex-direction: column; align-items: flex-start; gap: 10px; font-size: clamp(58px, 19vw, 78px); white-space: normal; }
+  .masthead i { display: none; }
+}

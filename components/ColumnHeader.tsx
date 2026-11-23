@@ -1,41 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { BrandMark } from "./BrandMark";
 import { ImageSlot } from "./ImageSlot";
-import { attributeEditProps, getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
-import { categories, megaMenuTreatmentOrder, treatments } from "@/content/treatments";
-import { TREATMENT_PAGES_READY } from "@/lib/config";
+import { getConcernItems, getImage, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
+import { categories, getTreatmentCategoryPath, megaMenuTreatmentOrder, treatments } from "@/content/treatments";
 import styles from "./ColumnHeader.module.css";
 
 type ColumnHeaderProps = { variant?: "taupe" | "overlay"; page?: "home" | "main" | "detail"; content: SiteContent };
-type Panel = "intro" | "treatments" | null;
+type Panel = "concerns" | (typeof categories)[number]["slug"] | null;
 
-const introItems = [
-  { key: "doctor" },
-  { key: "vision" },
-  { key: "equipment" },
-  { key: "gallery" },
-  { key: "location" },
-] as const;
+const menuGroups = categories.map((category) => ({
+  ...category,
+  items: megaMenuTreatmentOrder[category.slug].flatMap((slug) => {
+    const item = treatments.find((treatment) => treatment.slug === slug);
+    if (!item || /\[[^\]]+\]/.test(item.name)) return [];
+    return [{ ...item, menuLabel: item.menuName ?? item.name, menuDesc: item.desc.replace(/\s*\[[^\]]+\]\s*/g, " ").trim() }];
+  }),
+}));
 
-function Flag({ locale }: { locale: "KR" | "EN" | "CN" }) {
-  if (locale === "KR") return <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#fff" /><path d="M6.5 7a3.5 3.5 0 0 1 7 0z" fill="#CD2E3A" /><path d="M6.5 7a3.5 3.5 0 0 0 7 0z" fill="#0047A0" /></svg>;
-  if (locale === "EN") return <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#fff" /><rect width="20" height="2" fill="#B22234" /><rect y="4" width="20" height="2" fill="#B22234" /><rect y="8" width="20" height="2" fill="#B22234" /><rect y="12" width="20" height="2" fill="#B22234" /><rect width="9" height="8" fill="#3C3B6E" /></svg>;
-  return <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#DE2910" /><polygon points="4,2 4.9,4.6 7.6,4.6 5.4,6.2 6.2,8.8 4,7.2 1.8,8.8 2.6,6.2 0.4,4.6 3.1,4.6" fill="#FFDE00" /></svg>;
-}
-
-function TreatmentTarget({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return TREATMENT_PAGES_READY ? <Link href={href} className={className}>{children}</Link> : <div className={className} aria-disabled="true">{children}</div>;
+function Flag({ locale }: { locale: "us" | "cn" | "jp" }) {
+  if (locale === "us") return <svg viewBox="0 0 28 18" aria-hidden="true"><rect width="28" height="18" fill="#fff"/><path d="M0 1h28M0 4h28M0 7h28M0 10h28M0 13h28M0 16h28" stroke="#b22234" strokeWidth="2"/><rect width="12" height="10" fill="#3c3b6e"/><g fill="#fff"><circle cx="2" cy="2" r=".5"/><circle cx="5" cy="2" r=".5"/><circle cx="8" cy="2" r=".5"/><circle cx="10.5" cy="2" r=".5"/><circle cx="3.5" cy="4.5" r=".5"/><circle cx="6.5" cy="4.5" r=".5"/><circle cx="9.5" cy="4.5" r=".5"/><circle cx="2" cy="7" r=".5"/><circle cx="5" cy="7" r=".5"/><circle cx="8" cy="7" r=".5"/><circle cx="10.5" cy="7" r=".5"/></g></svg>;
+  if (locale === "cn") return <svg viewBox="0 0 28 18" aria-hidden="true"><rect width="28" height="18" fill="#de2910"/><path d="m5 2.2.9 2.6h2.7L6.4 6.4l.9 2.6L5 7.4 2.7 9l.9-2.6-2.2-1.6h2.7z" fill="#ffde00"/></svg>;
+  return <svg viewBox="0 0 28 18" aria-hidden="true"><rect width="28" height="18" fill="#fff"/><circle cx="14" cy="9" r="5" fill="#bc002d"/></svg>;
 }
 
 export function ColumnHeader({ content, variant = "taupe", page = "detail" }: ColumnHeaderProps) {
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const [panel, setPanel] = useState<Panel>(null);
+  const [panelPinned, setPanelPinned] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileCategory, setMobileCategory] = useState("");
+  const [mobileCategory, setMobileCategory] = useState<Panel>(null);
   const [scrolled, setScrolled] = useState(false);
   const isHome = page === "home";
+  const concerns = getConcernItems(content);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -45,63 +45,154 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
   }, []);
 
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { setPanel(null); setMobileOpen(false); }
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (surfaceRef.current && !surfaceRef.current.contains(event.target as Node)) {
+        setPanel(null);
+        setPanelPinned(false);
+      }
     };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePress);
   }, []);
 
-  const groups = categories.map((category) => ({
-    ...category,
-    items: megaMenuTreatmentOrder[category.slug].flatMap((slug) => {
-      const treatment = treatments.find((item) => item.slug === slug);
-      const hasPlaceholder = treatment && [treatment.name, treatment.desc, treatment.equipmentType].some((value) => value?.trim().startsWith("["));
-      return treatment && (process.env.NODE_ENV === "development" || !hasPlaceholder) ? [treatment] : [];
-    }),
-  }));
-  const open = panel !== null || mobileOpen;
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPanel(null);
+        setPanelPinned(false);
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, []);
+
+  const selectedGroup = panel && panel !== "concerns" ? menuGroups.find((group) => group.slug === panel) : undefined;
+  const lastHref = isHome ? "/column" : "/";
+  const lastLabel = isHome ? getText(content, "home.header.column") : getText(content, "common.header.homepage");
+  const showPanel = (next: Exclude<Panel, null>) => {
+    setPanel(next);
+    setPanelPinned(false);
+  };
+  const togglePanel = (next: Exclude<Panel, null>) => {
+    if (panel === next && panelPinned) {
+      setPanel(null);
+      setPanelPinned(false);
+      return;
+    }
+    setPanel(next);
+    setPanelPinned(true);
+  };
+  const closePanel = () => {
+    setPanel(null);
+    setPanelPinned(false);
+  };
 
   return (
     <div className={`${styles.shell} ${styles[variant]} ${isHome ? styles.home : ""}`}>
       <div
-        className={`${styles.surface} ${open ? styles.open : ""} ${scrolled ? styles.scrolled : ""}`}
-        onMouseLeave={() => setPanel(null)}
-        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPanel(null); }}
-        data-megamenu-open={panel ? "true" : "false"}
+        ref={surfaceRef}
+        className={`${styles.surface} ${panel || mobileOpen ? styles.open : ""} ${scrolled ? styles.scrolled : ""}`}
+        onMouseLeave={() => { if (!panelPinned) setPanel(null); }}
+        onBlur={(event) => { if (!panelPinned && !event.currentTarget.contains(event.relatedTarget)) setPanel(null); }}
       >
         <header className={styles.header}>
-          <Link className={styles.brand} href={isHome ? "/" : "/column"}>
-            <BrandMark image={getImage(content, "common.header.logo")} name={getText(content, "common.brand.name")} nameEn={isHome ? getText(content, "common.brand.nameEn") : undefined} compact={!isHome} plain={!isHome} />
+          <Link className={styles.brand} href={isHome ? "/" : "/column"} onMouseEnter={closePanel}>
+            <BrandMark image={getImage(content, "common.header.logo")} name={getText(content, "common.brand.name")} compact plain />
             {!isHome ? <span className={styles.badge} {...textEditProps("common.header.columnBadge")}>{getText(content, "common.header.columnBadge")}</span> : null}
           </Link>
 
-          <nav className={styles.nav} aria-label={isHome ? "주 메뉴" : "칼럼 카테고리"}>
-            {isHome ? <>
-              <button type="button" onMouseEnter={() => setPanel("intro")} onFocus={() => setPanel("intro")} {...textEditProps("home.header.about")}>{getText(content, "home.header.about")}</button>
-              {groups.map((group) => <button type="button" key={group.slug} onMouseEnter={() => setPanel("treatments")} onFocus={() => setPanel("treatments")}>{group.name}</button>)}
-              <Link href="/column" onMouseEnter={() => setPanel(null)}><b {...textEditProps("home.header.column")}>{getText(content, "home.header.column")}</b></Link>
-            </> : groups.map((group) => <Link key={group.slug} href={`/column/category/${group.slug}`} onMouseEnter={() => setPanel("treatments")} onFocus={() => setPanel("treatments")}>{group.name}</Link>)}
+          <nav className={styles.nav} aria-label="주 메뉴">
+            <button type="button" className={styles.hasMenu} onMouseEnter={() => showPanel("concerns")} onFocus={() => showPanel("concerns")} onClick={() => togglePanel("concerns")} aria-expanded={panel === "concerns"}>피부 고민 <i aria-hidden="true" /></button>
+            {menuGroups.map((group) => group.items.length ? (
+              <button type="button" key={group.slug} onMouseEnter={() => showPanel(group.slug)} onFocus={() => showPanel(group.slug)} onClick={() => togglePanel(group.slug)} aria-expanded={panel === group.slug}>{group.name}</button>
+            ) : (
+              <Link key={group.slug} href={`/column/category/${group.slug}`} onMouseEnter={closePanel}>{group.name}</Link>
+            ))}
+            <Link href={lastHref} onMouseEnter={closePanel}>{lastLabel}</Link>
           </nav>
 
-          <div className={styles.actions}>
-            {isHome ? <div className={styles.locales}>{(["KR", "EN", "CN"] as const).map((locale) => { const id = `home.header.locale.${locale.toLowerCase()}`; return locale === "KR" ? <Link href="/" key={locale}><Flag locale={locale} /><span {...textEditProps(id)}>{getText(content, id)}</span></Link> : <span className={styles.localeDisabled} aria-disabled="true" title="준비 중" key={locale}><Flag locale={locale} /><span {...textEditProps(id)}>{getText(content, id)}</span></span>; })}</div>
-              : page === "main" ? <><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link><span {...textEditProps("common.header.locales")}>{getText(content, "common.header.locales")}</span></>
-              : <><Link href="/column#search" {...textEditProps("common.header.search")}>{getText(content, "common.header.search")}</Link><Link href="/" {...textEditProps("common.header.homepage")}>{getText(content, "common.header.homepage")}</Link></>}
+          <div className={styles.locales} aria-label="언어 선택">
+            <Link href="/?locale=en" aria-label="English"><Flag locale="us" /></Link>
+            <Link href="/?locale=zh" aria-label="中文"><Flag locale="cn" /></Link>
+            <Link href="/?locale=ja" aria-label="日本語"><Flag locale="jp" /></Link>
           </div>
 
-          <button type="button" className={styles.menuButton} aria-label="메뉴 열기" aria-expanded={mobileOpen} onClick={() => setMobileOpen((value) => !value)}><span /><span /><span /></button>
+          <div className={styles.mobileActions}>
+            <Link className={styles.mobileSearch} href="/column#search" aria-label="칼럼 검색">
+              <MagnifyingGlassIcon aria-hidden="true" />
+            </Link>
+            <button type="button" className={styles.menuButton} aria-label={mobileOpen ? "메뉴 닫기" : "메뉴 열기"} aria-expanded={mobileOpen} onClick={() => { closePanel(); setMobileOpen((value) => !value); }}>
+              {mobileOpen ? <XMarkIcon aria-hidden="true" /> : <Bars3Icon aria-hidden="true" />}
+            </button>
+          </div>
         </header>
 
         <div className={`${styles.megaMenu} ${panel ? styles.megaMenuVisible : ""}`} aria-hidden={!panel}>
-          {panel === "intro" ? <div className={styles.introGrid}>{introItems.map((item) => { const prefix = `home.header.intro.${item.key}`; return <Link href={getText(content, `${prefix}.href`)} key={item.key} onClick={() => setPanel(null)} {...attributeEditProps(`${prefix}.href`, "href")}><ImageSlot className={styles.itemSlot} label="" alt="" editId={`${prefix}.thumbnail`} image={getImage(content, `${prefix}.thumbnail`)} sizes="72px" /><span className={styles.itemCopy}><b {...textEditProps(`${prefix}.label`)}>{getText(content, `${prefix}.label`)}</b><span {...textEditProps(`${prefix}.description`)}>{getText(content, `${prefix}.description`)}</span></span></Link>; })}</div>
-            : panel === "treatments" ? groups.map((group) => <section className={styles.megaGroup} key={group.slug}><Link className={styles.groupTitle} href={`/column/category/${group.slug}`}><span>{group.name}</span><small {...textEditProps("common.header.columnCount")}>{getText(content, "common.header.columnCount")}</small></Link><div className={styles.groupItems}>{group.items.map((item) => <TreatmentTarget href={item.detailPath} key={item.slug}><ImageSlot className={styles.itemSlot} label="" alt="" editId={`treatments.${item.slug}.thumbnail`} image={getImage(content, `treatments.${item.slug}.thumbnail`)} sizes="72px" /><span className={styles.itemCopy}><b>{item.name}</b><span>{item.desc}</span><small {...textEditProps("common.treatment.preparing")}>{TREATMENT_PAGES_READY ? getText(content, "common.header.relatedCount") : getText(content, "common.treatment.preparing")}</small></span></TreatmentTarget>)}</div><Link className={styles.moreButton} href={`/column/category/${group.slug}`} aria-label={`${group.name} 시술 더 보기`}>+</Link></section>) : null}
+          {panel === "concerns" ? (
+            <div className={styles.concernGrid}>
+              {concerns.map((concern) => (
+                <Link href={concern.link} key={concern.num} onClick={closePanel}>
+                  <span>{concern.num}</span>
+                  <span><b>{concern.name}</b><small>{concern.desc}</small></span>
+                  <i aria-hidden="true">→</i>
+                </Link>
+              ))}
+            </div>
+          ) : selectedGroup ? (
+            <section className={styles.treatmentPanel}>
+              <header>
+                <b>{selectedGroup.name}</b>
+                <div className={styles.panelHeaderLinks}>
+                  <Link href={getTreatmentCategoryPath(selectedGroup.slug)} onClick={closePanel}>{selectedGroup.name} 전체 보기 →</Link>
+                  <span>{selectedGroup.nameEn}</span>
+                </div>
+              </header>
+              <div className={styles.treatmentGrid}>
+                {selectedGroup.items.map((item) => {
+                  const image = getImage(content, `treatments.${item.slug}.thumbnail`);
+                  const hasLocalImage = image.src?.startsWith("/uploads/");
+                  const menuNameId = `treatments.${item.slug}.menuName`;
+                  const menuLabel = getText(content, menuNameId);
+                  return (
+                    <Link href={item.detailPath} key={item.slug} onClick={closePanel}>
+                      <span className={styles.itemVisual}>
+                        {hasLocalImage ? <ImageSlot className={styles.itemImage} label="" alt={image.alt} image={image} editId={`treatments.${item.slug}.thumbnail`} sizes="70px" unoptimized /> : <span className={styles.itemFallback} aria-hidden="true">{menuLabel.charAt(0)}</span>}
+                      </span>
+                      <span><b {...textEditProps(menuNameId)}>{menuLabel}</b>{item.menuDesc ? <small>{item.menuDesc}</small> : null}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <div className={`${styles.mobileMenu} ${mobileOpen ? styles.mobileMenuVisible : ""}`} aria-hidden={!mobileOpen}>
-          {isHome ? <section><button type="button" aria-expanded={mobileCategory === "intro"} onClick={() => setMobileCategory((value) => value === "intro" ? "" : "intro")}><span>{getText(content, "home.header.about")}</span><span>{mobileCategory === "intro" ? "−" : "+"}</span></button>{mobileCategory === "intro" ? <div>{introItems.map((item) => { const prefix = `home.header.intro.${item.key}`; return <Link href={getText(content, `${prefix}.href`)} key={item.key} onClick={() => setMobileOpen(false)} {...attributeEditProps(`${prefix}.href`, "href")}>{getText(content, `${prefix}.label`)}</Link>; })}</div> : null}</section> : null}
-          {groups.map((group) => { const expanded = mobileCategory === group.slug; return <section key={group.slug}><button type="button" aria-expanded={expanded} onClick={() => setMobileCategory(expanded ? "" : group.slug)}><span>{group.name}</span><span>{expanded ? "−" : "+"}</span></button>{expanded ? <div>{group.items.map((item) => <TreatmentTarget href={item.detailPath} key={item.slug}><b>{item.name}</b><span>{item.desc}</span></TreatmentTarget>)}</div> : null}</section>; })}
-          <div className={styles.mobileLinks}>{isHome ? <Link href="/column">{getText(content, "home.header.column")}</Link> : page === "main" ? <><Link href="/">{getText(content, "common.header.homepage")}</Link><span>{getText(content, "common.header.locales")}</span></> : <><Link href="/column#search">{getText(content, "common.header.search")}</Link><Link href="/">{getText(content, "common.header.homepage")}</Link></>}</div>
+          <section>
+            <button type="button" aria-expanded={mobileCategory === "concerns"} onClick={() => setMobileCategory(mobileCategory === "concerns" ? null : "concerns")}><span>피부 고민</span><span>{mobileCategory === "concerns" ? "−" : "+"}</span></button>
+            {mobileCategory === "concerns" ? <div>{concerns.map((concern) => <Link href={concern.link} key={concern.num} onClick={() => setMobileOpen(false)}><b>{concern.name}</b><small>{concern.desc}</small></Link>)}</div> : null}
+          </section>
+          {menuGroups.map((group) => {
+            const expanded = mobileCategory === group.slug;
+            return group.items.length ? <section key={group.slug}><button type="button" aria-expanded={expanded} onClick={() => setMobileCategory(expanded ? null : group.slug)}><span>{group.name}</span><span>{expanded ? "−" : "+"}</span></button>{expanded ? <div>{group.items.map((item) => {
+              const menuNameId = `treatments.${item.slug}.menuName`;
+              return <Link href={item.detailPath} key={item.slug} onClick={() => { setMobileOpen(false); setMobileCategory(null); }}><b {...textEditProps(menuNameId)}>{getText(content, menuNameId)}</b>{item.menuDesc ? <small>{item.menuDesc}</small> : null}</Link>;
+            })}</div> : null}</section> : <Link className={styles.mobileCategoryLink} key={group.slug} href={`/column/category/${group.slug}`} onClick={() => setMobileOpen(false)}>{group.name}</Link>;
+          })}
+          <Link className={styles.mobileLastLink} href={lastHref} onClick={() => setMobileOpen(false)}>{lastLabel}</Link>
+          <div className={styles.mobileLocales} aria-label="언어 선택">
+            <Link href="/?locale=en" aria-label="English"><Flag locale="us" /></Link>
+            <Link href="/?locale=zh" aria-label="中文"><Flag locale="cn" /></Link>
+            <Link href="/?locale=ja" aria-label="日本語"><Flag locale="jp" /></Link>
+          </div>
         </div>
       </div>
     </div>

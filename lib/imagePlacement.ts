@@ -40,7 +40,7 @@ const roomNames: Record<string, string> = {
 };
 
 export function getImagePlacementMeta(id: string, fallback = "사진") : ImagePlacementMeta {
-  let page = id.startsWith("column.") ? "칼럼 메인" : id.startsWith("common.") || id.startsWith("treatments.") ? "공통" : "홈";
+  const page = id.startsWith("column.") ? "칼럼 메인" : id.startsWith("common.") || id.startsWith("treatments.") ? "공통" : "홈";
   let section = "기타";
   let slotName = fallback || "사진";
 
@@ -78,6 +78,15 @@ export function getImagePlacementMeta(id: string, fallback = "사진") : ImagePl
     section = "진료 원칙";
     const slide = id.match(/principles\.(\d+)\.image/)?.[1];
     slotName = slide ? `진료 원칙 ${Number(slide) + 1} 사진` : "진료 원칙 1 사진";
+  } else if (id.startsWith("column.editorial.")) {
+    section = "글로리 화보";
+    const editorialSlots: Record<string, string> = {
+      "column.editorial.campaign": "대표 캠페인 사진",
+      "column.editorial.campaign.reception": "리셉션 캠페인 사진",
+      "column.editorial.campaign.lounge": "라운지 캠페인 사진",
+      "column.editorial.archive": "아카이브 배경 사진",
+    };
+    slotName = editorialSlots[id] ?? slotName;
   }
 
   return { page, section, slotName, displayName: `${page} · ${section} · ${slotName}` };

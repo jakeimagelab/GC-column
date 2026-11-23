@@ -6,14 +6,18 @@ import {
   EQUIPMENT_ITEMS_ID,
   getEditableEntry,
   HERO_SLIDES_ID,
+  HOME_CONCERN_ITEMS_ID,
   TYPING_EXAMPLES_ID,
+  VISION_PRINCIPLES_ID,
   withEditableEntry,
+  type ConcernContentItem,
   type EquipmentContentItem,
   type HeroSlide,
   type ImageContentEntry,
   type SiteContent,
   type SiteContentCollection,
   type SiteContentEntry,
+  type VisionPrincipleContentItem,
 } from "@/content/site-content-types";
 import { normalizePlacementTransform } from "@/lib/imagePlacement";
 
@@ -77,11 +81,33 @@ function validateTypingExamples(value: SiteContentCollection): asserts value is 
   }
 }
 
+function validateConcernItems(value: SiteContentCollection): asserts value is ConcernContentItem[] {
+  if (!Array.isArray(value) || value.length !== 6) throw new Error("고민 항목은 6개여야 합니다.");
+  if (!value.every((item) => typeof item === "object" && item !== null && "num" in item && "link" in item)) {
+    throw new Error("고민 항목 형식이 올바르지 않습니다.");
+  }
+  if (!value.every((item) => [item.num, item.name, item.desc, item.link].every((field) => typeof field === "string" && field.trim()))) {
+    throw new Error("고민 항목 문구가 올바르지 않습니다.");
+  }
+}
+
+function validateVisionPrinciples(value: SiteContentCollection): asserts value is VisionPrincipleContentItem[] {
+  if (!Array.isArray(value) || value.length !== 3) throw new Error("진료 원칙은 3개여야 합니다.");
+  if (!value.every((item) => typeof item === "object" && item !== null && "num" in item && "title" in item)) {
+    throw new Error("진료 원칙 형식이 올바르지 않습니다.");
+  }
+  if (!value.every((item) => [item.num, item.title, item.desc].every((field) => typeof field === "string" && field.trim()))) {
+    throw new Error("진료 원칙 문구가 올바르지 않습니다.");
+  }
+}
+
 export async function updateSiteContentCollection(id: string, value: SiteContentCollection) {
   const content = await readSiteContent();
   if (id === HERO_SLIDES_ID) validateHeroSlides(value);
   else if (id === EQUIPMENT_ITEMS_ID) validateEquipmentItems(value);
   else if (id === TYPING_EXAMPLES_ID) validateTypingExamples(value);
+  else if (id === HOME_CONCERN_ITEMS_ID) validateConcernItems(value);
+  else if (id === VISION_PRINCIPLES_ID) validateVisionPrinciples(value);
   else throw new Error(`Unknown collection id: ${id}`);
   content[id] = value;
   await writeSiteContent(content);

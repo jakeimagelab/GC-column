@@ -15,6 +15,11 @@
   --font-sans: var(--font-noto-sans-kr), sans-serif;
   --font-en: var(--font-montserrat), sans-serif;
   --font-sign: var(--font-nanum-pen-script), cursive;
+  --font-serif: var(--font-noto-serif-kr), serif;
+  --font-magazine: "Nanum Myeongjo", var(--font-noto-serif-kr), "AppleMyungjo", serif;
+  --font-editorial: var(--font-cormorant-garamond), serif;
+  --treatment-accent: #a24a26;
+  --treatment-accent-hover: #7e3719;
   --canvas-width: min(100vw, 1440px);
   --canvas-left: calc((100vw - var(--canvas-width)) / 2);
   --home-inner-gutter: clamp(24px, 5.5556vw, 80px);

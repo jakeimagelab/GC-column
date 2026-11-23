@@ -1211,6 +1211,5 @@
 <text class="ko" x="789.4" y="208.7" font-size="11" fill="#CFC5B8">KJ빌딩 3층 · 1층 커피빈</text>
 <g transform="translate(768.5 285.6)"><rect x="-38" y="-10" width="76" height="20" rx="10" fill="#FFFFFF" stroke="#D3A66F"/><text class="ko" x="0" y="4" text-anchor="middle" font-size="10.5" font-weight="500" fill="#8F7A60">1층 커피빈</text></g>
 <line x1="706.5" y1="275.6" x2="730.5" y2="285.6" stroke="#D3A66F" stroke-width="1" />
-<g transform="translate(1140 70)"><circle r="24" fill="#FFFFFF" stroke="#DDD5CB"/><g transform="rotate(-38.9)"><path d="M0 -16 L6 5 L0 1 L-6 5 Z" fill="#6E6052"/></g><text class="en" y="-30" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="2" fill="#8C7F72">N</text></g>
 </g>
 </svg>

@@ -19,6 +19,16 @@
 .popular { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 .popular > span { color: var(--muted); }
 .popular button { padding: 6px 14px; border: 0; border-radius: 999px; background: var(--paper); font-size: 13px; }
+.concernSection { margin-top: 10px; padding-top: 28px; border-top: 1px solid #eee8e1; word-break: keep-all; }
+.concernHeading { margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.concernHeading b { font-size: 15px; font-weight: 700; }
+.concernHeading span { color: #b5a595; font-family: var(--font-en); font-size: 11px; letter-spacing: 4px; white-space: nowrap; }
+.concernGrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: #f3f0eb; }
+.concernGrid a { min-width: 0; min-height: 100px; padding: 20px 22px; background: #fff; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; transition: background-color .24s ease; }
+.concernGrid a:hover, .concernGrid a:focus-visible { background: #fbfaf7; color: var(--ink); }
+.concernGrid small { color: #b5a595; font-family: var(--font-en); font-size: 12px; white-space: nowrap; }
+.concernGrid b { font-size: 16px; font-weight: 500; white-space: nowrap; }
+.concernGrid span { color: #5e5e5e; font-size: 12px; line-height: 1.5; }
 .guideLink { padding: 14px 18px; border: 1px solid var(--line-soft); background: #faf9f7; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
 .guideLink > span { color: var(--brown); font-family: var(--font-en); font-size: 10px; letter-spacing: 2px; }
 .guideLink > b { font-size: 14px; }
@@ -41,6 +51,7 @@
 .empty b { font-size: 16px; }
 .empty span { color: var(--muted); font-size: 14px; }
 .empty button { padding: 12px 18px; border: 0; background: var(--taupe); color: #fff; font-size: 14px; white-space: nowrap; }
+.questionForm { scroll-margin-top: 110px; }
 
 @keyframes typingCaret { 50% { opacity: 0; } }
 @keyframes questionUnfold {
@@ -60,6 +71,7 @@
 @media (max-width: 1024px) {
   .panel { padding-inline: 36px; }
   .heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .concernGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .panel { margin: -70px 16px 0; padding: 26px 20px; }
@@ -70,6 +82,12 @@
   .ask { display: none; }
   .guideLink { grid-template-columns: 1fr auto; }
   .guideLink > span { grid-column: 1 / -1; }
+  .concernSection { padding-top: 24px; }
+  .concernHeading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .concernHeading span { font-size: 10px; letter-spacing: 3px; }
+  .concernGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .concernGrid a { min-height: 112px; padding: 18px 14px; }
+  .concernGrid b { font-size: 15px; }
   .results { grid-template-columns: 1fr; }
   .empty { align-items: stretch; flex-direction: column; }
 }

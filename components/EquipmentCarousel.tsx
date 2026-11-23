@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { getText, type EquipmentContentItem, type SiteContent } from "@/content/site-content-types";
-import { getTreatment } from "@/content/treatments";
-import { TREATMENT_PAGES_READY } from "@/lib/config";
 import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
@@ -24,15 +22,15 @@ type EquipmentCardProps = {
 
 function EquipmentCard({ item, content, duplicate = false, editMode = false, onEdit, itemCount }: EquipmentCardProps) {
   const editPrefix = `home.equipment.items.${item.id}`;
-  const detailPath = getTreatment(item.id)?.detailPath;
+  const detailPath = item.link.trim();
   const cardContent = <>
     <div className={styles.imageWrap}>
       <ImageSlot className={styles.equipmentSlot} label="" alt="" editId={duplicate ? undefined : `${editPrefix}.image`} image={item.image} />
-      <div className={styles.benefitPanel} aria-hidden="true"><small {...(!duplicate ? { "data-edit-id": "home.equipment.hoverLabel", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.hoverLabel")}</small><span>{item.desc}</span></div>
+      <div className={styles.benefitPanel} aria-hidden="true"><small {...(!duplicate ? { "data-edit-id": "home.equipment.hoverLabel", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.hoverLabel")}</small><span {...(!duplicate ? { "data-edit-id": `${editPrefix}.hover`, "data-edit-type": "text" } : {})}>{item.hover ?? item.desc}</span></div>
     </div>
     <b>{duplicate ? item.name : <EditableRichText id={`${editPrefix}.name`} value={item.name} />}</b>
     <span>{duplicate ? item.desc : <EditableRichText id={`${editPrefix}.desc`} value={item.desc} />}</span>
-    <small {...(!duplicate ? (TREATMENT_PAGES_READY ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : { "data-edit-id": "common.treatment.preparing", "data-edit-type": "text" }) : {})}>{TREATMENT_PAGES_READY ? getText(content, "home.equipment.related") : getText(content, "common.treatment.preparing")}</small>
+    {detailPath ? <small {...(!duplicate ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.related")}</small> : null}
   </>;
 
   return (
@@ -42,9 +40,9 @@ function EquipmentCard({ item, content, duplicate = false, editMode = false, onE
       data-motion-item={!duplicate ? "" : undefined}
       aria-hidden={duplicate || undefined}
       aria-label={!duplicate ? `${item.name}: ${item.desc.replaceAll("\n", " ")}` : undefined}
-      tabIndex={!duplicate && (!TREATMENT_PAGES_READY || !detailPath) ? 0 : undefined}
+      tabIndex={!duplicate && !detailPath ? 0 : undefined}
     >
-      {TREATMENT_PAGES_READY && detailPath
+      {detailPath
         ? <Link href={detailPath} tabIndex={duplicate ? -1 : undefined}>{cardContent}</Link>
         : <div className={styles.disabledCard} role="link" aria-disabled="true">{cardContent}</div>}
       {editMode && onEdit ? (
@@ -79,6 +77,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   const normalizedEditIndex = items.length ? ((virtualIndex % items.length) + items.length) % items.length : 0;
   const renderedEditItems = canRotate ? [items, items, items].flat() : items;
+  const renderedManualItems = canRotate ? [items, items].flat() : items;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -139,18 +138,20 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     if (!viewport || !track) return;
     const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
     const cardStep = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth ?? viewport.clientWidth;
-    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    const index = cardStep ? Math.round(viewport.scrollLeft / cardStep) : 0;
-    setDisplayIndex(Math.min(Math.max(index, 0), Math.max(items.length - 1, 0)));
-    setCanScrollPrev(viewport.scrollLeft > 2);
-    setCanScrollNext(viewport.scrollLeft < maxScroll - 2);
-  }, [editMode, items.length]);
+    const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
+    const loopPosition = loopWidth > 0 ? viewport.scrollLeft % loopWidth : viewport.scrollLeft;
+    const index = cardStep ? Math.round(loopPosition / cardStep) % Math.max(items.length, 1) : 0;
+    setDisplayIndex((current) => current === index ? current : index);
+    setCanScrollPrev(canRotate || viewport.scrollLeft > 2);
+    setCanScrollNext(canRotate || viewport.scrollLeft < Math.max(0, viewport.scrollWidth - viewport.clientWidth) - 2);
+  }, [canRotate, editMode, items.length]);
 
   useEffect(() => {
     if (editMode) return;
     const viewport = viewportRef.current;
     const track = trackRef.current;
     if (!viewport || !track) return;
+    viewport.scrollLeft = 0;
     const observer = new ResizeObserver(updateManualPosition);
     observer.observe(viewport);
     observer.observe(track);
@@ -160,6 +161,28 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
       window.cancelAnimationFrame(frame);
     };
   }, [editMode, items.length, updateManualPosition]);
+
+  useEffect(() => {
+    if (editMode || reducedMotion || dragging || !canRotate) return;
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+    let frame = 0;
+    let previous = 0;
+    const startAt = performance.now() + 1200;
+    const rotate = (time: number) => {
+      const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
+      const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
+      if (time >= startAt && previous && loopWidth > 0) {
+        viewport.scrollLeft += Math.min(time - previous, 40) * 0.026;
+        if (viewport.scrollLeft >= loopWidth) viewport.scrollLeft -= loopWidth;
+      }
+      previous = time;
+      frame = window.requestAnimationFrame(rotate);
+    };
+    frame = window.requestAnimationFrame(rotate);
+    return () => window.cancelAnimationFrame(frame);
+  }, [canRotate, dragging, editMode, items.length, reducedMotion]);
 
   const moveEdit = useCallback((delta: number) => {
     if (!canRotate || transitioning) return;
@@ -182,6 +205,8 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     if (!viewport || !track) return;
     const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
     const distance = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth ?? viewport.clientWidth;
+    const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
+    if (delta < 0 && loopWidth > 0 && viewport.scrollLeft < distance) viewport.scrollLeft += loopWidth;
     viewport.scrollBy({ left: distance * delta, behavior: reducedMotion ? "auto" : "smooth" });
   };
 
@@ -241,7 +266,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         </div>
       </div>
       <div
-        className={`${styles.viewport} ${dragging ? styles.viewportDragging : ""}`}
+        className={`${styles.viewport} ${!editMode && canRotate ? styles.viewportAuto : ""} ${dragging ? styles.viewportDragging : ""}`}
         ref={viewportRef}
         data-scroll-world-layer="depth"
         onScroll={updateManualPosition}
@@ -265,7 +290,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
           </div>
         ) : (
           <div ref={trackRef} className={`${styles.track} ${styles.manualTrack}`}>
-            {items.map((item) => <EquipmentCard item={item} content={content} itemCount={items.length} key={item.id} />)}
+            {renderedManualItems.map((item, renderedIndex) => <EquipmentCard item={item} content={content} itemCount={items.length} duplicate={renderedIndex >= items.length} key={`${renderedIndex}-${item.id}`} />)}
           </div>
         )}
       </div>

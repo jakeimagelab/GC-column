@@ -1,7 +1,27 @@
+.paragraph {
+  white-space: pre-line;
+}
+
 .paragraph mark {
   padding: 0 2px;
   background: linear-gradient(transparent 58%, rgba(214,190,150,.55) 58%) no-repeat 0 0 / 100% 100%;
   color: inherit;
+}
+
+.paragraph strong {
+  font-weight: 700;
+}
+
+.reviewBadge {
+  margin-left: 6px;
+  padding: 2px 7px;
+  border: 1px dashed #e06f63;
+  border-radius: 999px;
+  color: #c9574d;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
 }
 
 .armed mark {

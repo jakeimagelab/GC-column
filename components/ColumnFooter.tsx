@@ -4,13 +4,16 @@ import { getText, textEditProps } from "@/content/site-content-types";
 import { FooterPolicyLinks } from "./FooterPolicyLinks";
 import styles from "./ColumnFooter.module.css";
 
-export function ColumnFooter({ content }: { content: SiteContent }) {
-  const youtube = getText(content, "clinic.sameAs.youtube");
-  const instagram = getText(content, "clinic.sameAs.instagram");
+export function ColumnFooter({ content, legal }: { content: SiteContent; legal?: string }) {
   return (
-    <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft">
-      <div data-scroll-world-layer="copy"><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><p {...textEditProps("column.footer.notice")}>{getText(content, "column.footer.notice")}</p><p {...textEditProps("column.footer.business")}>{getText(content, "column.footer.business")}</p></div>
-      <nav aria-label="푸터 메뉴" data-scroll-world-layer="counter"><div><Link href="/">홈페이지</Link><Link href="/column">원장 칼럼</Link>{instagram ? <a href={instagram} target="_blank" rel="noopener noreferrer">인스타그램</a> : null}{youtube ? <a href={youtube} target="_blank" rel="noopener noreferrer">유튜브</a> : null}</div><FooterPolicyLinks content={content} /><div><a href="/rss.xml">RSS</a><a href="/sitemap.xml">사이트맵</a></div></nav>
+    <footer className={`${styles.footer} ${legal ? styles.detail : ""}`}>
+      <div>
+        <p><b {...textEditProps("column.footer.brand")}>{getText(content, "column.footer.brand")}</b><span> | 원장 칼럼</span></p>
+        {!legal ? <p {...textEditProps("column.footer.intro")}>{getText(content, "column.footer.intro")}</p> : null}
+        {legal ? <p>{legal}</p> : null}
+        <small>© 2026 글로리의원</small>
+      </div>
+      <nav aria-label="푸터 메뉴"><Link href="/">홈페이지</Link><FooterPolicyLinks content={content} includePatientRights={!legal} /></nav>
     </footer>
   );
 }

@@ -38,7 +38,7 @@ export default async function DoctorProfilePage() {
       <JsonLd value={pageGraph} />
       <div className={styles.content}>
         <section className={styles.profile} data-scroll-world-scene data-scroll-world-strength="subtle">
-          <ImageSlot className={styles.doctorPhoto} label="대표원장 이호 프로필 사진" alt="글로리의원 대표원장 이호" image={getImage(content, "home.doctor.photo")} sizes="(max-width: 820px) 100vw, 440px" scrollWorldLayer="depth" />
+          <ImageSlot className={styles.doctorPhoto} label="대표원장 이호 프로필 사진" alt="글로리의원 대표원장 이호" image={getImage(content, "home.doctor.photo")} sizes="(max-width: 820px) 100vw, 440px" unoptimized scrollWorldLayer="depth" />
           <div className={styles.profileCopy} data-scroll-world-layer="copy">
             <span className={styles.eyebrow}>ABOUT THE DIRECTOR</span>
             <h1><small>{getText(content, "doctor.jobTitle")}</small>{getText(content, "doctor.name")}</h1>

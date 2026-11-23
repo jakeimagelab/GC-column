@@ -100,29 +100,29 @@
       "type": "image",
       "bgImage": {
         "type": "bgImage",
-        "src": null,
+        "src": "/uploads/glory-home-hero-director.jpg",
         "label": "글로리의원 브랜딩 이미지",
-        "alt": "글로리의원 브랜딩 영상",
+      "alt": "글로리의원 이호 대표원장이 고객을 진료하는 모습",
         "zoom": 100,
-        "focusX": 50,
-        "focusY": 50
+        "focusX": 67.18033260769313,
+        "focusY": 31.43334365472561
       },
-      "eyebrow": "NATURAL · PERSONAL · BY THE DIRECTOR",
+      "eyebrow": "NATURAL · PERSONAL · BY THE DIRECTOR",
       "title": "자연스러운 아름다움,",
       "titleStrong": "대표원장이 직접 진행합니다",
-      "description": "시술을 고르기 전에, 내 고민과 선택 기준부터 이해할 수 있도록 설명합니다.",
+      "description": "개개인의 얼굴에 맞춘 시술을 추구합니다.",
       "id": "hero-slide-1"
     },
     {
       "type": "image",
       "bgImage": {
         "type": "bgImage",
-        "src": null,
-        "label": "글로리의원 브랜딩 이미지",
-        "alt": "글로리의원 브랜딩 영상",
+        "src": "/uploads/glory-home-hero-equipment.webp",
+        "label": "대표원장과 리프팅 장비 이미지",
+        "alt": "글로리의원 이호 대표원장이 리프팅 장비 옆에 서 있는 모습",
         "zoom": 100,
-        "focusX": 50,
-        "focusY": 50
+        "focusX": 67,
+        "focusY": 45
       },
       "eyebrow": "QUESTION FIRST · BY THE DIRECTOR",
       "title": "무엇이 더 좋은지보다,",
@@ -134,12 +134,12 @@
       "type": "image",
       "bgImage": {
         "type": "bgImage",
-        "src": null,
-        "label": "글로리의원 브랜딩 이미지",
-        "alt": "글로리의원 브랜딩 영상",
+        "src": "/uploads/glory-home-hero-direct-care.webp",
+        "label": "대표원장 직접 진료 이미지",
+        "alt": "글로리의원 이호 대표원장이 환자의 얼굴을 직접 살펴보는 모습",
         "zoom": 100,
-        "focusX": 50,
-        "focusY": 50
+        "focusX": 66,
+        "focusY": 46
       },
       "eyebrow": "READ · COMPARE · ASK",
       "title": "진료실에 들어가기 전,",
@@ -221,6 +221,52 @@
     "세르프와 써마지는 보통 어느 연령대가 선택하나요?",
     "리프팅 시술 후 냉찜질, 꼭 해야 하나요?",
     "리쥬란, 몇 번 맞아야 하나요?"
+  ],
+  "home.concern.title": {
+    "type": "text",
+    "value": "시술 이름을 몰라도, 고민으로 찾아보세요"
+  },
+  "home.concern.eyebrow": {
+    "type": "text",
+    "value": "FIND BY CONCERN"
+  },
+  "home.concern.items": [
+    {
+      "num": "01",
+      "name": "처짐·탄력",
+      "desc": "어느 층이 느슨해졌는지부터",
+      "link": "/column/all?q=처짐"
+    },
+    {
+      "num": "02",
+      "name": "턱선·볼륨",
+      "desc": "무거워 보이는 하안면",
+      "link": "/column/all?q=턱선"
+    },
+    {
+      "num": "03",
+      "name": "색소",
+      "desc": "기미·잡티는 원인이 다릅니다",
+      "link": "/column/all?q=색소"
+    },
+    {
+      "num": "04",
+      "name": "모공·흉터",
+      "desc": "표면보다 진피의 문제",
+      "link": "/column/all?q=모공"
+    },
+    {
+      "num": "05",
+      "name": "피부결·재생",
+      "desc": "속부터 차오르는 피부",
+      "link": "/column/all?q=피부결"
+    },
+    {
+      "num": "06",
+      "name": "주름·볼륨",
+      "desc": "움직임 주름과 꺼짐",
+      "link": "/column/all?q=주름"
+    }
   ],
   "home.question.closest": {
     "type": "text",
@@ -323,6 +369,23 @@
     "focusX": 50,
     "focusY": 50
   },
+  "home.vision.principles": [
+    {
+      "num": "01",
+      "title": "상담부터 시술까지",
+      "desc": "글로리의원의 모든 시술은 대표원장이 직접 진행합니다."
+    },
+    {
+      "num": "02",
+      "title": "다른 선택까지 설명",
+      "desc": "효과뿐 아니라 선택 기준과 다른 선택이 필요한 경우까지 함께 설명합니다."
+    },
+    {
+      "num": "03",
+      "title": "얼굴에 맞춘 시술",
+      "desc": "개개인의 얼굴에 맞춘, 자연스러운 변화를 지향합니다."
+    }
+  ],
   "home.equipment.eyebrow": {
     "type": "text",
     "value": "EQUIPMENT"
@@ -357,6 +420,7 @@
       },
       "name": "온다",
       "desc": "지방 세포 파괴로\n리프팅 효과와 지방감소",
+      "hover": "이중턱·볼살·바디 군살\n윤곽과 탄력을 함께 고민할 때",
       "link": "/column/category/lifting?treatment=onda"
     },
     {
@@ -372,6 +436,7 @@
       },
       "name": "써마지FLX",
       "desc": "핵심 쿨링 기술로\n피부 데미지 최소화",
+      "hover": "잔주름·피부결·탄력 저하\n자연스러운 타이트닝을 원할 때",
       "link": "/column/category/lifting?treatment=thermage-flx"
     },
     {
@@ -387,6 +452,7 @@
       },
       "name": "울쎄라피 프라임",
       "desc": "더 정밀해진 초음파 리프팅\n미국 FDA 승인",
+      "hover": "처진 턱선·이중턱·볼 처짐\n깊은 층 리프팅을 고민할 때",
       "link": "/column/category/lifting?treatment=ulthera-prime"
     },
     {
@@ -400,15 +466,16 @@
         "focusX": 50,
         "focusY": 50
       },
-      "name": "소프라노 티타늄",
+      "name": "티타늄레이저",
       "desc": "3파장 리프팅",
+      "hover": "칙칙한 피부톤·잔주름·탄력 저하\n복합적인 피부 고민이 있을 때",
       "link": "/column/category/lifting?treatment=titanium"
     },
     {
       "id": "tuneface",
       "image": {
         "type": "image",
-        "src": "/uploads/glory-equipment-tuneface.png",
+        "src": "/uploads/glory-equipment-tuneface-cutout.png",
         "label": "튠페이스 장비 이미지",
         "alt": "튠페이스 장비 누끼 사진",
         "zoom": 100,
@@ -417,6 +484,7 @@
       },
       "name": "튠페이스",
       "desc": "고주파와 입체초음파로\n리프팅",
+      "hover": "얼굴선·이중턱·피부 탄력\n부위별 맞춤 타이트닝이 필요할 때",
       "link": "/column/category/lifting?treatment=tuneface"
     },
     {
@@ -432,6 +500,7 @@
       },
       "name": "세르프",
       "desc": "고주파에 더 깊은 층\n모드를 더한 리프팅",
+      "hover": "볼·턱선의 깊은 탄력 저하\n고주파 리프팅을 비교할 때",
       "link": "/column/category/lifting?treatment=xerf"
     },
     {
@@ -447,6 +516,7 @@
       },
       "name": "슈링크",
       "desc": "초음파 리프팅",
+      "hover": "턱선·볼 처짐·이중턱\n초음파 리프팅을 고민할 때",
       "link": "/column/category/lifting?treatment=shurink"
     },
     {
@@ -462,6 +532,7 @@
       },
       "name": "올리지오",
       "desc": "고주파 리프팅",
+      "hover": "잔주름·모공·피부 탄력\n고주파 관리를 원할 때",
       "link": "/column/category/lifting?treatment=oligio"
     }
   ],
@@ -476,6 +547,47 @@
   "home.latest.all": {
     "type": "text",
     "value": "전체 칼럼 보기 →"
+  },
+  "home.latest.featureImage": {
+    "type": "image",
+    "src": "/uploads/glory-column-editorial-campaign-01.png",
+    "label": "홈페이지 특집 칼럼 대표 이미지",
+    "alt": "글로리의원 리프팅 칼럼 캠페인 이미지",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "home.latest.questionsTitle": {
+    "type": "text",
+    "value": "원장이 답한 질문"
+  },
+  "home.latest.answerCountPrefix": {
+    "type": "text",
+    "value": "지금까지"
+  },
+  "home.latest.answerCountSuffix": {
+    "type": "text",
+    "value": "개 답변"
+  },
+  "home.latest.answerAction": {
+    "type": "text",
+    "value": "답 보기 →"
+  },
+  "home.latest.questionPrefix": {
+    "type": "text",
+    "value": "Q"
+  },
+  "home.latest.ctaLine1": {
+    "type": "text",
+    "value": "궁금한 점을 남기면"
+  },
+  "home.latest.ctaLine2": {
+    "type": "text",
+    "value": "대표원장이 칼럼으로 답합니다."
+  },
+  "home.latest.ctaButton": {
+    "type": "text",
+    "value": "원장님께 질문 남기기"
   },
   "home.gallery.eyebrow": {
     "type": "text",
@@ -585,6 +697,34 @@
     "type": "text",
     "value": ""
   },
+  "home.consult.eyebrow": {
+    "type": "text",
+    "value": "CONSULTATION"
+  },
+  "home.consult.title": {
+    "type": "text",
+    "value": "상담부터 시술까지, **대표원장이 직접 진행합니다**"
+  },
+  "home.consult.weekdayLabel": {
+    "type": "text",
+    "value": "월–금"
+  },
+  "home.consult.saturdayLabel": {
+    "type": "text",
+    "value": "토"
+  },
+  "home.consult.kakao": {
+    "type": "text",
+    "value": "카카오톡 상담"
+  },
+  "home.transition.glory": {
+    "type": "text",
+    "value": "Glory"
+  },
+  "home.transition.column": {
+    "type": "text",
+    "value": "Magazine"
+  },
   "home.footer.businessInfo": {
     "type": "text",
     "value": "서울 강남구 봉은사로 207, KJ빌딩 3층 (논현동) · 대표원장 이호 · 02-6958-7525"
@@ -632,6 +772,163 @@
   "column.hero.description": {
     "type": "text",
     "value": "시술명을 몰라도 괜찮습니다. 고민을 입력하면 핵심 답과 선택 기준을 바로 찾아드립니다."
+  },
+  "column.cover.vertical": {
+    "type": "text",
+    "value": "01 / GLORY'S COLUMN"
+  },
+  "column.cover.kicker": {
+    "type": "text",
+    "value": "GLORY MEDICAL WEBZINE"
+  },
+  "column.cover.issue": {
+    "type": "text",
+    "value": "ISSUE 01 · NOVEMBER 2026"
+  },
+  "column.cover.issueShort": {
+    "type": "text",
+    "value": "ISSUE 01 / 2026 NOVEMBER"
+  },
+  "column.cover.titleTop": {
+    "type": "text",
+    "value": "Glory"
+  },
+  "column.cover.titleBottom": {
+    "type": "text",
+    "value": "Magazine"
+  },
+  "column.cover.description": {
+    "type": "text",
+    "value": "궁금한 시술이나 고민을 입력하세요. 대표원장이 쓴 답을 바로 찾아드립니다."
+  },
+  "column.feature.eyebrow": {
+    "type": "text",
+    "value": "FEATURE 01 · 처짐·탄력"
+  },
+  "column.feature.readMeta": {
+    "type": "text",
+    "value": "READ 06 MIN · 대표원장 이호"
+  },
+  "column.feature.number": {
+    "type": "text",
+    "value": "01"
+  },
+  "column.feature.title": {
+    "type": "text",
+    "value": "피부를\n읽는 기준"
+  },
+  "column.feature.conclusion": {
+    "type": "text",
+    "value": "결론부터"
+  },
+  "column.feature.treatments": {
+    "type": "text",
+    "value": "관련 시술"
+  },
+  "column.feature.slug": {
+    "type": "text",
+    "value": "xerf-vs-thermage"
+  },
+  "column.feature.image": {
+    "type": "image",
+    "src": "/uploads/glory-column-editorial-campaign-01.png",
+    "label": "원장 칼럼 특집 화보",
+    "alt": "글로리의원 리프팅 장비와 인물을 담은 특집 화보",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "column.concerns.eyebrow": {
+    "type": "text",
+    "value": "CONCERNS"
+  },
+  "column.concerns.title": {
+    "type": "text",
+    "value": "고민별로 읽기"
+  },
+  "column.concerns.empty": {
+    "type": "text",
+    "value": "이 고민에 대한 칼럼을 준비하고 있습니다."
+  },
+  "column.questions.eyebrow": {
+    "type": "text",
+    "value": "QUESTION NOTES · ISSUE 01"
+  },
+  "column.questions.title": {
+    "type": "text",
+    "value": "이번 호의 질문"
+  },
+  "column.questions.description": {
+    "type": "text",
+    "value": "진료실에서 실제로 받은 질문입니다.\n펼치면 원장의 결론부터 보입니다."
+  },
+  "column.questions.answered": {
+    "type": "text",
+    "value": "ANSWERED SO FAR"
+  },
+  "column.questions.answeredDesc": {
+    "type": "text",
+    "value": "지금까지 원장이 답한 질문"
+  },
+  "column.questions.week": {
+    "type": "text",
+    "value": "THIS WEEK"
+  },
+  "column.questions.weekDesc": {
+    "type": "text",
+    "value": "이번 주 원장이 답한 질문"
+  },
+  "column.questions.latest": {
+    "type": "text",
+    "value": "LATEST"
+  },
+  "column.questions.answerLabel": {
+    "type": "text",
+    "value": "결론부터"
+  },
+  "column.questions.read": {
+    "type": "text",
+    "value": "전문 보기 →"
+  },
+  "column.questions.askCaption": {
+    "type": "text",
+    "value": "내 질문도 원장에게 직접 물어보세요. 답변은 칼럼으로 공개됩니다."
+  },
+  "column.questions.askAction": {
+    "type": "text",
+    "value": "원장에게 질문 남기기 →"
+  },
+  "column.treatments.eyebrow": {
+    "type": "text",
+    "value": "TREATMENTS"
+  },
+  "column.treatments.sectionTitle": {
+    "type": "text",
+    "value": "칼럼에서 다룬 시술"
+  },
+  "column.archive.eyebrow": {
+    "type": "text",
+    "value": "ARCHIVE"
+  },
+  "column.archive.title": {
+    "type": "text",
+    "value": "최근 발행"
+  },
+  "column.consult.eyebrow": {
+    "type": "text",
+    "value": "CONSULTATION"
+  },
+  "column.consult.title": {
+    "type": "text",
+    "value": "대표원장이 직접 상담합니다 · 언주역 4번 출구 30m"
+  },
+  "column.consult.kakao": {
+    "type": "text",
+    "value": "카카오톡 상담"
+  },
+  "column.footer.intro": {
+    "type": "text",
+    "value": "글로리의원 원장이 직접 쓰는 의학 칼럼입니다."
   },
   "column.search.label": {
     "type": "text",
@@ -739,7 +1036,7 @@
   },
   "column.doctor.titleLabel": {
     "type": "text",
-    "value": "대표원장"
+    "value": "글로리의원 대표원장"
   },
   "column.doctor.signatureImage": {
     "type": "image",
@@ -1069,7 +1366,7 @@
   },
   "home.doctor.photo": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-director-lee-ho-profile.jpg",
     "label": "대표원장 이호 프로필 사진",
     "alt": "글로리의원 대표원장 이호 프로필 사진",
     "zoom": 100,
@@ -1150,16 +1447,16 @@
   },
   "column.hero.background": {
     "type": "bgImage",
-    "src": null,
+    "src": "/uploads/glory-column-hero-consultation.webp",
     "label": "대표원장 상담과 시술 장면",
     "alt": "글로리의원 대표원장 상담 또는 시술 장면",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 44,
+    "focusY": 48
   },
   "column.doctor.photo": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-director-lee-ho-profile.jpg",
     "label": "대표원장 이호 프로필 사진",
     "alt": "대표원장 이호 프로필",
     "zoom": 100,
@@ -1168,30 +1465,106 @@
   },
   "column.principles.photo": {
     "type": "image",
-    "src": null,
-    "label": "글로리의원 라운지와 상담실 사진",
-    "alt": "글로리의원 라운지와 상담실",
+    "src": "/uploads/glory-principle-consultation.webp",
+    "label": "대표원장 일대일 상담 사진",
+    "alt": "글로리의원 이호 대표원장이 거울을 보며 환자에게 얼굴 상태를 설명하는 모습",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 41,
+    "focusY": 48
   },
   "column.principles.1.image": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-principle-explanation.webp",
     "label": "필요한 시술을 설명하는 상담 장면",
     "alt": "피부 상태를 확인하고 필요한 시술을 설명하는 글로리의원 상담 장면",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 46,
+    "focusY": 48
   },
   "column.principles.2.image": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-principle-aftercare.webp",
     "label": "시술 후 관리 안내 장면",
     "alt": "시술 후 관리 내용을 안내하는 글로리의원 상담 장면",
     "zoom": 100,
+    "focusX": 42,
+    "focusY": 48
+  },
+  "column.editorial.campaign": {
+    "type": "bgImage",
+    "src": "/uploads/glory-column-editorial-campaign-01.png",
+    "label": "글로리의원 시술 공간 화보",
+    "alt": "실크 원피스를 입은 여성이 글로리의원 시술실의 써마지 FLX 장비 옆에 서 있는 화보",
+    "zoom": 100,
     "focusX": 50,
-    "focusY": 50
+    "focusY": 50,
+    "desktop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 100
+    },
+    "mobile": {
+      "x": 60,
+      "y": 50,
+      "zoom": 100
+    }
+  },
+  "column.editorial.campaign.reception": {
+    "type": "bgImage",
+    "src": "/uploads/glory-column-editorial-campaign-02.png",
+    "label": "글로리의원 리셉션 캠페인 화보",
+    "alt": "원형 조명과 브론즈 파티션이 보이는 글로리의원 리셉션의 써마지 FLX 화보",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50,
+    "desktop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 100
+    },
+    "mobile": {
+      "x": 52,
+      "y": 50,
+      "zoom": 100
+    }
+  },
+  "column.editorial.campaign.lounge": {
+    "type": "bgImage",
+    "src": "/uploads/glory-column-editorial-campaign-03.png",
+    "label": "글로리의원 라운지 캠페인 화보",
+    "alt": "차분한 코트를 입은 여성이 글로리의원 라운지의 써마지 FLX 장비 옆을 걷는 화보",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50,
+    "desktop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 100
+    },
+    "mobile": {
+      "x": 56,
+      "y": 50,
+      "zoom": 100
+    }
+  },
+  "column.editorial.archive": {
+    "type": "bgImage",
+    "src": "/uploads/glory-gallery-exterior.webp",
+    "label": "글로리의원 건물 외관 아카이브 배경",
+    "alt": "서울 강남구 봉은사로에 위치한 글로리의원 건물 외관",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 52,
+    "desktop": {
+      "x": 50,
+      "y": 52,
+      "zoom": 100
+    },
+    "mobile": {
+      "x": 48,
+      "y": 50,
+      "zoom": 118
+    }
   },
   "column.location.map": {
     "type": "image",
@@ -1300,34 +1673,34 @@
   },
   "home.header.intro.doctor.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-director-home-profile.webp",
     "label": "원장 소개 썸네일",
     "alt": "글로리의원 대표원장 소개",
     "zoom": 100,
     "focusX": 50,
-    "focusY": 50
+    "focusY": 40
   },
   "home.header.intro.vision.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-column-hero-consultation.webp",
     "label": "진료 원칙 썸네일",
     "alt": "글로리의원 진료 원칙",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 42,
+    "focusY": 48
   },
   "home.header.intro.equipment.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-home-hero-equipment.webp",
     "label": "보유 장비 썸네일",
     "alt": "글로리의원 보유 장비",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 72,
+    "focusY": 48
   },
   "home.header.intro.gallery.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-gallery-overview.webp",
     "label": "시설 썸네일",
     "alt": "글로리의원 시설",
     "zoom": 100,
@@ -1336,16 +1709,104 @@
   },
   "home.header.intro.location.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-header-location.webp",
     "label": "오시는 길 썸네일",
     "alt": "글로리의원 오시는 길",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
   },
+  "treatments.thermage-flx.menuName": {
+    "type": "text",
+    "value": "써마지FLX"
+  },
+  "treatments.ulthera-prime.menuName": {
+    "type": "text",
+    "value": "울쎄라피프라임"
+  },
+  "treatments.titanium.menuName": {
+    "type": "text",
+    "value": "티타늄레이저"
+  },
+  "treatments.onda.menuName": {
+    "type": "text",
+    "value": "온다"
+  },
+  "treatments.xerf.menuName": {
+    "type": "text",
+    "value": "세르프"
+  },
+  "treatments.tuneface.menuName": {
+    "type": "text",
+    "value": "튠페이스"
+  },
+  "treatments.inmode.menuName": {
+    "type": "text",
+    "value": "인모드"
+  },
+  "treatments.shurink.menuName": {
+    "type": "text",
+    "value": "슈링크유니버스"
+  },
+  "treatments.oligio.menuName": {
+    "type": "text",
+    "value": "올리지오"
+  },
+  "treatments.curejet.menuName": {
+    "type": "text",
+    "value": "큐어젯"
+  },
+  "treatments.revlite-si.menuName": {
+    "type": "text",
+    "value": "레블라이트SI"
+  },
+  "treatments.selec-ipl.menuName": {
+    "type": "text",
+    "value": "셀렉IPL"
+  },
+  "treatments.secret-rf.menuName": {
+    "type": "text",
+    "value": "시크릿RF"
+  },
+  "treatments.agnes.menuName": {
+    "type": "text",
+    "value": "아그네스"
+  },
+  "treatments.stem-cell.menuName": {
+    "type": "text",
+    "value": "줄기세포주사"
+  },
+  "treatments.botox.menuName": {
+    "type": "text",
+    "value": "보톡스"
+  },
+  "treatments.filler.menuName": {
+    "type": "text",
+    "value": "필러"
+  },
+  "treatments.custom-skin-booster.menuName": {
+    "type": "text",
+    "value": "맞춤스킨부스터"
+  },
+  "treatments.neck-wrinkle-filler.menuName": {
+    "type": "text",
+    "value": "목주름필러"
+  },
+  "treatments.hand-filler.menuName": {
+    "type": "text",
+    "value": "손등필러"
+  },
+  "treatments.eye-area-filler.menuName": {
+    "type": "text",
+    "value": "눈위·눈밑필러"
+  },
+  "treatments.earlobe-filler.menuName": {
+    "type": "text",
+    "value": "귓볼필러"
+  },
   "treatments.ulthera-prime.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-ulthera-prime.png",
     "label": "울쎄라 프라임 썸네일",
     "alt": "울쎄라 프라임",
     "zoom": 100,
@@ -1354,7 +1815,7 @@
   },
   "treatments.thermage-flx.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-thermage-flx.png",
     "label": "써마지 FLX 썸네일",
     "alt": "써마지 FLX",
     "zoom": 100,
@@ -1363,7 +1824,7 @@
   },
   "treatments.titanium.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-soprano-titanium.png",
     "label": "티타늄 썸네일",
     "alt": "티타늄 리프팅",
     "zoom": 100,
@@ -1372,7 +1833,7 @@
   },
   "treatments.onda.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-onda.png",
     "label": "온다 썸네일",
     "alt": "온다 리프팅",
     "zoom": 100,
@@ -1381,7 +1842,7 @@
   },
   "treatments.tuneface.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-tuneface-cutout.png",
     "label": "튠페이스 썸네일",
     "alt": "튠페이스",
     "zoom": 100,
@@ -1390,7 +1851,7 @@
   },
   "treatments.shurink.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-shurink-universe.png",
     "label": "슈링크 썸네일",
     "alt": "슈링크",
     "zoom": 100,
@@ -1399,7 +1860,7 @@
   },
   "treatments.oligio.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-oligio.png",
     "label": "올리지오 썸네일",
     "alt": "올리지오",
     "zoom": 100,
@@ -1408,9 +1869,18 @@
   },
   "treatments.xerf.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-equipment-xerf.png",
     "label": "세르프 썸네일",
     "alt": "세르프",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.inmode.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "인모드 썸네일",
+    "alt": "인모드",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
@@ -1426,36 +1896,54 @@
   },
   "treatments.botox.thumbnail": {
     "type": "image",
-    "src": null,
+    "src": "/uploads/glory-treatment-botox.webp",
     "label": "보톡스 썸네일",
     "alt": "보톡스",
     "zoom": 100,
-    "focusX": 50,
-    "focusY": 50
+    "focusX": 54,
+    "focusY": 48
   },
-  "treatments.pigment-1.thumbnail": {
+  "treatments.curejet.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "색소·모공 시술 썸네일 1",
-    "alt": "색소·모공 시술",
+    "label": "큐어젯 썸네일",
+    "alt": "큐어젯",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
   },
-  "treatments.pigment-2.thumbnail": {
+  "treatments.revlite-si.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "색소·모공 시술 썸네일 2",
-    "alt": "색소·모공 시술",
+    "label": "레블라이트 SI 썸네일",
+    "alt": "레블라이트 SI",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
   },
-  "treatments.pigment-3.thumbnail": {
+  "treatments.selec-ipl.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "색소·모공 시술 썸네일 3",
-    "alt": "색소·모공 시술",
+    "label": "셀렉 IPL 썸네일",
+    "alt": "셀렉 IPL",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.secret-rf.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "시크릿 RF 썸네일",
+    "alt": "시크릿 RF",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.agnes.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "아그네스 썸네일",
+    "alt": "아그네스",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
@@ -1472,26 +1960,62 @@
   "treatments.stem-cell.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "줄기세포 썸네일",
-    "alt": "줄기세포 시술",
+    "label": "줄기세포주사 썸네일",
+    "alt": "줄기세포주사",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
   },
-  "treatments.filler-1.thumbnail": {
+  "treatments.filler.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "스페셜필러 썸네일 1",
-    "alt": "스페셜필러 시술",
+    "label": "필러 썸네일",
+    "alt": "필러",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
   },
-  "treatments.filler-2.thumbnail": {
+  "treatments.custom-skin-booster.thumbnail": {
     "type": "image",
     "src": null,
-    "label": "스페셜필러 썸네일 2",
-    "alt": "스페셜필러 시술",
+    "label": "맞춤 스킨부스터 썸네일",
+    "alt": "맞춤 스킨부스터",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.neck-wrinkle-filler.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "목주름 필러 썸네일",
+    "alt": "목주름 필러",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.hand-filler.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "손등 필러 썸네일",
+    "alt": "손등 필러",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.eye-area-filler.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "눈위·눈밑 필러 썸네일",
+    "alt": "눈위·눈밑 필러",
+    "zoom": 100,
+    "focusX": 50,
+    "focusY": 50
+  },
+  "treatments.earlobe-filler.thumbnail": {
+    "type": "image",
+    "src": null,
+    "label": "귓볼 필러 썸네일",
+    "alt": "귓볼 필러",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
@@ -1567,6 +2091,22 @@
   "qna.preparing": {
     "type": "text",
     "value": "질문 접수 기능은 준비 중입니다."
+  },
+  "qna.sidebar.title": {
+    "type": "text",
+    "value": "원장에게 질문하기"
+  },
+  "qna.sidebar.description": {
+    "type": "text",
+    "value": "남겨주신 질문은 대표원장이 확인하고, 답변은 이 칼럼의 질문에 공개될 수 있습니다."
+  },
+  "qna.sidebar.notice": {
+    "type": "text",
+    "value": "이름·연락처 등 개인정보는 적지 마세요."
+  },
+  "qna.sidebar.consentText": {
+    "type": "text",
+    "value": "질문 내용 수집·이용 동의 · 30일 보관"
   },
   "qna.readerTitle": {
     "type": "text",
@@ -1695,6 +2235,146 @@
   "column.detail.summaryNotice": {
     "type": "text",
     "value": "이 글은 일반적인 정보를 정리한 것으로 개인 진단을 대신하지 않습니다."
+  },
+  "column.detail.issueLabel": {
+    "type": "text",
+    "value": "ISSUE 01 · LIFTING · COMPARE"
+  },
+  "column.detail.breadcrumb.concern": {
+    "type": "text",
+    "value": "처짐·탄력"
+  },
+  "column.detail.breadcrumb.title": {
+    "type": "text",
+    "value": "세르프와 써마지"
+  },
+  "column.detail.byline": {
+    "type": "text",
+    "value": "글·감수 대표원장 이호"
+  },
+  "column.detail.depthLabel": {
+    "type": "text",
+    "value": "CHOOSE YOUR DEPTH"
+  },
+  "column.detail.answerLabel": {
+    "type": "text",
+    "value": "결론부터 · 원장이 직접 답합니다"
+  },
+  "column.detail.transcript": {
+    "type": "text",
+    "value": "영상 자막 원고 · 영상을 볼 수 없을 때 읽기"
+  },
+  "column.detail.table.scrollHint": {
+    "type": "text",
+    "value": "← 옆으로 넘겨보세요"
+  },
+  "column.detail.toc.eyebrow": {
+    "type": "text",
+    "value": "CONTENTS"
+  },
+  "column.detail.section.0.eyebrow": {
+    "type": "text",
+    "value": "DIFFERENCE"
+  },
+  "column.detail.section.1.eyebrow": {
+    "type": "text",
+    "value": "SINGLE OR COMBINED"
+  },
+  "column.detail.judgement.eyebrow": {
+    "type": "text",
+    "value": "WHO IT'S FOR"
+  },
+  "column.detail.judgement.title": {
+    "type": "text",
+    "value": "누구에게 권하고, 언제 먼저 상담하나요?"
+  },
+  "column.detail.judgement.recommend": {
+    "type": "text",
+    "value": "RECOMMEND / 이런 분께 권합니다"
+  },
+  "column.detail.judgement.consult": {
+    "type": "text",
+    "value": "CONSULT FIRST / 이런 경우는 먼저 상담합니다"
+  },
+  "column.detail.precautions.eyebrow": {
+    "type": "text",
+    "value": "BEFORE TREATMENT"
+  },
+  "column.detail.precautions.title": {
+    "type": "text",
+    "value": "시술 전 확인하세요"
+  },
+  "column.detail.share.title": {
+    "type": "text",
+    "value": "혼자 고민하지 마세요"
+  },
+  "column.detail.share.description": {
+    "type": "text",
+    "value": "가족·친구에게 보내 물어보거나, 저장해 두고 상담 때 바로 보여주세요."
+  },
+  "column.detail.share.kakao": {
+    "type": "text",
+    "value": "카톡으로 보내기"
+  },
+  "column.detail.share.consult": {
+    "type": "text",
+    "value": "상담 때 보여주기 · 저장"
+  },
+  "column.detail.share.copy": {
+    "type": "text",
+    "value": "링크 복사"
+  },
+  "column.detail.share.copiedConsult": {
+    "type": "text",
+    "value": "링크를 복사했어요. 상담 때 보여주세요."
+  },
+  "column.detail.faq.eyebrow": {
+    "type": "text",
+    "value": "QUESTIONS ABOUT THIS ARTICLE"
+  },
+  "column.detail.faq.title": {
+    "type": "text",
+    "value": "이 글에 대한 질문"
+  },
+  "column.detail.faq.answerLabel": {
+    "type": "text",
+    "value": "이호 원장"
+  },
+  "column.detail.faq.meta": {
+    "type": "text",
+    "value": "QUESTIONS · 진료실과 독자 질문"
+  },
+  "column.detail.author.eyebrow": {
+    "type": "text",
+    "value": "WRITTEN BY"
+  },
+  "column.detail.author.title": {
+    "type": "text",
+    "value": "대표원장 이호"
+  },
+  "column.detail.author.career": {
+    "type": "text",
+    "value": "글로리의원 대표원장 · 한양대학교 의과대학 졸업 · 前 리쥬미의원 원장 · 前 바오밥성형외과 원장 · 前 에이스의원 원장"
+  },
+  "column.detail.author.action": {
+    "type": "text",
+    "value": "원장 프로필 →"
+  },
+  "column.detail.related.title": {
+    "type": "text",
+    "value": "이 글에서 다룬 시술"
+  },
+  "column.detail.related.eyebrow": {
+    "type": "text",
+    "value": "RELATED TREATMENTS"
+  },
+  "column.detail.related.consult": {
+    "type": "text",
+    "value": "나에게 맞는 조합은 대표원장이 직접 상담합니다"
+  },
+  "column.detail.legal": {
+    "type": "text",
+    "value": "이 글은 일반적인 정보를 정리한 것으로 개인 진단을 대신하지 않습니다. 시술 효과와 부작용은 개인에 따라 다를 수 있습니다."
   },
   "column.detail.visit.eyebrow": {
     "type": "text",
