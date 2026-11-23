@@ -53,15 +53,22 @@ export function ColumnDetailMotion() {
       });
     });
 
+    const revealTargets = new Map<HTMLElement,HTMLElement>();
+    reveals.forEach((node) => {
+      const target = node.closest<HTMLElement>("[data-detail-reveal-observer]") ?? node;
+      revealTargets.set(target,node);
+    });
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        const node = entry.target as HTMLElement;
+        const target = entry.target as HTMLElement;
+        const node = revealTargets.get(target) ?? target;
         requestAnimationFrame(() => node.setAttribute("data-detail-reveal-active",""));
-        observer.unobserve(node);
+        observer.unobserve(target);
       });
     },{ threshold:.06, rootMargin:"0px 0px -6% 0px" });
-    reveals.forEach((node) => observer.observe(node));
+    revealTargets.forEach((_,target) => observer.observe(target));
 
     const update = () => {
       frame = 0;

@@ -224,12 +224,14 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             {column.sections.map((section, sectionIndex) => {
               if (section.kind === "image") {
                 return (
-                  <figure className={`${styles.imageOnly} ${section.ratio === "4/5" ? styles.imageOnlyPortrait : ""}`} key={`${section.src}-${sectionIndex}`} data-detail-reveal="figure">
-                    <div className={styles.imageOnlyMedia}>
-                      <Image src={section.src} alt={section.alt} fill sizes="(max-width: 1000px) 100vw, 788px" unoptimized loading="eager" />
-                    </div>
-                    <figcaption>{section.caption}</figcaption>
-                  </figure>
+                  <div className={styles.imageOnlyObserver} key={`${section.src}-${sectionIndex}`} data-detail-reveal-observer>
+                    <figure className={`${styles.imageOnly} ${section.ratio === "4/5" ? styles.imageOnlyPortrait : ""}`} data-detail-reveal="figure">
+                      <div className={styles.imageOnlyMedia}>
+                        <Image src={section.src} alt={section.alt} fill sizes="(max-width: 1000px) 100vw, 788px" unoptimized loading="eager" />
+                      </div>
+                      <figcaption>{section.caption}</figcaption>
+                    </figure>
+                  </div>
                 );
               }
               const numberedSectionIndex = column.sections

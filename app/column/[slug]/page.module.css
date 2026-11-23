@@ -56,11 +56,13 @@
 .pointTable .outlineDot { background:transparent; border:1px solid #8c7b6b; }
 .pointTable span { white-space:nowrap; }
 .sections { display:flex; flex-direction:column; }
-.imageOnly { width:100%; margin:0; padding-top:96px; }
+.imageOnlyObserver { width:100%; }
+.imageOnly { width:100%; margin:0; padding-top:56px; }
 .imageOnlyMedia { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:#f2ede6; }
 .imageOnlyPortrait .imageOnlyMedia { aspect-ratio:4/5; }
 .imageOnlyMedia img { object-fit:cover; }
 .imageOnly figcaption { margin-top:12px; color:#766e66; font-size:13px; line-height:1.7; }
+.imageOnlyObserver+.articleSection { padding-top:56px; }
 .comparisonGraphic { width:100%; margin:40px 0 0; }
 .comparisonGraphic img { width:100%; height:auto; display:block; }
 .comparisonGraphic figcaption { margin-top:8px; color:#766e66; font-size:13px; line-height:1.7; }
@@ -223,7 +225,7 @@
   .imageOnly{width:100vw;margin:0 0 0 calc(50% - 50vw);padding-top:56px}
   .imageOnlyMedia,.imageOnlyPortrait .imageOnlyMedia{width:100%;aspect-ratio:4/5}
   .imageOnly figcaption{margin:0;padding:10px 22px 0;font-size:13px;line-height:1.75}
-  .imageOnly+.articleSection{padding-top:56px}
+  .imageOnlyObserver+.articleSection{padding-top:56px}
   .tableViewport{margin-top:40px}
   .tableViewport::after,.tableHint{display:none}
   .tableScroll{width:100%;margin:0;overflow:visible}

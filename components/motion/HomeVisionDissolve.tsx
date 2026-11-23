@@ -44,7 +44,7 @@ export function HomeVisionDissolve() {
 
       section.setAttribute("data-vision-motion-ready", "");
       section.style.setProperty("--vision-progress", progress.toFixed(4));
-      section.style.setProperty("--vision-photo-opacity", dissolve.toFixed(4));
+      section.style.setProperty("--vision-photo-opacity", (dissolve * 0.85).toFixed(4));
       section.style.setProperty("--vision-photo-scale", (1.08 - 0.08 * scaleProgress).toFixed(4));
       section.style.setProperty("--vision-title-color", mixColor([43, 43, 43], [255, 255, 255], dissolve));
       section.style.setProperty("--vision-body-color", mixColor([94, 94, 94], [232, 226, 219], dissolve));

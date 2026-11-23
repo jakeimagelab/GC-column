@@ -66,8 +66,6 @@
 
 passed
 
----
-
 # 홈 비전 디졸브·칼럼 고정 헤더·상담 사진 최종 QA
 
 ## 증거와 상태
@@ -748,6 +746,42 @@ passed
 - [x] 수정 TSX 접근성·이벤트 정리·수동 전역 리스너 해제 확인
 - [x] 프로덕션 빌드와 TypeScript 통과
 - [x] ESLint 오류 0건; 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+
+## 최종 결과
+
+passed
+
+---
+
+# 홈 비전 타이포·칼럼 상세 간격 최종 QA
+
+## 증거와 환경
+
+- 홈 비전 기준: `/var/folders/qz/9f9fdlpn72gdc0qtrn0l7vgr0000gn/T/TemporaryItems/NSIRD_screencaptureui_KTpBdj/스크린샷 2026-11-23 오후 11.44.55.png`
+- 칼럼 상세 기준: `/var/folders/qz/9f9fdlpn72gdc0qtrn0l7vgr0000gn/T/TemporaryItems/NSIRD_screencaptureui_soaKfk/스크린샷 2026-11-23 오후 11.46.44.png`
+- 구현 캡처: `output/playwright/home-vision-font-opacity-final.png`, `output/playwright/column-detail-image-gap-reveal-final-1024.png`, `output/playwright/column-detail-image-to-section3-gap-final-1024.png`, `output/playwright/column-detail-image-gap-final-390.png`
+- 나란히 비교: `output/design-qa/vision-source-vs-implementation.png`, `output/design-qa/column-spacing-source-vs-implementation.png`
+- 검수 viewport: 1440×900, 1024×900, 390×844, DPR 1
+
+## 비교 결과
+
+- 홈 비전 제목은 바로 앞 DIRECTOR 제목과 동일한 Noto Sans KR, 300 굵기, 자간 0을 사용한다. 강조 줄만 700으로 유지해 기존 계층을 보존했다.
+- 비전 사진의 최종 불투명도는 0.85로 제한해 이전보다 15% 더 투명하게 보이며, 텍스트 대비와 GLORY 외곽선 가독성은 유지된다.
+- 칼럼 상세의 상담 사진은 완전히 가려진 figure 자체가 아니라 보이는 부모를 관찰하도록 변경해, 처음 접근하거나 빠르게 스크롤해도 리빌이 정상 완료된다.
+- 섹션 02 표에서 상담 사진까지, 상담 사진 캡션에서 섹션 03까지의 여백은 각각 56px로 맞췄다. 비교 입력에서 보이던 비정상적인 빈 영역이 없다.
+- 1024px와 390px에서 사진·캡션·다음 섹션이 순서대로 이어지며 문서 가로 넘침이 없다.
+
+## 검증
+
+- [x] 홈 비전 제목의 font-family/font-weight가 DIRECTOR 제목과 일치
+- [x] 비전 사진 최종 opacity 0.85
+- [x] 상담 사진 리빌 활성 상태 및 clip-path 해제
+- [x] 표→사진 56px, 사진→03 섹션 56px
+- [x] 390px에서 `scrollWidth === clientWidth === 390`
+- [x] 브라우저 콘솔 오류 0건
+- [x] `npm run build` 통과
+- [x] `npm run lint` 오류 0건; 수정 범위 밖 기존 경고 8건
 - [x] `git diff --check` 통과
 
 ## 최종 결과
