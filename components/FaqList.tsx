@@ -47,7 +47,7 @@ export function FaqList({
           ? { first: `${item.summary}${item.summaryNeedsReview ? " [원장 확인]" : ""}`, rest: item.a }
           : answerParts(item.a);
         return (
-          <article className={`${styles.item} ${isOpen ? styles.open : ""} ${mobileStyle === "issue" ? styles.issueItem : ""}`} id={item.id} key={`${item.q}-${index}`}>
+          <article className={`${styles.item} ${isOpen ? styles.open : ""} ${mobileStyle === "issue" ? styles.issueItem : ""}`} id={item.id} key={`${item.q}-${index}`} data-faq-item>
             <button
               type="button"
               className={styles.summary}
@@ -57,12 +57,12 @@ export function FaqList({
             >
               <span className={styles.number}>{String(index + 1).padStart(2, "0")}</span>
               <span className={styles.question}>{item.q}</span>
-              <span className={styles.toggle} aria-hidden="true">{mobileStyle === "issue" ? "+" : isOpen ? "−" : "+"}</span>
+              <span className={styles.toggle} aria-hidden="true">+</span>
             </button>
             <div
               className={styles.answerWrap}
               id={`${item.id ?? `faq-${index + 1}`}-answer`}
-              hidden={!isOpen}
+              aria-hidden={!isOpen}
             >
               <div className={styles.answer}>
                 <span>{answerLabel}</span>
@@ -70,7 +70,7 @@ export function FaqList({
                   <strong className={styles.firstSentence}><InlineRichText value={answer.first} showReview={showReview} /></strong>
                   {answer.rest ? <span className={styles.answerRest}> <InlineRichText value={answer.rest} showReview={showReview} /></span> : null}
                 </p>
-                {item.href ? <Link href={item.href}>{readLabel}</Link> : null}
+                {item.href ? <Link href={item.href} tabIndex={isOpen ? undefined : -1}>{readLabel}</Link> : null}
               </div>
             </div>
           </article>

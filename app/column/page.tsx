@@ -90,58 +90,58 @@ export default async function ColumnMainPage() {
   );
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-column-page>
       <ColumnMainMotion />
       <div className={styles.heroStage} data-column-hero>
-        <MotionGroup as="section" className={styles.cover}>
+        <section className={styles.cover}>
           <ColumnHeader content={content} variant="overlay" page="main" />
-          <span className={styles.verticalLabel} data-motion-item {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          <span className={styles.verticalLabel} data-column-entry="meta" {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
           <div className={styles.coverInner}>
-            <div className={styles.coverMeta} data-motion-item>
+            <div className={styles.coverMeta} data-column-entry="meta">
               <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
               <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
             </div>
             <h1 className={`${styles.masthead} ${styles.desktopMasthead}`}>
-              <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
-              <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
             </h1>
             <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
-              <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
-              <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
             </h1>
-            <p data-motion-item {...textEditProps("column.cover.description")}>
+            <p data-column-entry="description" {...textEditProps("column.cover.description")}>
               {coverDescriptionLead}
               {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
             </p>
           </div>
-        </MotionGroup>
+        </section>
 
-        <div className={styles.searchShell}>
+        <div className={styles.searchShell} data-column-entry="search">
           <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
         </div>
       </div>
 
-      <div className={styles.issueBar} aria-label="발행 정보">
+      <div className={styles.issueBar} aria-label="발행 정보" data-column-section-motion="issue">
         <span {...textEditProps("column.cover.issueShort")}>{getText(content, "column.cover.issueShort")}</span>
         <i aria-hidden="true" />
         <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
       </div>
 
       {feature ? (
-        <section className={styles.feature} aria-labelledby="feature-heading">
+        <section className={styles.feature} aria-labelledby="feature-heading" data-column-section-motion="feature">
           <div className={styles.featureMeta}>
             <span {...textEditProps("column.feature.eyebrow")}>{getText(content, "column.feature.eyebrow")}</span>
             <span {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
           </div>
-          <div className={styles.featureVisual}>
+          <div className={styles.featureVisual} data-column-reveal="feature-image" data-column-parallax="80">
             <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId={feature?.listImage ? undefined : "column.feature.image"} image={featureImage} priority sizes="100vw" />
             <div className={styles.featureShade} aria-hidden="true" />
-            <div className={styles.featureTitle}>
+            <div className={styles.featureTitle} data-column-reveal="feature-title">
               <span {...textEditProps("column.feature.number")}>{getText(content, "column.feature.number")}</span>
               <h2 id="feature-heading" {...textEditProps("column.feature.title")}>{getText(content, "column.feature.title")}</h2>
             </div>
           </div>
-          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth">
+          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth" columnParallax={60}>
             <article data-motion-item>
               <span className={styles.featureCardMeta} {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
               <h3><Link href={`/column/${feature.slug}`}><span className={styles.desktopFeatureTitle}>{feature.title} →</span><span className={styles.mobileFeatureTitle}>{feature.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요? →</span></> : feature.title}</span></Link></h3>
@@ -167,8 +167,8 @@ export default async function ColumnMainPage() {
       <ColumnList columns={published} content={content} concernMode />
 
       {questionItems.length ? (
-        <section className={styles.questions} aria-labelledby="questions-heading">
-          <span className={styles.qaDecoration} aria-hidden="true">Q&amp;A</span>
+        <section className={styles.questions} aria-labelledby="questions-heading" data-column-section-motion="questions">
+          <span className={styles.qaDecoration} aria-hidden="true" data-column-parallax="-110">Q&amp;A</span>
           <div className={styles.questionsInner}>
             <header className={styles.questionsHeader}>
               <h2 id="questions-heading" {...textEditProps("column.questions.title")}>{getText(content, "column.questions.title")}</h2>
@@ -210,12 +210,12 @@ export default async function ColumnMainPage() {
       ) : null}
 
       {treatmentSlugs.length ? (
-        <section className={styles.treatments} aria-labelledby="treatments-heading">
+        <section className={styles.treatments} aria-labelledby="treatments-heading" data-column-section-motion="treatments">
           <header>
             <h2 id="treatments-heading" {...textEditProps("column.treatments.sectionTitle")}>{getText(content, "column.treatments.sectionTitle")}</h2>
             <span {...textEditProps("column.treatments.eyebrow")}>{getText(content, "column.treatments.eyebrow")}</span>
           </header>
-          <MotionGroup className={styles.treatmentGrid} scrollWorldLayer="copy">
+          <MotionGroup className={styles.treatmentGrid} scrollWorldLayer="copy" stagger={0.1}>
             {treatmentSlugs.flatMap((slug) => {
               const treatment = getTreatment(slug);
               if (!treatment) return [];
@@ -230,12 +230,12 @@ export default async function ColumnMainPage() {
         </section>
       ) : null}
 
-      <section className={styles.archive} aria-labelledby="archive-heading">
+      <section className={styles.archive} aria-labelledby="archive-heading" data-column-section-motion="archive">
         <header>
           <h2 id="archive-heading" {...textEditProps("column.archive.title")}>{getText(content, "column.archive.title")}</h2>
           <span {...textEditProps("column.archive.eyebrow")}>{getText(content, "column.archive.eyebrow")}</span>
         </header>
-        <MotionGroup className={styles.archiveList} scrollWorldLayer="depth">
+        <MotionGroup className={styles.archiveList} scrollWorldLayer="depth" stagger={0.1}>
           {published.map((column) => (
             <Link href={`/column/${column.slug}`} key={column.slug} data-motion-item>
               <div className={styles.archiveMeta}>
@@ -250,7 +250,7 @@ export default async function ColumnMainPage() {
         </MotionGroup>
       </section>
 
-      <section className={styles.consult}>
+      <section className={styles.consult} data-column-section-motion="consult">
         <div>
           <span {...textEditProps("column.consult.eyebrow")}>{getText(content, "column.consult.eyebrow")}</span>
           <h2 className={styles.desktopConsultTitle} {...textEditProps("column.consult.title")}>{consultTitle}</h2>

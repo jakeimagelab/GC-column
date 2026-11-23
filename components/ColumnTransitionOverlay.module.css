@@ -1,43 +1,26 @@
-.layer { position:fixed; z-index:10000; inset:0; pointer-events:all; }
-.dimmer { position:absolute; inset:0; background:rgba(20,16,12,.48); }
-.cover { position:absolute; inset:0; overflow:hidden; background:#3a3028; display:flex; align-items:center; justify-content:center; transform-origin:center; will-change:clip-path,transform,opacity,filter; }
-.masthead { color: #fff; display: flex; align-items: baseline; gap: clamp(22px, 3vw, 46px); font-family: var(--font-en); font-size: clamp(76px, 10.4167vw, 150px); line-height: .88; letter-spacing: -.055em; white-space: nowrap; }
-.masthead strong { font-weight: 700; }
-.masthead span { font-weight: 300; }
-.masthead i { font-size: .58em; font-style: normal; font-weight: 300; }
+.layer { position:fixed; z-index:10000; inset:0; pointer-events:all; contain:strict; }
+.surface { position:absolute; inset:0; background:#3a3028; display:block; will-change:clip-path,opacity; }
+.expanding .surface { animation:expandFromOrigin .85s cubic-bezier(.77,0,.18,1) both; }
+.arrived .surface { clip-path:inset(0); animation:arrivalFade .12s linear both; }
+.covering .surface { clip-path:inset(0); animation:homeCover .35s cubic-bezier(.2,.8,.2,1) both; }
+.collapsing .surface { animation:collapseToOrigin .7s cubic-bezier(.77,0,.18,1) both; }
+.reduced .surface { clip-path:inset(0); animation:reducedFade .2s linear both; }
 
-.entering .dimmer { animation:transitionDimIn 1.28s cubic-bezier(.7,0,.2,1) both; }
-.covered .dimmer { opacity:1; }
-.leaving .dimmer { animation:transitionDimOut 1.08s cubic-bezier(.22,.61,.36,1) both; }
-.entering.toColumn .cover { animation:coverInFromRight 1.28s cubic-bezier(.76,0,.16,1) both; }
-.entering.toHome .cover { animation:coverInFromLeft 1.28s cubic-bezier(.76,0,.16,1) both; }
-.covered .cover { clip-path:inset(0); transform:none; }
-.leaving .cover { animation:coverDissolve 1.08s cubic-bezier(.22,.61,.36,1) both; }
-.entering .masthead { animation:mastheadIn .74s .36s cubic-bezier(.22,.61,.36,1) both; }
-.covered .masthead { opacity:1; transform:none; }
-.leaving .masthead { animation:mastheadDissolve .64s cubic-bezier(.4,0,.2,1) both; }
+:global(html[data-column-transition="active"]),:global(html[data-column-transition="active"] body),
+:global(html[data-column-transition="arrived"]),:global(html[data-column-transition="arrived"] body) { overflow:hidden; }
+:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="expanding"] body > main) { transform:scale(.94); transform-origin:50% 40%; filter:brightness(.45); transition:transform .9s cubic-bezier(.77,0,.18,1),filter .9s cubic-bezier(.2,.8,.2,1); }
+:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="arrived"] body > main),
+:global(html[data-column-transition-direction="to-home"][data-column-transition-phase="collapsing"] body > main) { transform:none; filter:none; }
 
-:global(html[data-column-transition="active"]),
-:global(html[data-column-transition="active"] body) { overflow: hidden; }
-:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="entering"] body > main) { opacity:.86; transform:translate3d(-1.5%,0,0) scale(.994); filter:blur(1px); transition:opacity 1.28s ease,transform 1.28s cubic-bezier(.76,0,.16,1),filter 1.28s ease; }
-:global(html[data-column-transition-direction="to-home"][data-column-transition-phase="entering"] body > main) { opacity:.86; transform:translate3d(1.5%,0,0) scale(.994); filter:blur(1px); transition:opacity 1.28s ease,transform 1.28s cubic-bezier(.76,0,.16,1),filter 1.28s ease; }
-:global(html[data-column-transition-phase="covered"] body > main) { opacity:.76; transform:translateY(10px) scale(.99); filter:blur(2px); }
-:global(html[data-column-transition-phase="leaving"] body > main) { opacity:1; transform:none; filter:none; transition:opacity 1.08s ease,transform 1.08s cubic-bezier(.22,.61,.36,1),filter 1.08s ease; }
+@keyframes expandFromOrigin { from { clip-path:inset(var(--column-origin-top) var(--column-origin-right) var(--column-origin-bottom) var(--column-origin-left) round 2px); } to { clip-path:inset(0 round 0); } }
+@keyframes arrivalFade { from { opacity:1; } to { opacity:0; } }
+@keyframes homeCover { from { opacity:0; } to { opacity:1; } }
+@keyframes collapseToOrigin { from { clip-path:inset(0 round 0); opacity:1; } to { clip-path:inset(var(--column-origin-top) var(--column-origin-right) var(--column-origin-bottom) var(--column-origin-left) round 2px); opacity:1; } }
+@keyframes reducedFade { 0% { opacity:0; } 45% { opacity:1; } 100% { opacity:0; } }
 
-@keyframes coverInFromRight { from { clip-path:inset(0 0 0 100%); transform:translateX(3.5vw) scale(1.012); } to { clip-path:inset(0); transform:none; } }
-@keyframes coverInFromLeft { from { clip-path:inset(0 100% 0 0); transform:translateX(-3.5vw) scale(1.012); } to { clip-path:inset(0); transform:none; } }
-@keyframes coverDissolve { from { opacity:1; transform:scale(1); filter:blur(0); } to { opacity:0; transform:translateY(-10px) scale(1.025); filter:blur(6px); } }
-@keyframes transitionDimIn { from { opacity:0; } to { opacity:1; } }
-@keyframes transitionDimOut { from { opacity:1; } to { opacity:0; } }
-@keyframes mastheadIn { from { opacity:0; transform:translateY(24px) scale(.985); } to { opacity:1; transform:none; } }
-@keyframes mastheadDissolve { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(-14px) scale(.99); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .layer { display: none; }
-  :global(html[data-column-transition="active"] body > main) { transform:none; transition:none; }
+@media(max-width:640px) { .expanding .surface { animation-duration:.6s; } }
+@media(prefers-reduced-motion:reduce) {
+  .expanding .surface,.arrived .surface,.covering .surface,.collapsing .surface { animation:reducedFade .2s linear both; clip-path:inset(0); }
+  :global(html[data-column-transition="active"] body > main),:global(html[data-column-transition="arrived"] body > main) { transform:none; filter:none; transition:none; }
 }
-
-@media (max-width: 640px) {
-  .masthead { flex-direction: column; align-items: flex-start; gap: 10px; font-size: clamp(58px, 19vw, 78px); white-space: normal; }
-  .masthead i { display: none; }
-}
+:global(body.devEditActive) .layer { display:none; }

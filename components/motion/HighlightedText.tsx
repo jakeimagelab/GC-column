@@ -31,7 +31,7 @@ export function InlineRichText({ value, showReview = false }: { value: string; s
 export function HighlightedParagraph({ value, lead, showReview = false, className }: { value: string; lead?: string; showReview?: boolean; className?: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const hasHighlight = value.includes("==") || Boolean(lead?.includes("=="));
-  const options = useMemo(() => ({ threshold: 0.35, rootMargin: "0px 0px -10%", armBeforePlay: true }), []);
+  const options = useMemo(() => ({ threshold: 0.06, rootMargin: "0px 0px -6% 0px", armBeforePlay: true }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
 
   return (

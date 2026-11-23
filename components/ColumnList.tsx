@@ -46,7 +46,7 @@ export function ColumnList({ columns, content, concernMode = false }: ColumnList
   if (concernMode && content) {
     const concerns = getConcernItems(content);
     return (
-      <section className={styles.concernExplorer} aria-labelledby="concern-list-title">
+      <section className={styles.concernExplorer} aria-labelledby="concern-list-title" data-column-section-motion="concerns">
         <aside className={styles.concernRail}>
           <span className={styles.eyebrow} {...textEditProps("column.concerns.eyebrow")}>{getText(content, "column.concerns.eyebrow")}</span>
           <h2 id="concern-list-title" {...textEditProps("column.concerns.title")}>{getText(content, "column.concerns.title")}</h2>
@@ -62,6 +62,7 @@ export function ColumnList({ columns, content, concernMode = false }: ColumnList
                   className={selected ? styles.activeConcern : ""}
                   onClick={() => setActiveConcern(key)}
                   key={concern.num}
+                  data-column-stagger-item
                 >
                   <span {...textEditProps(`home.concern.items.${concern.num}.num`)}>{concern.num}</span>
                   <span><b {...textEditProps(`home.concern.items.${concern.num}.name`)}>{concern.name}</b><small {...textEditProps(`home.concern.items.${concern.num}.desc`)}>{concern.desc}</small></span>

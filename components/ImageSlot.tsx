@@ -20,6 +20,7 @@ type ImageSlotProps = {
   unoptimized?: boolean;
   motionRole?: "doctor-photo";
   scrollWorldLayer?: "depth" | "copy" | "counter";
+  transitionOrigin?: boolean;
 };
 
 export function ImageSlot({
@@ -38,6 +39,7 @@ export function ImageSlot({
   unoptimized = false,
   motionRole,
   scrollWorldLayer,
+  transitionOrigin = false,
 }: ImageSlotProps) {
   const desktop = image ? desktopTransform(image) : { x: 50, y: 50, zoom: 100 };
   const mobile = image ? mobileTransform(image) : desktop;
@@ -71,6 +73,7 @@ export function ImageSlot({
       data-placement-display={placement?.displayName}
       data-motion-photo={motionRole === "doctor-photo" ? "" : undefined}
       data-scroll-world-layer={scrollWorldLayer}
+      data-column-transition-origin={transitionOrigin ? "" : undefined}
     >
       {image?.src ? (
         <Image className={styles.image} src={image.src} alt={resolvedAlt} fill sizes={sizes} priority={priority} unoptimized={unoptimized || image.src.startsWith("http")} />

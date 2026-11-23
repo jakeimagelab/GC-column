@@ -4,9 +4,7 @@ import { ColumnTransitionOverlay } from "@/components/ColumnTransitionOverlay";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ContentBoardPreviewBridge } from "@/components/ContentBoardPreviewBridge";
 import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
-import { getText } from "@/content/site-content-types";
 import { SITE_URL } from "@/content/site";
-import { readSiteContent } from "@/lib/contentStore";
 import { cormorantGaramond, montserrat, nanumPenScript, notoSansKr, notoSerifKr } from "./fonts";
 import "./globals.css";
 
@@ -18,14 +16,13 @@ export const metadata: Metadata = {
   robots: process.env.NODE_ENV === "development" ? { index: false, follow: false } : { index: true, follow: true },
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const content = await readSiteContent();
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" className={`${notoSansKr.variable} ${montserrat.variable} ${nanumPenScript.variable} ${notoSerifKr.variable} ${cormorantGaramond.variable}`}>
       <body>
         {children}
         <Suspense fallback={null}>
-          <ColumnTransitionOverlay gloryLabel={getText(content, "home.transition.glory")} columnLabel={getText(content, "home.transition.column")} />
+          <ColumnTransitionOverlay />
         </Suspense>
         <ScrollWorldJourney />
         {process.env.NODE_ENV === "development" ? <ContentBoardPreviewBridge /> : null}

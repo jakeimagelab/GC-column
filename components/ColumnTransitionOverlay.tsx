@@ -1,152 +1,197 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { textEditProps } from "@/content/site-content-types";
+import { isVisualEditingMode } from "@/lib/motion";
 import styles from "./ColumnTransitionOverlay.module.css";
 
 type ColumnNavigateDetail = { href?: string };
 type TransitionDirection = "toColumn" | "toHome";
-type TransitionPhase = "idle" | "entering" | "covered" | "leaving";
+type TransitionPhase = "idle" | "expanding" | "arrived" | "covering" | "collapsing" | "reduced";
+type StoredRect = { top:number; left:number; width:number; height:number; viewportWidth:number; viewportHeight:number };
 
-const ENTER_DURATION = 1280;
-const COVER_HOLD_DURATION = 180;
-const EXIT_DURATION = 1080;
-const ROUTE_TIMEOUT = 2800;
+const ORIGIN_KEY = "glory:column-transition-origin";
+const EXPAND_DURATION = 850;
+const EXPAND_DURATION_MOBILE = 600;
+const ARRIVAL_FADE_DURATION = 120;
+const HOME_COVER_DURATION = 350;
+const HOME_COLLAPSE_DURATION = 700;
+const REDUCED_DURATION = 200;
+const ROUTE_TIMEOUT = 2400;
 
-type ColumnTransitionOverlayProps = {
-  columnLabel: string;
-  gloryLabel: string;
-};
+function rectFromElement(element:Element | null):StoredRect {
+  const rect = element?.getBoundingClientRect();
+  if (!rect || rect.width < 2 || rect.height < 2) {
+    return { top:window.innerHeight*.46, left:window.innerWidth*.46, width:window.innerWidth*.08, height:window.innerHeight*.08, viewportWidth:window.innerWidth, viewportHeight:window.innerHeight };
+  }
+  return { top:rect.top, left:rect.left, width:rect.width, height:rect.height, viewportWidth:window.innerWidth, viewportHeight:window.innerHeight };
+}
 
-export function ColumnTransitionOverlay({ columnLabel, gloryLabel }: ColumnTransitionOverlayProps) {
+function storedOrigin() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(ORIGIN_KEY) ?? "") as StoredRect;
+    if ([value.top,value.left,value.width,value.height,value.viewportWidth,value.viewportHeight].every(Number.isFinite)) {
+      const scaleX = window.innerWidth / Math.max(value.viewportWidth,1);
+      const scaleY = window.innerHeight / Math.max(value.viewportHeight,1);
+      return { top:value.top*scaleY, left:value.left*scaleX, width:value.width*scaleX, height:value.height*scaleY, viewportWidth:window.innerWidth, viewportHeight:window.innerHeight };
+    }
+  } catch {
+    // The remembered home card is optional.
+  }
+  return rectFromElement(null);
+}
+
+function originStyle(rect:StoredRect):CSSProperties {
+  return {
+    "--column-origin-top":`${Math.max(0,rect.top)}px`,
+    "--column-origin-right":`${Math.max(0,window.innerWidth-rect.left-rect.width)}px`,
+    "--column-origin-bottom":`${Math.max(0,window.innerHeight-rect.top-rect.height)}px`,
+    "--column-origin-left":`${Math.max(0,rect.left)}px`,
+  } as CSSProperties;
+}
+
+export function ColumnTransitionOverlay() {
   const router = useRouter();
   const pathname = usePathname();
-  const [href, setHref] = useState("");
-  const [direction, setDirection] = useState<TransitionDirection>("toColumn");
-  const [phase, setPhase] = useState<TransitionPhase>("idle");
-  const navigationTimerRef = useRef<number | null>(null);
-  const holdTimerRef = useRef<number | null>(null);
-  const finishTimerRef = useRef<number | null>(null);
-  const routeTimeoutRef = useRef<number | null>(null);
+  const [href,setHref] = useState("");
+  const [direction,setDirection] = useState<TransitionDirection>("toColumn");
+  const [phase,setPhase] = useState<TransitionPhase>("idle");
+  const [origin,setOrigin] = useState<StoredRect | null>(null);
+  const targetPathRef = useRef("");
+  const expansionDoneRef = useRef(false);
+  const routeDoneRef = useRef(false);
+  const timersRef = useRef<number[]>([]);
   const transitioningRef = useRef(false);
 
+  const later = useCallback((callback:()=>void,delay:number) => {
+    const timer = window.setTimeout(callback,delay);
+    timersRef.current.push(timer);
+  },[]);
+
   const clearTimers = useCallback(() => {
-    [navigationTimerRef, holdTimerRef, finishTimerRef, routeTimeoutRef].forEach((timer) => {
-      if (timer.current !== null) window.clearTimeout(timer.current);
-      timer.current = null;
-    });
-  }, []);
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = [];
+  },[]);
 
   const finish = useCallback(() => {
     clearTimers();
     transitioningRef.current = false;
+    targetPathRef.current = "";
+    expansionDoneRef.current = false;
+    routeDoneRef.current = false;
     setHref("");
+    setOrigin(null);
     setPhase("idle");
-  }, [clearTimers]);
+  },[clearTimers]);
+
+  const revealColumn = useCallback(() => {
+    if (!expansionDoneRef.current || !routeDoneRef.current) return;
+    setPhase("arrived");
+    later(finish,ARRIVAL_FADE_DURATION);
+  },[finish,later]);
+
+  const start = useCallback((nextHref:string,nextDirection:TransitionDirection,source?:Element | null) => {
+    if (transitioningRef.current || isVisualEditingMode()) return;
+    const url = new URL(nextHref,window.location.origin);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nextOrigin = nextDirection === "toColumn" ? rectFromElement(source ?? null) : storedOrigin();
+    transitioningRef.current = true;
+    targetPathRef.current = url.pathname;
+    routeDoneRef.current = false;
+    expansionDoneRef.current = false;
+    setHref(`${url.pathname}${url.search}${url.hash}`);
+    setDirection(nextDirection);
+    setOrigin(nextOrigin);
+    if (nextDirection === "toColumn") {
+      try { sessionStorage.setItem(ORIGIN_KEY,JSON.stringify(nextOrigin)); } catch { /* optional */ }
+    }
+    if (reduceMotion) {
+      setPhase("reduced");
+      router.push(`${url.pathname}${url.search}${url.hash}`);
+      later(finish,REDUCED_DURATION);
+      return;
+    }
+    if (nextDirection === "toColumn") {
+      const duration = window.matchMedia("(max-width: 640px)").matches ? EXPAND_DURATION_MOBILE : EXPAND_DURATION;
+      setPhase("expanding");
+      router.push(`${url.pathname}${url.search}${url.hash}`);
+      later(() => { expansionDoneRef.current = true; revealColumn(); },duration);
+    } else {
+      // Intentionally not the forward animation in reverse: first dissolve the
+      // column into a full cover, then fold the cover into the remembered card.
+      setPhase("covering");
+      later(() => router.push(`${url.pathname}${url.search}${url.hash}`),HOME_COVER_DURATION);
+    }
+    later(finish,ROUTE_TIMEOUT);
+  },[finish,later,revealColumn,router]);
 
   useEffect(() => {
     router.prefetch("/column");
     router.prefetch("/");
-
-    const start = (nextHref: string, nextDirection: TransitionDirection) => {
-      if (transitioningRef.current) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        router.push(nextHref);
-        return;
-      }
-
-      transitioningRef.current = true;
-      setHref(nextHref);
-      setDirection(nextDirection);
-      setPhase("entering");
-      navigationTimerRef.current = window.setTimeout(() => {
-        setPhase("covered");
-        router.push(nextHref);
-        routeTimeoutRef.current = window.setTimeout(() => setPhase("leaving"), ROUTE_TIMEOUT);
-      }, ENTER_DURATION);
-    };
-
-    const onClick = (event: MouseEvent) => {
+    const onClick = (event:MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      if (document.body.classList.contains("devEditActive")) return;
       const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>("a[href]");
       if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
-      const url = new URL(anchor.href, window.location.href);
+      const url = new URL(anchor.href,window.location.href);
       if (url.origin !== window.location.origin) return;
       const currentPath = window.location.pathname;
-      const nextDirection = currentPath === "/" && url.pathname.startsWith("/column")
-        ? "toColumn"
-        : currentPath.startsWith("/column") && url.pathname === "/"
-          ? "toHome"
-          : null;
+      const nextDirection = currentPath === "/" && url.pathname.startsWith("/column") ? "toColumn"
+        : currentPath.startsWith("/column") && url.pathname === "/" ? "toHome" : null;
       if (!nextDirection) return;
+      const markedOrigin = anchor.querySelector<HTMLElement>("[data-column-transition-origin]")
+        ?? anchor.closest<HTMLElement>("[data-column-transition-origin]") ?? anchor;
       event.preventDefault();
-      start(`${url.pathname}${url.search}${url.hash}`, nextDirection);
+      start(`${url.pathname}${url.search}${url.hash}`,nextDirection,markedOrigin);
     };
-
-    const onNavigate = (event: Event) => {
-      const transitionEvent = event as CustomEvent<ColumnNavigateDetail>;
-      const nextHref = transitionEvent.detail?.href;
-      if (window.location.pathname !== "/" || !nextHref?.startsWith("/column")) return;
-      transitionEvent.preventDefault();
-      start(nextHref, "toColumn");
+    const onNavigate = (event:Event) => {
+      const detail = (event as CustomEvent<ColumnNavigateDetail>).detail;
+      if (window.location.pathname !== "/" || !detail?.href?.startsWith("/column")) return;
+      event.preventDefault();
+      start(detail.href,"toColumn",null);
     };
-
-    document.addEventListener("click", onClick, true);
-    window.addEventListener("glory:column-navigate", onNavigate);
+    document.addEventListener("click",onClick,true);
+    window.addEventListener("glory:column-navigate",onNavigate);
     return () => {
-      document.removeEventListener("click", onClick, true);
-      window.removeEventListener("glory:column-navigate", onNavigate);
-      clearTimers();
-      delete document.documentElement.dataset.columnTransition;
-      delete document.documentElement.dataset.columnTransitionDirection;
-      delete document.documentElement.dataset.columnTransitionPhase;
+      document.removeEventListener("click",onClick,true);
+      window.removeEventListener("glory:column-navigate",onNavigate);
     };
-  }, [clearTimers, router]);
+  },[router,start]);
 
   useEffect(() => {
+    if (phase === "idle" || !targetPathRef.current || pathname !== targetPathRef.current) return;
+    routeDoneRef.current = true;
+    if (direction === "toColumn") revealColumn();
+    else if (direction === "toHome" && phase === "covering") {
+      setPhase("collapsing");
+      later(finish,HOME_COLLAPSE_DURATION);
+    }
+  },[direction,finish,later,pathname,phase,revealColumn]);
+
+  useEffect(() => {
+    const root = document.documentElement;
     if (phase === "idle") {
-      delete document.documentElement.dataset.columnTransition;
-      delete document.documentElement.dataset.columnTransitionDirection;
-      delete document.documentElement.dataset.columnTransitionPhase;
+      delete root.dataset.columnTransition;
+      delete root.dataset.columnTransitionDirection;
+      delete root.dataset.columnTransitionPhase;
       return;
     }
-    document.documentElement.dataset.columnTransition = "active";
-    document.documentElement.dataset.columnTransitionDirection = direction === "toColumn" ? "to-column" : "to-home";
-    document.documentElement.dataset.columnTransitionPhase = phase;
-  }, [direction, phase]);
+    root.dataset.columnTransition = phase === "arrived" ? "arrived" : "active";
+    root.dataset.columnTransitionDirection = direction === "toColumn" ? "to-column" : "to-home";
+    root.dataset.columnTransitionPhase = phase;
+  },[direction,phase]);
 
-  useEffect(() => {
-    if (phase !== "covered" || !href || typeof window === "undefined") return;
-    const targetPath = new URL(href, window.location.origin).pathname;
-    if (pathname !== targetPath || holdTimerRef.current !== null) return;
-    if (routeTimeoutRef.current !== null) {
-      window.clearTimeout(routeTimeoutRef.current);
-      routeTimeoutRef.current = null;
-    }
-    holdTimerRef.current = window.setTimeout(() => setPhase("leaving"), COVER_HOLD_DURATION);
-  }, [href, pathname, phase]);
+  useEffect(() => () => {
+    clearTimers();
+    delete document.documentElement.dataset.columnTransition;
+    delete document.documentElement.dataset.columnTransitionDirection;
+    delete document.documentElement.dataset.columnTransitionPhase;
+  },[clearTimers]);
 
-  useEffect(() => {
-    if (phase !== "leaving") return;
-    finishTimerRef.current = window.setTimeout(finish, EXIT_DURATION);
-  }, [finish, phase]);
-
-  if (phase === "idle" || !href || typeof document === "undefined") return null;
-
+  if (phase === "idle" || !href || !origin || typeof document === "undefined") return null;
   return createPortal(
-    <div
-      className={`${styles.layer} ${styles[direction]} ${styles[phase]}`}
-      role="status"
-      aria-live="polite"
-      aria-label={direction === "toColumn" ? "원장 칼럼으로 이동 중" : "홈페이지로 이동 중"}
-    >
-      <div className={styles.dimmer} />
-      <div className={styles.cover}>
-        <div className={styles.masthead} aria-hidden="true"><strong {...textEditProps("home.transition.glory")}>{gloryLabel}</strong><i>/</i><span {...textEditProps("home.transition.column")}>{columnLabel}</span></div>
-      </div>
+    <div className={`${styles.layer} ${styles[direction]} ${styles[phase]}`} style={originStyle(origin)} role="status" aria-live="polite" aria-label={direction === "toColumn" ? "원장 칼럼으로 이동 중" : "홈페이지로 이동 중"}>
+      <span className={styles.surface} aria-hidden="true" />
     </div>,
     document.body,
   );

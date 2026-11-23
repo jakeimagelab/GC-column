@@ -102,8 +102,8 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
   };
 
   return (
-    <div className={styles.search} id="search">
-      <div className={styles.inputRow}>
+    <div className={styles.search} id="search" data-column-search>
+      <div className={styles.inputRow} data-column-search-box>
         <label htmlFor="column-search" {...textEditProps("column.search.label")}>{getText(content, "column.search.label")}</label>
         <MagnifyingGlassIcon className={styles.searchIcon} aria-hidden="true" />
         <input
@@ -176,9 +176,9 @@ export function ColumnSearch({ columns, content, faqIndex, treatments }: ColumnS
         </div>
       ) : null}
 
-      <div className={styles.popular}>
+      <div className={styles.popular} data-column-keywords>
         <span>{getText(content, "column.search.popularLabel")}</span>
-        {popular.map((keyword) => <button type="button" onClick={() => chooseQuery(keyword.value)} key={keyword.id} data-edit-control>{keyword.value}</button>)}
+        {popular.map((keyword) => <button type="button" onClick={() => chooseQuery(keyword.value)} key={keyword.id} data-edit-control data-column-keyword>{keyword.value}</button>)}
       </div>
     </div>
   );

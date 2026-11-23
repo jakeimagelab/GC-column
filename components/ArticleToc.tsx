@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { isVisualEditingMode } from "@/lib/motion";
 import styles from "./ArticleToc.module.css";
 
 export type TocItem = { id: string; label: string };
@@ -16,55 +17,78 @@ type ArticleTocProps = {
 export function ArticleToc({ items, title, compact = false, mobileBar = false }: ArticleTocProps) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
   const [open, setOpen] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const progressRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const elements = items.flatMap((item) => {
       const element = document.getElementById(item.id);
       return element ? [element] : [];
     });
+    const article = mobileBar ? document.querySelector<HTMLElement>("[data-article-body]") : null;
+    const media = window.matchMedia("(max-width: 640px)");
     let frame = 0;
+    let enabled = mobileBar ? media.matches : !media.matches;
+    let needsMeasure = true;
+    let positions:Array<{ id:string; top:number }> = [];
+    let articleStart = 0;
+    let articleEnd = 1;
+    let lastProgress = -1;
+    const measure = () => {
+      const scrollY = window.scrollY;
+      positions = elements.map((element) => ({ id:element.id, top:element.getBoundingClientRect().top+scrollY }));
+      if (article) {
+        articleStart = article.getBoundingClientRect().top+scrollY;
+        articleEnd = Math.max(articleStart+1,articleStart+article.offsetHeight-window.innerHeight);
+      }
+      needsMeasure = false;
+    };
     const update = () => {
       frame = 0;
-      const activationLine = mobileBar ? 132 : window.innerHeight * 0.22;
-      let current = elements[0]?.id ?? "";
-      for (const element of elements) {
-        if (element.getBoundingClientRect().top > activationLine) break;
-        current = element.id;
+      if (!enabled) return;
+      if (needsMeasure) measure();
+      const activationPoint = window.scrollY+window.innerHeight*.35;
+      let current = positions[0]?.id ?? "";
+      for (const position of positions) {
+        if (position.top > activationPoint) break;
+        current = position.id;
       }
       if (current) setActiveId((previous) => previous === current ? previous : current);
+      if (article && progressRef.current) {
+        const progress = Math.max(0,Math.min(1,(window.scrollY-articleStart)/(articleEnd-articleStart)));
+        if (Math.abs(progress-lastProgress) >= .001) {
+          progressRef.current.style.transform = `scaleX(${progress.toFixed(4)})`;
+          lastProgress = progress;
+        }
+      }
     };
     const schedule = () => {
+      if (!enabled) return;
       if (frame) return;
       frame = window.requestAnimationFrame(update);
     };
+    const scheduleMeasure = () => {
+      needsMeasure = true;
+      schedule();
+    };
+    const handleMediaChange = () => {
+      enabled = mobileBar ? media.matches : !media.matches;
+      if (enabled) scheduleMeasure();
+    };
+    const resizeObserver = new ResizeObserver(scheduleMeasure);
+    elements.forEach((element) => resizeObserver.observe(element));
+    if (article) resizeObserver.observe(article);
     update();
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", scheduleMeasure);
+    media.addEventListener("change",handleMediaChange);
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", scheduleMeasure);
+      media.removeEventListener("change",handleMediaChange);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [items, mobileBar]);
-
-  useEffect(() => {
-    if (!mobileBar) return;
-    const update = () => {
-      const article = document.querySelector<HTMLElement>("[data-article-body]");
-      if (!article) return;
-      const start = article.getBoundingClientRect().top + window.scrollY;
-      const end = start + article.offsetHeight - window.innerHeight;
-      setProgress(end <= start ? 1 : Math.max(0, Math.min(1, (window.scrollY - start) / (end - start))));
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [mobileBar]);
 
   useEffect(() => {
     if (!open) return;
@@ -75,11 +99,23 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
     return () => window.removeEventListener("keydown", close);
   }, [open]);
 
+  const jumpTo = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    event.preventDefault();
+    const target = document.getElementById(id);
+    if (!target) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isVisualEditingMode();
+    const offset = mobileBar ? 127 : 24;
+    window.history.replaceState(null, "", `#${id}`);
+    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: reduceMotion ? "auto" : "smooth" });
+    setActiveId(id);
+    setOpen(false);
+  };
+
   if (mobileBar) {
     const activeLabel = items.find((item) => item.id === activeId)?.label ?? items[0]?.label ?? "";
     return (
       <div className={styles.mobileToc}>
-        <span className={styles.progress} aria-hidden="true"><i style={{ transform: `scaleX(${progress})` }} /></span>
+        <span className={styles.progress} aria-hidden="true"><i ref={progressRef} /></span>
         <button type="button" aria-expanded={open} aria-controls="mobile-column-toc" onClick={() => setOpen((value) => !value)}>
           <span>목차</span><b>{activeLabel}</b><ChevronDownIcon aria-hidden="true" />
         </button>
@@ -89,7 +125,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
               href={`#${item.id}`}
               key={item.id}
               className={activeId === item.id ? styles.active : ""}
-              onClick={() => { setActiveId(item.id); setOpen(false); }}
+              onClick={(event) => jumpTo(event, item.id)}
             >
               {item.label}
             </a>
@@ -107,7 +143,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
           href={`#${item.id}`}
           key={item.id}
           className={activeId === item.id ? styles.active : ""}
-          onClick={() => setActiveId(item.id)}
+          onClick={(event) => jumpTo(event, item.id)}
         >
           {item.label}
         </a>

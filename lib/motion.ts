@@ -1,7 +1,12 @@
-export const MOTION_EASE = "cubic-bezier(.22,.61,.36,1)";
+export const MOTION_EASE = "cubic-bezier(.2,.8,.2,1)";
+export const MOTION_DRAW_EASE = "cubic-bezier(.77,0,.18,1)";
+
+export type MotionReveal = "up" | "line" | "mask" | "clip" | "draw" | "zoom" | "highlight" | "table";
 
 export function isVisualEditingMode() {
-  if (typeof window === "undefined" || process.env.NODE_ENV !== "development") return false;
+  if (typeof window === "undefined") return false;
+  if (document.body?.classList.contains("devEditActive")) return true;
+  if (process.env.NODE_ENV !== "development") return false;
   const search = new URLSearchParams(window.location.search);
   return search.get("edit") === "1" || search.get("content-board-preview") === "1";
 }

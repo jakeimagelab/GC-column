@@ -13,6 +13,7 @@ import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { LayerDiagram } from "@/components/LayerDiagram";
+import { ColumnDetailMotion } from "@/components/motion/ColumnDetailMotion";
 import { HighlightedParagraph, InlineRichText } from "@/components/motion/HighlightedText";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { QuestionForm } from "@/components/QuestionForm";
@@ -138,23 +139,25 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const relatedConsultRest = relatedConsultBreak >= 0 ? relatedConsultText.slice(relatedConsultBreak).trim() : "";
 
   return (
-    <main className={styles.page} style={articleStyle}>
+    <main className={styles.page} style={articleStyle} data-column-detail-page>
+      <ColumnDetailMotion />
       <ArticleProgress />
       <JsonLd value={structured} />
       <ArticleToc items={tocItems} title={getText(content, "column.detail.toc.eyebrow")} mobileBar />
 
-      <section className={styles.articleCover}>
+      <section className={styles.articleCover} data-detail-hero>
+        <div className={styles.articleCoverMedia} aria-hidden="true" />
         <ColumnHeader content={content} variant="overlay" page="detail" />
         <div className={styles.articleCoverInner}>
-          <nav className={styles.breadcrumb} aria-label="현재 위치">
+          <nav className={styles.breadcrumb} aria-label="현재 위치" data-detail-entry="breadcrumb">
             <Link href="/column">원장 칼럼</Link><span>›</span><span {...textEditProps("column.detail.breadcrumb.concern")}>{getText(content, "column.detail.breadcrumb.concern")}</span><span>›</span><span aria-current="page" {...textEditProps("column.detail.breadcrumb.title")}>{getText(content, "column.detail.breadcrumb.title")}</span>
           </nav>
-          <span className={styles.issueLabel} {...textEditProps("column.detail.issueLabel")}>{getText(content, "column.detail.issueLabel")}</span>
-          <h1 className={styles.desktopHeroTitle}>{titleRest.length ? <>{titleLead},<br />{titleRest.join(",").trim()}</> : column.title}</h1>
+          <span className={styles.issueLabel} data-detail-entry="issue" {...textEditProps("column.detail.issueLabel")}>{getText(content, "column.detail.issueLabel")}</span>
+          <h1 className={styles.desktopHeroTitle}>{titleRest.length ? <><span className={styles.heroTitleLine}><span data-detail-entry="title-1">{titleLead},</span></span><span className={styles.heroTitleLine}><span data-detail-entry="title-2">{titleRest.join(",").trim()}</span></span></> : <span className={styles.heroTitleLine}><span data-detail-entry="title-1">{column.title}</span></span>}</h1>
           <h1 className={styles.mobileHeroTitle}>
-            {column.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요?</span></> : column.title}
+            {column.slug === "xerf-vs-thermage" ? <><span className={styles.heroTitleLine}><span data-detail-entry="title-1">세르프(XERF)와</span></span><span className={styles.heroTitleLine}><span data-detail-entry="title-2">써마지FLX의 차이,</span></span><span className={styles.heroTitleLine}><span data-detail-entry="title-3">누구에게 맞을까요?</span></span></> : <span className={styles.heroTitleLine}><span data-detail-entry="title-1">{column.title}</span></span>}
           </h1>
-          <div className={styles.bylineRow}>
+          <div className={styles.bylineRow} data-detail-entry="byline">
             <div className={styles.byline}>
               <ImageSlot className={styles.avatar} label="" alt={getImage(content, "home.doctor.photo").alt} image={getImage(content, "home.doctor.photo")} sizes="52px" />
               <div>
@@ -174,7 +177,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
       <div className={styles.bodyLayout}>
         <article className={styles.article} data-article-body>
-          <nav className={styles.depthNav} aria-label={getText(content, "column.detail.depthLabel")}>
+          <nav className={styles.depthNav} aria-label={getText(content, "column.detail.depthLabel")} data-detail-reveal="up">
             <span {...textEditProps("column.detail.depthLabel")}>{getText(content, "column.detail.depthLabel")}</span>
             <div>
               <a className={styles.depthActive} href="#a30">30초 · 핵심 답</a>
@@ -183,7 +186,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             </div>
           </nav>
 
-          <section className={`${styles.quickAnswer} ${column.video?.src || showReview ? styles.quickAnswerWithMedia : ""}`} id="a30">
+          <section className={`${styles.quickAnswer} ${column.video?.src || showReview ? styles.quickAnswerWithMedia : ""}`} id="a30" data-detail-reveal="up">
             {column.video?.src ? (
               <div className={styles.videoColumn}>
                 <video controls poster={column.video.poster} preload="metadata"><source src={column.video.src} /></video>
@@ -211,17 +214,17 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           {column.shortAnswer ? (
             <section className={styles.shortAnswer} id="ans">
               <span>{column.shortAnswer.eyebrow}</span>
-              <h2>{column.shortAnswer.title}</h2>
+              <h2 data-detail-reveal="up">{column.shortAnswer.title}</h2>
               {column.shortAnswer.body.map((paragraph) => <HighlightedParagraph key={paragraph} value={paragraph} showReview={showReview} />)}
               {column.shortAnswer.note ? <small>{column.shortAnswer.note}</small> : null}
             </section>
           ) : null}
 
-          <MotionGroup className={styles.sections} scrollWorldLayer="copy">
+          <div className={styles.sections}>
             {column.sections.map((section, sectionIndex) => {
               if (section.kind === "image") {
                 return (
-                  <figure className={`${styles.imageOnly} ${section.ratio === "4/5" ? styles.imageOnlyPortrait : ""}`} key={`${section.src}-${sectionIndex}`} data-motion-item>
+                  <figure className={`${styles.imageOnly} ${section.ratio === "4/5" ? styles.imageOnlyPortrait : ""}`} key={`${section.src}-${sectionIndex}`} data-detail-reveal="figure">
                     <div className={styles.imageOnlyMedia}>
                       <Image src={section.src} alt={section.alt} fill sizes="(max-width: 1000px) 100vw, 788px" unoptimized loading="eager" />
                     </div>
@@ -234,7 +237,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                 .filter((candidate) => candidate.kind !== "image").length;
               const visibleBody = section.body.filter((paragraph) => showReview || !isReviewOnly(paragraph));
               return (
-                <section className={styles.articleSection} id={section.id} key={section.id} data-motion-item>
+                <section className={styles.articleSection} id={section.id} key={section.id} data-detail-reveal="section">
                   <div className={styles.sectionMarker}>
                     <span>{section.no}</span>
                     <b>{section.en ?? getText(content, `column.detail.section.${numberedSectionIndex}.eyebrow`)}</b>
@@ -251,17 +254,17 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                     </details>
                   ) : null}
 
-                  {section.figure?.kind === "layers" ? <LayerDiagram caption={section.figure.caption} showReview={showReview && section.figure.needsReview} /> : null}
+                  {section.figure?.kind === "layers" ? <div className={styles.figureMotion} data-detail-reveal="figure"><LayerDiagram caption={section.figure.caption} showReview={showReview && section.figure.needsReview} /></div> : null}
 
                   {section.figure?.kind === "image" ? (
-                    <figure className={styles.comparisonGraphic}>
+                    <figure className={styles.comparisonGraphic} data-detail-reveal="figure">
                       <Image src={section.figure.src} alt={section.figure.alt} width={3600} height={2320} sizes="(max-width: 640px) 100vw, 788px" />
                       <figcaption>{section.figure.caption}</figcaption>
                     </figure>
                   ) : null}
 
                   {section.table ? (
-                    <div className={styles.tableViewport}>
+                    <div className={styles.tableViewport} data-detail-reveal="table">
                       <span className={styles.tableHint} {...textEditProps("column.detail.table.scrollHint")}>{getText(content, "column.detail.table.scrollHint")}</span>
                       <div className={styles.tableScroll}>
                         <table>
@@ -274,7 +277,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                   ) : null}
 
                   {section.callout ? (
-                    <aside className={styles.callout}>
+                    <aside className={styles.callout} data-detail-reveal="up">
                       <span>{section.callout.eyebrow}</span>
                       <h3>{section.callout.title}</h3>
                       <p><InlineRichText value={visibleReviewText(section.callout.body, showReview)} showReview={showReview} /></p>
@@ -282,7 +285,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                   ) : null}
 
                   {section.twoCol ? (
-                    <div className={styles.twoCol}>
+                    <div className={styles.twoCol} data-detail-reveal="up">
                       {section.twoCol.items.map((item) => (
                         <article key={item.eyebrow}>
                           <span>{item.eyebrow}</span>
@@ -295,10 +298,10 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                 </section>
               );
             })}
-          </MotionGroup>
+          </div>
 
           {hasJudgement ? (
-            <section className={styles.judgement} id="judgement">
+            <section className={styles.judgement} id="judgement" data-detail-reveal="section">
               <div className={styles.sectionMarker}><span>03</span><b {...textEditProps("column.detail.judgement.eyebrow")}>{getText(content, "column.detail.judgement.eyebrow")}</b></div>
               <h2 {...textEditProps("column.detail.judgement.title")}>{getText(content, "column.detail.judgement.title")}</h2>
               <div className={styles.judgementGrid}>
@@ -309,7 +312,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           ) : null}
 
           {hasPrecautions ? (
-            <section className={styles.precautions} id="precautions">
+            <section className={styles.precautions} id="precautions" data-detail-reveal="section">
               <div className={styles.sectionMarker}><span>04</span><b {...textEditProps("column.detail.precautions.eyebrow")}>{getText(content, "column.detail.precautions.eyebrow")}</b></div>
               <h2 {...textEditProps("column.detail.precautions.title")}>{getText(content, "column.detail.precautions.title")}</h2>
               <ul>{column.precautions.map((item) => <li key={item}>{item}</li>)}</ul>
@@ -317,7 +320,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           ) : null}
 
           {readNext.length ? (
-            <section className={styles.readNext} aria-labelledby="read-next-title">
+            <section className={styles.readNext} aria-labelledby="read-next-title" data-detail-reveal="up">
               <span>READ NEXT</span>
               <h2 id="read-next-title">함께 읽으면 좋은 글</h2>
               <div>
@@ -331,7 +334,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             </section>
           ) : null}
 
-          <section className={styles.shareBox} id="share-actions">
+          <section className={styles.shareBox} id="share-actions" data-detail-reveal="up">
             <div><h2 {...textEditProps("column.detail.share.title")}>{getText(content, "column.detail.share.title")}</h2><p {...textEditProps("column.detail.share.description")}>{getText(content, "column.detail.share.description")}</p></div>
             <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
           </section>
@@ -346,7 +349,8 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       </div>
 
       {faqItems.length ? (
-        <section className={styles.faqBand} id="qa" aria-labelledby="detail-faq-heading">
+        <section className={styles.faqBand} id="qa" aria-labelledby="detail-faq-heading" data-detail-reveal="faq">
+          <span className={styles.faqDecoration} aria-hidden="true" data-detail-parallax="-100">Q&amp;A</span>
           <div className={styles.faqBandInner}>
             <header><div><span {...textEditProps("column.detail.faq.eyebrow")}>{getText(content, "column.detail.faq.eyebrow")}</span><h2 id="detail-faq-heading">{column.faqTitle ?? getText(content, "column.detail.faq.title")}</h2></div><b className={styles.faqMeta} {...textEditProps("column.detail.faq.meta")}>{getText(content, "column.detail.faq.meta")}</b></header>
             <FaqList items={faqItems} variant="magazine" firstOpen answerLabel={getText(content, "column.detail.faq.answerLabel")} showReview={showReview} />
@@ -359,20 +363,20 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         <QuestionForm content={content} columnSlug={column.slug} sidebar idSuffix="mobile" />
       </section>
 
-      <section className={styles.visitPrep}>
+      <section className={styles.visitPrep} data-detail-reveal="visit">
         <div className={styles.visitHeading}><span {...textEditProps("column.detail.visit.eyebrow")}>{getText(content, "column.detail.visit.eyebrow")}</span><h2 {...textEditProps("column.detail.visit.title")}>{getText(content, "column.detail.visit.title")}</h2></div>
         <MotionGroup className={styles.visitGrid} scrollWorldLayer="counter">
           {[0, 1, 2].map((index) => <div key={index} data-motion-item><span>{String(index + 1).padStart(2, "0")}</span><b {...textEditProps(`column.detail.visit.${index}`)}>{getText(content, `column.detail.visit.${index}`)}</b></div>)}
         </MotionGroup>
       </section>
 
-      <section className={styles.authorBox}>
+      <section className={styles.authorBox} data-detail-reveal="up">
         <ImageSlot className={styles.authorPhoto} label="" alt={getImage(content, "home.doctor.photo").alt} image={getImage(content, "home.doctor.photo")} sizes="96px" priority />
         <div><span {...textEditProps("column.detail.author.eyebrow")}>{getText(content, "column.detail.author.eyebrow")}</span><h2 {...textEditProps("column.detail.author.title")}>{getText(content, "column.detail.author.title")}</h2>{column.authorGreeting ? <p className={styles.authorGreeting}>{column.authorGreeting}</p> : null}<p className={styles.desktopCareer} {...textEditProps("column.detail.author.career")}>{getText(content, "column.detail.author.career")}</p><div className={styles.mobileCareer}>{getText(content, "column.detail.author.career").split(" · ").map((career) => <span key={career}>{career}</span>)}</div></div>
         <Link className={styles.authorAction} href="/doctor/lee-ho" {...textEditProps("column.detail.author.action")}>{getText(content, "column.detail.author.action")}</Link>
       </section>
 
-      <section className={styles.relatedBand}>
+      <section className={styles.relatedBand} data-detail-reveal="up">
         <div>
           <span {...textEditProps("column.detail.related.eyebrow")}>{getText(content, "column.detail.related.eyebrow")}</span>
           <h2 {...textEditProps("column.detail.related.title")}>{getText(content, "column.detail.related.title")}</h2>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { isVisualEditingMode } from "@/lib/motion";
 
 export function motionDisabled() {
@@ -14,17 +14,40 @@ export function useMotionOnce<T extends HTMLElement>(
   playingClass: string,
   options: { threshold?: number; rootMargin?: string; armBeforePlay?: boolean; onPlay?: (element: T) => void } = {},
 ) {
+  const onPlayRef = useRef(options.onPlay);
+  onPlayRef.current = options.onPlay;
+  const threshold = options.threshold ?? 0.28;
+  const rootMargin = options.rootMargin ?? "0px 0px -8%";
+  const armBeforePlay = options.armBeforePlay ?? false;
+
   useEffect(() => {
     const element = ref.current;
-    if (!element || motionDisabled()) return;
+    if (!element) return;
+    let armFrame = 0;
+    let playFrame = 0;
+    if (motionDisabled()) {
+      element.classList.remove(armedClass, playingClass);
+      element.dataset.motionComplete = "true";
+      return;
+    }
 
-    if (options.armBeforePlay) element.classList.add(armedClass);
+    if (armBeforePlay) element.classList.add(armedClass);
+
+    const setPlaying = () => {
+      playFrame = requestAnimationFrame(() => {
+        element.classList.add(playingClass);
+        element.dataset.motionComplete = "true";
+      });
+    };
 
     const play = () => {
-      if (!options.armBeforePlay) element.classList.add(armedClass);
-      options.onPlay?.(element);
-      void element.offsetWidth;
-      requestAnimationFrame(() => element.classList.add(playingClass));
+      onPlayRef.current?.(element);
+      if (armBeforePlay) {
+        setPlaying();
+        return;
+      }
+      element.classList.add(armedClass);
+      armFrame = requestAnimationFrame(setPlaying);
     };
 
     if (!("IntersectionObserver" in window)) {
@@ -37,10 +60,16 @@ export function useMotionOnce<T extends HTMLElement>(
       observer.disconnect();
       play();
     }, {
-      threshold: options.threshold ?? 0.28,
-      rootMargin: options.rootMargin ?? "0px 0px -8%",
+      threshold,
+      rootMargin,
     });
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [armedClass, options, playingClass, ref]);
+    return () => {
+      observer.disconnect();
+      if (armFrame) cancelAnimationFrame(armFrame);
+      if (playFrame) cancelAnimationFrame(playFrame);
+      element.classList.remove(armedClass, playingClass);
+      delete element.dataset.motionComplete;
+    };
+  }, [armBeforePlay, armedClass, playingClass, ref, rootMargin, threshold]);
 }

@@ -118,7 +118,7 @@ export default async function HomePage() {
         <MotionGroup className={styles.latestGrid} scrollWorldLayer="depth">
           {featuredColumn ? <article className={styles.featureArticle} data-motion-item>
             <Link className={styles.latestCardLink} href={`/column/${featuredColumn.slug}`}>
-              <ImageSlot className={styles.latestPhoto} label="" alt="" align="end" editId="home.latest.featureImage" image={featuredImage} sizes="(max-width: 900px) 100vw, 56vw" />
+              <ImageSlot className={styles.latestPhoto} label="" alt="" align="end" editId="home.latest.featureImage" image={featuredImage} sizes="(max-width: 900px) 100vw, 56vw" transitionOrigin />
               <span>{getCategory(featuredColumn.categorySlug)?.name}</span>
               <b>{featuredColumn.title}</b>
               <p>{columnExcerpts.home[featuredColumn.slug] ?? featuredColumn.summary}</p>
