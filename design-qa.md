@@ -829,3 +829,84 @@ passed
 ## 최종 결과
 
 passed
+
+---
+
+# 기존 사이트 원장 칼럼 4개 이전 QA
+
+## 기준과 구현 증거
+
+- 콘텐츠 기준: `content/columns-legacy.ts`의 원문·문단 순서·소제목·그림 표기와 기존 사이트 URL
+- 구현 라우트: `/column/ulthera-prime-shots`, `/column/ulthera-low-volume-face`, `/column/thermage-vs-ulthera`, `/column/lifting-cold-compress`
+- 정적 출력: `.next/server/app/column/<slug>.html`, `.next/server/app/sitemap.xml.body`, `.next/server/app/llms.txt.body`, `.next/server/app/llms-full.txt.body`
+- 이미지 원본: `public/uploads/columns/<slug>/` 아래 doctor 4개, 본문 figure 5개. 총 9개 파일의 형식과 실제 픽셀 크기를 확인했다.
+- 요청된 비교 상태: 1440px와 390px, 공개 모드
+
+## 전체·집중 검수
+
+- 네 칼럼 모두 프로덕션 정적 페이지로 생성되고 `/column` 카드가 실제 상세 URL과 doctor 이미지를 사용한다.
+- `###` 원문 표기는 목차를 늘리지 않는 섹션 내부 `h3`로 변환된다. 볼패임 칼럼 4개, 울쎄라·써마지 비교 칼럼 4개를 정적 HTML에서 확인했다.
+- 본문 그림은 원문 순서대로 `figure`로 변환되고 칼럼별로 `그림 N.` 번호가 매겨진다. 5개 그림의 alt·caption·실제 width/height가 일치한다.
+- 레거시 본문·핵심 요약·FAQ·소제목의 줄바꿈은 `br-d`로 출력된다. CSS에서 1024px 미만은 숨고 1024px 이상에서만 표시된다.
+- 메타 description과 OG description은 각 칼럼의 `metaDescription`을 동일하게 사용한다. JSON-LD와 llms 출력에는 원문의 줄바꿈 문자가 남지 않는다.
+- 기존 `/column/xerf-vs-thermage` 정적 HTML에는 `br-d`, 레거시 소제목, 레거시 figure 클래스가 추가되지 않아 기존 렌더 경로가 유지된다.
+- sitemap과 llms에 네 URL이 모두 포함된다.
+
+## 기능·코드 검증
+
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+- [x] 수정 TSX의 이미지 alt, 실제 크기, 안정적인 key, 기존 클라이언트 상태 경로 확인
+- [x] 이미지 9개 형식·크기 확인
+- [x] 원문 마크업 문자열(`###`, `![...]`)이 최종 HTML 본문에 노출되지 않음
+
+## 제한과 후속 검수
+
+- 이 실행 환경에서는 브라우저 호스트가 제공되지 않고 샌드박스의 macOS 브라우저 실행 권한도 거부되어 1440px·390px 신규 화면 캡처를 만들 수 없었다.
+- 저장소 안에서 `Legacy3`~`Legacy6` 원본 보드 이미지도 찾을 수 없어, 동일 viewport의 소스/구현 병합 비교와 390px 실제 `scrollWidth` 측정은 수행하지 못했다.
+- 코드·정적 출력·프로덕션 빌드 검증은 통과했지만, 요청된 시각 비교 증거가 없으므로 디자인 QA 결과는 차단 상태로 기록한다.
+
+## 최종 결과
+
+blocked
+
+---
+
+# 칼럼 표지 책갈피·전역 TOP 버튼 QA
+
+## 기준과 구현 증거
+
+- 기준 시안: 캔버스 `확정 · 원장 칼럼`의 `MotionBookmark` 보드와 요청서의 수치·상태 정의
+- 구현: `components/ColumnBookmark.tsx`, `components/ColumnBookmark.module.css`, `components/ScrollToTopButton.tsx`, `components/ScrollToTopButton.module.css`
+- 정적 출력: `.next/server/app/column.html` 및 홈·칼럼 상세·시술 상세·원장 소개 정적 HTML
+- 검수 대상 상태: `/column` 1440px 정방향/역방향 스크럽, 검색 패널 열기·닫기, 공통 TOP 버튼 1440px/390px
+
+## 코드·정적 출력 검수
+
+- 책갈피 진행률은 `scrollY / 560`을 passive scroll listener와 requestAnimationFrame 한 번/프레임으로 계산한다. 제목·검색 복제본은 transform/opacity만 사용하고 원본 공간은 유지해 CLS를 만들지 않는다.
+- 제목 회전은 p .5~.95, 책갈피 높이는 p .42~.9, 검색 복제본 페이드는 p .7~.92, 검색 버튼 활성화는 p>.92로 분리했다. 위로 스크롤하면 동일 진행률을 역으로 사용해 원상 복귀한다.
+- 검색 패널은 기존 `ColumnSearch` 데이터·검색 로직을 그대로 사용하며 별도 ID prefix를 적용해 원본 검색창과 ID가 겹치지 않는다. ×, Esc, 바깥 클릭, p<.9 닫기와 입력 자동 포커스를 구현했다.
+- 1023px 이하에서는 책갈피 레이어를 표시하지 않는다. reduced-motion에서는 복제·회전을 생략하고 책갈피와 패널을 0.2초 페이드로 처리한다. 개발 편집 모드에서도 책갈피 모션을 끈다.
+- 공통 레이아웃에는 `aria-label="맨 위로"` 버튼이 정확히 한 번 렌더된다. 기존 `FloatingQuickMenu`의 중복 TOP 버튼은 제거했다.
+- 홈, `/column`, 칼럼 상세, 시술 상세, 원장 소개의 정적 HTML에서 공통 TOP 버튼 한 개를 확인했다. 칼럼 모바일 바는 `phone`, 공통 빠른 상담 바는 `tablet` 표식을 사용해 버튼 하단 간격을 각각 보정한다.
+- 검색·닫기·위쪽 화살표는 기존 Heroicons를 사용하고, 모든 버튼에 포커스 링과 접근 가능한 이름을 제공한다.
+
+## 자동 검증
+
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 통과
+- [x] `git diff --check` 통과
+- [x] `/column` 정적 HTML의 원본/미니 검색 input ID가 각각 1개이며 서로 다름
+- [x] 주요 정적 페이지마다 전역 TOP 버튼이 정확히 1개
+- [x] passive scroll + rAF, reduced-motion, 키보드 포커스·Esc 경로 코드 검수
+
+## 제한과 후속 검수
+
+- 현재 실행 환경의 브라우저 호스트가 연결되지 않았고 로컬 서버 포트도 `EPERM`으로 차단되어, MotionBookmark 보드를 직접 스크롤하거나 1440px/390px 구현 화면을 캡처할 수 없었다.
+- 사용자의 화면에 브라우저 창이나 완료 알림을 띄우지 않는 조건을 지켜 별도 네이티브 브라우저 실행은 하지 않았다.
+- 따라서 요청된 1440px GIF, 패널 실동작 영상, 홈·상세·시술 1440px/390px 위치 스크린샷과 소스/구현 병합 비교는 증거가 없어 완료로 판정하지 않는다.
+
+## 최종 결과
+
+blocked

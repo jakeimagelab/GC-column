@@ -1,4 +1,5 @@
 import type { Column } from "./types";
+import { legacyColumns } from "./columns-legacy";
 
 const placeholderPhoto = {
   label: "원장 진료 사진",
@@ -195,6 +196,7 @@ export const xerfVsThermage: Column = {
 
 export const columns: Column[] = [
   xerfVsThermage,
+  ...legacyColumns,
   placeholderColumn({
     slug: "ulthera-with-xerf",
     categorySlug: "lifting",
@@ -202,38 +204,6 @@ export const columns: Column[] = [
     title: "울쎄라만 받으면 세르프는 필요 없나요?",
     summary: "[핵심 답변 2~3줄]",
     keywords: ["울쎄라", "세르프", "병행", "리프팅"],
-  }),
-  placeholderColumn({
-    slug: "lifting-cold-compress",
-    categorySlug: "lifting",
-    treatmentSlugs: ["ulthera-prime", "thermage-flx"],
-    title: "리프팅 시술 후 냉찜질, 꼭 해야 하나요?",
-    summary: "[핵심 답변 2~3줄]",
-    keywords: ["냉찜질", "붓기", "시술 후 관리", "리프팅", "울쎄라", "써마지"],
-  }),
-  placeholderColumn({
-    slug: "ulthera-low-volume-face",
-    categorySlug: "lifting",
-    treatmentSlugs: ["ulthera-prime"],
-    title: "볼륨이 적은 얼굴도 울쎄라 받아도 되나요?",
-    summary: "[핵심 답변 2~3줄]",
-    keywords: ["울쎄라", "볼륨", "꺼짐"],
-  }),
-  placeholderColumn({
-    slug: "ulthera-prime-shots",
-    categorySlug: "lifting",
-    treatmentSlugs: ["ulthera-prime"],
-    title: "울쎄라 프라임, 샷 수가 많을수록 좋을까요?",
-    summary: "핵심 답변 한 줄 미리보기",
-    keywords: ["울쎄라", "울쎄라 프라임", "샷 수", "리프팅"],
-  }),
-  placeholderColumn({
-    slug: "thermage-vs-ulthera",
-    categorySlug: "lifting",
-    treatmentSlugs: ["thermage-flx", "ulthera-prime"],
-    title: "써마지와 울쎄라, 어떻게 다르고 무엇이 맞을까요?",
-    summary: "핵심 답변 한 줄 미리보기",
-    keywords: ["써마지", "울쎄라", "리프팅"],
   }),
   placeholderColumn({
     slug: "rejuran-count",

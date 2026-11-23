@@ -90,6 +90,27 @@
 .popular span { padding: 8px 10px 0 0; color: #766e66; white-space: nowrap; }
 .popular button { min-height: 34px; padding: 6px 16px; border: 1px solid #d6cec3; border-radius: 999px; background: #fff; color: #3a3028; font-size: 12px; }
 
+.bookmark .inputRow {
+  height: 52px;
+  padding: 6px 6px 6px 16px;
+  gap: 10px;
+  border: 1px solid #ddd7ce;
+  box-shadow: none;
+}
+
+.bookmark .inputRow label { display: none; }
+.bookmark .searchIcon { width: 17px; height: 17px; color: #766e66; display: block; flex: none; }
+.bookmark .inputRow input { font-size: 14px; }
+.bookmark .submit { width: 76px; height: 40px; font-size: 13px; }
+.bookmark .clear { display: none; }
+.bookmark .popular { min-height: 34px; padding-top: 12px; flex-wrap: nowrap; gap: 6px; overflow: hidden; }
+.bookmark .popular span { display: none; }
+.bookmark .popular button { min-width: 0; min-height: 32px; padding: 0 10px; flex: 0 1 auto; font-size: 11px; }
+.bookmark .results { grid-template-columns: 1fr; max-height: min(460px, calc(100vh - 188px)); overflow: auto; }
+.bookmark .related { display: none; }
+.bookmark .resultContent { padding: 20px; }
+.bookmark .empty { align-items: stretch; flex-direction: column; }
+
 @media (max-width: 640px) {
   .inputRow { height: 56px; padding: 6px 6px 6px 16px; gap: 9px; }
   .inputRow label { display: none; }

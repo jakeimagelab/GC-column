@@ -29,6 +29,21 @@ import styles from "./page.module.css";
 
 type ColumnDetailPageProps = { params: Promise<{ slug: string }> };
 
+const INLINE_FIGURE_PATTERN = /^!\[([^\]]+)]\(([^)]+)\)$/;
+const INLINE_FIGURE_SIZES: Record<string, { width: number; height: number }> = {
+  "/uploads/columns/ulthera-prime-shots/figure-1.png": { width: 500, height: 561 },
+  "/uploads/columns/ulthera-low-volume-face/figure-1.png": { width: 371, height: 434 },
+  "/uploads/columns/thermage-vs-ulthera/figure-1.png": { width: 500, height: 561 },
+  "/uploads/columns/thermage-vs-ulthera/figure-2.png": { width: 744, height: 525 },
+  "/uploads/columns/lifting-cold-compress/figure-1.png": { width: 346, height: 372 },
+};
+
+function parseInlineFigure(value: string) {
+  const match = value.match(INLINE_FIGURE_PATTERN);
+  if (!match) return undefined;
+  return { caption: match[1], src: match[2] };
+}
+
 export const dynamicParams = true;
 
 export function generateStaticParams() {
@@ -43,7 +58,7 @@ export async function generateMetadata({ params }: ColumnDetailPageProps): Promi
   const content = await readSiteContent();
   return buildMetadata(content, {
     title: column.metaTitle ?? `${column.title} | 언주역 글로리의원`,
-    description: sentenceDescription(column.summary),
+    description: sentenceDescription(column.metaDescription ?? column.summary),
     pathname: `/column/${column.slug}`,
     type: "article",
     imagePath: `/column/${column.slug}/opengraph-image`,
@@ -89,6 +104,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const category = getCategory(column.categorySlug);
   if (!category) notFound();
   const showReview = process.env.NEXT_PUBLIC_SHOW_REVIEW === "true";
+  const usesLegacyBodyMarkup = Boolean(column.legacyUrl);
   const pageUrl = `${SITE_URL}/column/${column.slug}`;
   const primaryTreatment = column.primaryTreatment ? getTreatment(column.primaryTreatment) : undefined;
   const relatedTreatments = column.treatmentSlugs.flatMap((treatmentSlug) => {
@@ -137,6 +153,16 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const relatedConsultBreak = relatedConsultText.indexOf("대표원장이");
   const relatedConsultLead = relatedConsultBreak >= 0 ? relatedConsultText.slice(0, relatedConsultBreak).trim() : relatedConsultText;
   const relatedConsultRest = relatedConsultBreak >= 0 ? relatedConsultText.slice(relatedConsultBreak).trim() : "";
+  const inlineFigureNumbers = new Map<string, number>();
+  let inlineFigureCount = 0;
+  column.sections.forEach((section, sectionIndex) => {
+    if (section.kind === "image") return;
+    section.body.forEach((paragraph, bodyIndex) => {
+      if (!parseInlineFigure(paragraph)) return;
+      inlineFigureCount += 1;
+      inlineFigureNumbers.set(`${sectionIndex}-${bodyIndex}`, inlineFigureCount);
+    });
+  });
 
   return (
     <main className={styles.page} style={articleStyle} data-column-detail-page>
@@ -205,7 +231,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             <div className={styles.quickCopy}>
               <span>핵심 요약 · 원장이 직접 답합니다</span>
               <ul className={styles.quickPoints} id="summary">
-                {column.keyPoints.map((point, index) => <li key={index}><InlineRichText value={visibleReviewText(point, showReview)} showReview={showReview} /></li>)}
+                {column.keyPoints.map((point, index) => <li key={index}><InlineRichText value={visibleReviewText(point, showReview)} showReview={showReview} desktopBreaks={usesLegacyBodyMarkup} /></li>)}
               </ul>
               {showReview && !column.video?.src ? <details className={styles.mobileTranscript}><summary>{getText(content, "column.detail.transcript")} <b>＋</b></summary></details> : null}
             </div>
@@ -237,7 +263,9 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
               const numberedSectionIndex = column.sections
                 .slice(0, sectionIndex)
                 .filter((candidate) => candidate.kind !== "image").length;
-              const visibleBody = section.body.filter((paragraph) => showReview || !isReviewOnly(paragraph));
+              const visibleBody = section.body
+                .map((paragraph, bodyIndex) => ({ paragraph, bodyIndex }))
+                .filter(({ paragraph }) => showReview || !isReviewOnly(paragraph));
               return (
                 <section className={styles.articleSection} id={section.id} key={section.id} data-detail-reveal="section">
                   <div className={styles.sectionMarker}>
@@ -246,7 +274,29 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                   </div>
                   <h2>{section.heading}</h2>
                   {visibleBody.length
-                    ? visibleBody.map((paragraph, bodyIndex) => <HighlightedParagraph key={paragraph} value={visibleReviewText(paragraph, showReview)} lead={bodyIndex === 0 ? section.lead : undefined} showReview={showReview} />)
+                    ? visibleBody.map(({ paragraph, bodyIndex }) => {
+                      const value = visibleReviewText(paragraph, showReview);
+                      const subheading = value.match(/^###\s+([\s\S]+)$/);
+                      if (subheading) {
+                        return <h3 className={styles.legacySubheading} key={`${section.id}-body-${bodyIndex}`}><InlineRichText value={subheading[1]} showReview={showReview} desktopBreaks /></h3>;
+                      }
+                      const figure = parseInlineFigure(value);
+                      if (figure) {
+                        const size = INLINE_FIGURE_SIZES[figure.src] ?? { width: 1200, height: 900 };
+                        const figureNumber = inlineFigureNumbers.get(`${sectionIndex}-${bodyIndex}`) ?? 1;
+                        return (
+                          <div className={styles.legacyFigureObserver} key={`${section.id}-body-${bodyIndex}`} data-detail-reveal-observer>
+                            <figure className={styles.legacyFigure} data-detail-reveal="figure">
+                              <div className={styles.legacyFigureMedia}>
+                                <Image src={figure.src} alt={figure.caption} width={size.width} height={size.height} sizes="(max-width: 640px) calc(100vw - 100px), 744px" />
+                              </div>
+                              <figcaption>그림 {figureNumber}. {figure.caption}</figcaption>
+                            </figure>
+                          </div>
+                        );
+                      }
+                      return <HighlightedParagraph key={`${section.id}-body-${bodyIndex}`} value={value} lead={bodyIndex === 0 ? section.lead : undefined} showReview={showReview} desktopBreaks={usesLegacyBodyMarkup} />;
+                    })
                     : section.lead ? <HighlightedParagraph value="" lead={section.lead} showReview={showReview} /> : null}
 
                   {sectionIndex === 0 && showReview && column.reviewNotes ? (
@@ -355,7 +405,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <span className={styles.faqDecoration} aria-hidden="true" data-detail-parallax="-100">Q&amp;A</span>
           <div className={styles.faqBandInner}>
             <header><div><span {...textEditProps("column.detail.faq.eyebrow")}>{getText(content, "column.detail.faq.eyebrow")}</span><h2 id="detail-faq-heading">{column.faqTitle ?? getText(content, "column.detail.faq.title")}</h2></div><b className={styles.faqMeta} {...textEditProps("column.detail.faq.meta")}>{getText(content, "column.detail.faq.meta")}</b></header>
-            <FaqList items={faqItems} variant="magazine" firstOpen answerLabel={getText(content, "column.detail.faq.answerLabel")} showReview={showReview} />
+            <FaqList items={faqItems} variant="magazine" firstOpen answerLabel={getText(content, "column.detail.faq.answerLabel")} showReview={showReview} desktopBreaks={usesLegacyBodyMarkup} />
           </div>
         </section>
       ) : null}
@@ -388,7 +438,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       </section>
 
       <ColumnFooter content={content} legal={getText(content, "column.detail.legal")} />
-      <nav className={styles.mobileBottomBar} aria-label="칼럼 빠른 메뉴">
+      <nav className={styles.mobileBottomBar} aria-label="칼럼 빠른 메뉴" data-mobile-bottom-bar="phone">
         <a href="#share-actions">공유</a>
         <a href="#ask-doctor-mobile">질문하기</a>
         <a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer"><ChatBubbleLeftEllipsisIcon aria-hidden="true" />카카오톡 상담</a>

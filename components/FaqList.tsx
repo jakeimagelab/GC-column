@@ -20,6 +20,7 @@ type FaqListProps = {
   showReview?: boolean;
   mobileStyle?: "issue" | "detail";
   useSummary?: boolean;
+  desktopBreaks?: boolean;
 };
 
 function answerParts(value: string) {
@@ -36,6 +37,7 @@ export function FaqList({
   showReview = false,
   mobileStyle = "detail",
   useSummary = false,
+  desktopBreaks = false,
 }: FaqListProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(firstOpen && items.length ? 0 : null);
 
@@ -67,8 +69,8 @@ export function FaqList({
               <div className={styles.answer}>
                 <span>{answerLabel}</span>
                 <p>
-                  <strong className={styles.firstSentence}><InlineRichText value={answer.first} showReview={showReview} /></strong>
-                  {answer.rest ? <span className={styles.answerRest}> <InlineRichText value={answer.rest} showReview={showReview} /></span> : null}
+                  <strong className={styles.firstSentence}><InlineRichText value={answer.first} showReview={showReview} desktopBreaks={desktopBreaks} /></strong>
+                  {answer.rest ? <span className={styles.answerRest}> <InlineRichText value={answer.rest} showReview={showReview} desktopBreaks={desktopBreaks} /></span> : null}
                 </p>
                 {item.href ? <Link href={item.href} tabIndex={isOpen ? undefined : -1}>{readLabel}</Link> : null}
               </div>

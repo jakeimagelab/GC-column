@@ -93,6 +93,8 @@ export type Column = {
   heroOverlay?: string;
   title: string;
   metaTitle?: string;
+  metaDescription?: string;
+  legacyUrl?: string;
   questionSource?: string;
   summary: string;
   keyPoints: string[];

@@ -20,6 +20,8 @@ export function stripMotionMarkup(value: string) {
     .replace(HIGHLIGHT_PATTERN, "$1")
     .replace(BOLD_PATTERN, "$1")
     .replace(REVIEW_MARKER_PATTERN, "")
+    .replace(/\s*\n+\s*/g, " ")
+    .replace(/ {2,}/g, " ")
     .trim();
 }
 

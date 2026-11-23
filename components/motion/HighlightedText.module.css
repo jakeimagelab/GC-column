@@ -2,6 +2,14 @@
   white-space: pre-line;
 }
 
+.desktopBreakParagraph {
+  white-space: normal;
+}
+
+:global(.br-d) {
+  display: none;
+}
+
 .paragraph mark {
   padding: 0 2px;
   background-color: transparent;
@@ -59,4 +67,10 @@
 :global(.devEditActive) .playing mark {
   background-size: 100% 100%;
   transition: none;
+}
+
+@media (min-width: 1024px) {
+  :global(.br-d) {
+    display: inline;
+  }
 }

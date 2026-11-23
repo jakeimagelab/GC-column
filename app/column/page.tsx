@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { ColumnFooter } from "@/components/ColumnFooter";
+import { ColumnBookmark } from "@/components/ColumnBookmark";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { ColumnList } from "@/components/ColumnList";
 import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
@@ -92,16 +93,17 @@ export default async function ColumnMainPage() {
   return (
     <main className={styles.page} data-column-page>
       <ColumnMainMotion />
+      <ColumnBookmark columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
       <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>
         <section className={styles.cover}>
-          <span className={styles.verticalLabel} data-column-entry="meta" {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          <span className={styles.verticalLabel} data-column-entry="meta" data-column-bookmark-fade {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
           <div className={styles.coverInner}>
             <div className={styles.coverMeta} data-column-entry="meta">
               <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
               <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
             </div>
-            <h1 className={`${styles.masthead} ${styles.desktopMasthead}`}>
+            <h1 className={`${styles.masthead} ${styles.desktopMasthead}`} data-column-bookmark-title>
               <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
               <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
             </h1>
@@ -109,14 +111,14 @@ export default async function ColumnMainPage() {
               <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
               <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
             </h1>
-            <p data-column-entry="description" {...textEditProps("column.cover.description")}>
+            <p data-column-entry="description" data-column-bookmark-fade {...textEditProps("column.cover.description")}>
               {coverDescriptionLead}
               {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
             </p>
           </div>
         </section>
 
-        <div className={styles.searchShell} data-column-entry="search">
+        <div className={styles.searchShell} data-column-entry="search" data-column-bookmark-search>
           <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
         </div>
       </div>
@@ -269,7 +271,7 @@ export default async function ColumnMainPage() {
       </section>
 
       <ColumnFooter content={content} />
-      <nav className={styles.mobileBottomBar} aria-label="빠른 상담">
+      <nav className={styles.mobileBottomBar} aria-label="빠른 상담" data-mobile-bottom-bar="phone">
         <a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer"><ChatBubbleLeftEllipsisIcon aria-hidden="true" />카카오톡 상담</a>
         <a href="tel:0269587525">전화 02-6958-7525</a>
       </nav>

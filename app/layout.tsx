@@ -4,6 +4,7 @@ import { ColumnTransitionOverlay } from "@/components/ColumnTransitionOverlay";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ContentBoardPreviewBridge } from "@/components/ContentBoardPreviewBridge";
 import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { SITE_URL } from "@/content/site";
 import { cormorantGaramond, montserrat, nanumPenScript, notoSansKr, notoSerifKr } from "./fonts";
 import "./globals.css";
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}>
           <ColumnTransitionOverlay />
         </Suspense>
+        <ScrollToTopButton />
         <ScrollWorldJourney />
         {process.env.NODE_ENV === "development" ? <ContentBoardPreviewBridge /> : null}
         {process.env.NEXT_PUBLIC_GA_ID ? <SiteAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} /> : null}

@@ -80,6 +80,12 @@
 .articleSection h2,.judgement h2,.precautions h2 { margin:16px 0 28px; font-family:var(--font-magazine); font-size:38px; font-weight:400; letter-spacing:-.04em; line-height:1.4; white-space:pre-line; }
 .articleSection>p { margin:0 0 24px; font-size:17px; line-height:2; }
 .articleSection :global(mark) { padding:0 .1em; color:inherit; }
+.legacySubheading { margin:14px 0 20px; font-family:var(--font-magazine); font-size:24px; font-weight:400; letter-spacing:-.02em; line-height:1.5; }
+.legacyFigureObserver { width:100%; }
+.legacyFigure { width:100%; margin:40px 0 24px; padding:28px; background:#faf8f5; }
+.legacyFigureMedia { display:flex; justify-content:center; }
+.legacyFigure img { width:auto; max-width:100%; height:auto; display:block; transform:none!important; animation:none!important; }
+.legacyFigure figcaption { margin-top:10px; color:#766e66; font-size:13px; line-height:1.7; }
 .reviewNotes { margin-top:26px; border:1px dashed #ddd7ce; background:#fff; }
 .reviewNotes summary { padding:14px 16px; color:var(--muted); font-size:12px; cursor:pointer; }
 .reviewNotes ul { margin:0; padding:0 30px 16px 36px; color:var(--muted); font-size:12px; line-height:1.75; }
