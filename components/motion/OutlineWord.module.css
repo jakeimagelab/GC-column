@@ -21,11 +21,43 @@
   letter-spacing: -2px;
 }
 
+.cssOutline {
+  width: calc(var(--outline-ratio) * 1em);
+  height: 1em;
+}
+
+.cssText {
+  width: 100%;
+  height: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  color: transparent;
+  -webkit-text-stroke: var(--outline-css-stroke-width, 1px) var(--outline-stroke);
+  font-family: var(--font-en);
+  font-size: 1em;
+  font-weight: var(--outline-css-font-weight, 300);
+  letter-spacing: var(--outline-css-letter-spacing, 0);
+  line-height: 1;
+  white-space: nowrap;
+  clip-path: inset(0);
+}
+
 .armed .svg {
   clip-path: inset(0 100% 0 0);
 }
 
 .playing .svg {
+  animation: outlineReveal 1.6s cubic-bezier(.22,.61,.36,1) both;
+  will-change: clip-path;
+}
+
+.armed .cssText {
+  clip-path: inset(0 100% 0 0);
+}
+
+.playing .cssText {
   animation: outlineReveal 1.6s cubic-bezier(.22,.61,.36,1) both;
   will-change: clip-path;
 }
@@ -54,6 +86,11 @@
     clip-path: inset(0);
     animation: none;
   }
+  .armed .cssText,
+  .playing .cssText {
+    clip-path: inset(0);
+    animation: none;
+  }
   .tracking.armed .svg,
   .tracking.playing .svg { clip-path: none; }
   .tracking.armed .text,
@@ -62,6 +99,12 @@
 
 :global(.devEditActive) .armed .svg,
 :global(.devEditActive) .playing .svg {
+  clip-path: inset(0);
+  animation: none;
+}
+
+:global(.devEditActive) .armed .cssText,
+:global(.devEditActive) .playing .cssText {
   clip-path: inset(0);
   animation: none;
 }

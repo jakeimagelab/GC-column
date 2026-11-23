@@ -106,7 +106,7 @@ export default async function HomePage() {
             <Image src="/uploads/glory-treatment-pigment-1.webp" alt="" fill sizes="100vw" />
             <i />
           </div>
-          <OutlineWord className={styles.visionOutline} text="GLORY" fill="transparent" stroke="#cdbead" />
+          <OutlineWord className={styles.visionOutline} text="GLORY" fill="transparent" stroke="#cdbead" cssOutline />
           <div className={styles.visionInner}>
             <div className={styles.visionCopy}><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} fallbackText="" /></div></div>
             <div className={styles.principles}>
