@@ -873,6 +873,48 @@ blocked
 
 ---
 
+# 홈 비전 외곽선·칼럼 책갈피 회귀 QA (2026-11-24)
+
+## 비교 기준과 증거
+
+- 글꼴 기준: 같은 홈 화면의 `DIRECTOR` SVG 외곽선 컴포넌트
+- 홈 비전 시작 상태: `output/playwright/home-vision-start-mask.png`
+- GLORY 외곽선 집중 캡처: `output/playwright/home-vision-glory-close.png`
+- 반투명 원칙 카드: `output/playwright/home-vision-cards-translucent.png`
+- 책갈피 휠 1회: `output/playwright/column-bookmark-wheel-1-fixed.png`
+- 책갈피 완료 상태: `output/playwright/column-bookmark-complete-fixed.png`
+- 검수 viewport: 데스크톱 1440px, 모바일 390px
+
+## 정확성 확인
+
+- `DIRECTOR`와 `GLORY`는 같은 `OutlineWord` SVG `<text>` 경로를 사용한다. 두 요소 모두 Montserrat 700, 150px, 자간 -2px이며 CSS 글자 외곽선 대체 경로를 제거했다.
+- GLORY는 2px SVG stroke의 글리프 안쪽 절반을 luminance mask로 제거해 화면상 약 1px 외곽선만 남긴다. 글자 내부는 투명하고 R·Y 접합부의 겹친 쐐기 선은 보이지 않는다.
+- 기존 `.svg` clip-path 리빌 경로를 그대로 사용하므로 왼쪽에서 오른쪽으로 그려지는 기존 등장 모션과 비전 디졸브 위치·크기·진행 구간은 유지된다.
+- 원칙 카드 배경은 `rgba(255,255,255,.78)`과 10px backdrop blur로 바꿔 사진이 은은하게 비치며 본문 대비를 유지한다.
+- 책갈피 복제본은 제목 두 줄과 검색창·키워드 전체를 동일한 요소에서 복제·측정한다. 복제본 내부의 진입 transform·animation·opacity를 제거해 첫 휠에서 한 줄이 사라지거나 좌표가 튀지 않는다.
+- 복제 레이어를 `document.body` portal로 옮겨 상위 transform의 영향을 없앴다. 제목·검색 복제본에는 프레임 간 CSS transition이 없고, 실제 스크롤 위치를 매 프레임 14%씩 따라간다.
+- 헤더 높이는 같은 진행률로 72px에서 56px로 줄고 책갈피 top·검색 패널 top이 이를 따라간다. 완료 상태에서 헤더와 책갈피 배경이 같은 `#3A3028`로 이어지고 연브라운 띠는 책갈피 아래쪽에 있다.
+- 맨 위로 돌아오면 원본 제목·검색창 visibility, 72px 헤더, 책갈피 높이 0이 복구된다.
+
+## 동작·반응형 확인
+
+- [x] 1440px 휠 1회·2회·완료 상태에서 제목 두 줄과 검색창이 연속 이동
+- [x] 검색 패널 열기, 입력 포커스, Esc 닫기
+- [x] Feature 01 사진과 흰 카드가 서로 반대 방향으로 패럴랙스
+- [x] 홈 비전 디졸브와 Feature 패럴랙스에 동일한 14% 스무딩 적용
+- [x] 390px에서 `document.documentElement.scrollWidth === 390`
+- [x] 1023px 이하 책갈피 레이어 숨김
+- [x] reduced-motion·개발 편집 모드 우회 유지
+- [x] `npm run build` 통과 — 46개 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+
+## 최종 결과
+
+passed
+
+---
+
 # 칼럼 표지 책갈피·전역 TOP 버튼 QA
 
 ## 기준과 구현 증거

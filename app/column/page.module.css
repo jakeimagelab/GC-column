@@ -14,7 +14,7 @@
 .coverInner>p { margin:0; color:rgb(255 255 255 / 72%); font-size:16px; line-height:1.8; }
 .searchShell { position:relative; z-index:5; width:min(1040px,calc(100% - 48px)); min-height:104px; margin:-44px auto 0; }
 
-@media(min-width:1025px){
+@media(min-width:1024px){
   .heroStage{
     position:relative;
     height:calc(100svh + 320px);
@@ -209,7 +209,7 @@
 @keyframes featureCopyIn { from { opacity:0; transform:translateY(100%); } to { opacity:1; transform:none; } }
 @keyframes featureImageSettle { from { transform:scale(1.2); } to { transform:scale(1.04); } }
 
-@media(max-width:1024px) {
+@media(max-width:1023px) {
   @keyframes columnEntrySearch { from { opacity:0; transform:translate3d(0,18px,0); } to { opacity:1; transform:none; } }
 }
 

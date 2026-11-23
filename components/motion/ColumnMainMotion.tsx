@@ -19,6 +19,8 @@ export function ColumnMainMotion() {
     const parallaxRevealListeners = new Map<HTMLElement,(event:AnimationEvent) => void>();
     const parallaxSettleTimers = new Map<HTMLElement,number>();
     let frame = 0;
+    let targetY = window.scrollY;
+    let smoothY = window.scrollY;
     let needsMeasure = true;
     let heroTop = 0;
     let heroTravel = 1;
@@ -65,11 +67,10 @@ export function ColumnMainMotion() {
       needsMeasure = false;
     };
 
-    const update = () => {
-      frame = 0;
+    const update = (scrollY: number) => {
       if (needsMeasure) measure();
-      const desktop = window.innerWidth > 1024;
-      const rawProgress = desktop ? clamp((window.scrollY-heroTop)/heroTravel) : 0;
+      const desktop = window.innerWidth >= 1024;
+      const rawProgress = desktop ? clamp((scrollY-heroTop)/heroTravel) : 0;
       const exit = desktop ? clamp((rawProgress-.12)/.88) : 0;
       const eased = exit*exit*(3-2*exit);
       const progressValue = rawProgress.toFixed(4);
@@ -87,16 +88,14 @@ export function ColumnMainMotion() {
 
       activeParallax.forEach((node) => {
         if (node.hasAttribute("data-column-parallax-after-reveal") && !node.hasAttribute("data-column-parallax-ready")) return;
-        const nodeRect = node.getBoundingClientRect();
-        const featureScope = node.hasAttribute("data-column-feature-card-parallax")
-          ? node.closest<HTMLElement>("[data-column-section-motion='feature']")
-          : null;
-        const progressRect = featureScope?.getBoundingClientRect() ?? nodeRect;
+        const progressScope = node.closest<HTMLElement>("[data-column-section-motion]") ?? node;
+        const progressRect = progressScope.getBoundingClientRect();
+        const progressTop = progressRect.top + window.scrollY - scrollY;
         const mobileRange = window.innerWidth < 768 ? node.dataset.columnParallaxMobile : undefined;
         const range = mobileRange !== undefined
           ? Number(mobileRange)
           : Number(node.dataset.columnParallax || 60)*distanceScale;
-        const progress = clamp((viewportHeight-progressRect.top)/(viewportHeight+progressRect.height));
+        const progress = clamp((viewportHeight-progressTop)/(viewportHeight+progressRect.height));
         const value = `${((progress-.5)*range).toFixed(2)}px`;
         if (lastParallax.get(node) === value) return;
         node.style.setProperty("--column-parallax-y",value);
@@ -104,9 +103,18 @@ export function ColumnMainMotion() {
       });
     };
 
+    const tick = () => {
+      const difference = targetY-smoothY;
+      if (Math.abs(difference)<.5) smoothY = targetY;
+      else smoothY += difference*.14;
+      update(smoothY);
+      if (Math.abs(targetY-smoothY)>=.5) frame = window.requestAnimationFrame(tick);
+      else frame = 0;
+    };
     const schedule = () => {
+      targetY = window.scrollY;
       if (frame) return;
-      frame = window.requestAnimationFrame(update);
+      frame = window.requestAnimationFrame(tick);
     };
     const scheduleMeasure = () => {
       needsMeasure = true;
@@ -154,7 +162,7 @@ export function ColumnMainMotion() {
 
     const resizeObserver = new ResizeObserver(scheduleMeasure);
     resizeObserver.observe(hero);
-    update();
+    update(smoothY);
     window.addEventListener("scroll",schedule,{ passive:true });
     window.addEventListener("resize",scheduleMeasure);
 

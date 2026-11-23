@@ -35,14 +35,19 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
   const [mobileCategory, setMobileCategory] = useState<Panel>(null);
   const [scrolled, setScrolled] = useState(false);
   const isHome = page === "home";
+  const isColumnMain = page === "main";
   const concerns = getConcernItems(content);
 
   useEffect(() => {
+    if (isColumnMain) {
+      setScrolled(false);
+      return;
+    }
     const onScroll = () => setScrolled(window.scrollY > 80);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isColumnMain]);
 
   useEffect(() => {
     const closeOnOutsidePress = (event: PointerEvent) => {
@@ -96,7 +101,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
   };
 
   return (
-    <div className={`${styles.shell} ${styles[variant]} ${isHome ? styles.home : ""}`}>
+    <div className={`${styles.shell} ${styles[variant]} ${isHome ? styles.home : ""} ${isColumnMain ? styles.main : ""}`}>
       <div
         ref={surfaceRef}
         className={`${styles.surface} ${panel || mobileOpen ? styles.open : ""} ${scrolled ? styles.scrolled : ""}`}

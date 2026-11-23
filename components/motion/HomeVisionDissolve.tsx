@@ -24,19 +24,21 @@ export function HomeVisionDissolve() {
     if (!section) return;
 
     let frame = 0;
+    let targetY = window.scrollY;
+    let smoothY = window.scrollY;
 
-    const update = () => {
-      frame = 0;
+    const update = (scrollY: number) => {
       if (reducedMotion.matches || isVisualEditingMode()) {
         section.removeAttribute("data-vision-motion-ready");
         return;
       }
 
       const rect = section.getBoundingClientRect();
-      const headerHeight = window.innerWidth <= 640 ? 56 : window.innerWidth <= 1024 ? 64 : 72;
+      const rectTop = rect.top + window.scrollY - scrollY;
+      const headerHeight = window.innerWidth <= 640 ? 56 : window.innerWidth <= 1023 ? 64 : 72;
       const stickyHeight = Math.max(window.innerHeight - headerHeight, 1);
       const travel = Math.max(rect.height - stickyHeight, 1);
-      const progress = clamp((headerHeight - rect.top) / travel);
+      const progress = clamp((headerHeight - rectTop) / travel);
       const dissolve = segment(progress, 0.18, 0.42);
       const scaleProgress = segment(progress, 0.18, 1);
       const mobile = window.innerWidth <= 640;
@@ -59,11 +61,22 @@ export function HomeVisionDissolve() {
       }
     };
 
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
+    const tick = () => {
+      const direct = reducedMotion.matches || isVisualEditingMode();
+      const difference = targetY - smoothY;
+      if (direct || Math.abs(difference) < .5) smoothY = targetY;
+      else smoothY += difference * .14;
+      update(smoothY);
+      if (!direct && Math.abs(targetY - smoothY) >= .5) frame = window.requestAnimationFrame(tick);
+      else frame = 0;
     };
 
-    update();
+    const schedule = () => {
+      targetY = window.scrollY;
+      if (!frame) frame = window.requestAnimationFrame(tick);
+    };
+
+    update(smoothY);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     reducedMotion.addEventListener("change", schedule);
