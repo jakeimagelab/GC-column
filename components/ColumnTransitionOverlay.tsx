@@ -117,8 +117,8 @@ export function ColumnTransitionOverlay() {
     if (nextDirection === "toColumn") {
       const duration = window.matchMedia("(max-width: 640px)").matches ? SLIDE_DURATION_MOBILE : SLIDE_DURATION;
       setPhase("sliding");
-      // Grow the magazine cover from the clicked card. Once the cover fully
-      // fills the viewport, swap the route behind the identical brown surface.
+      // Slide the magazine cover in from the right. Once it fully covers the
+      // viewport, swap the route behind the identical brown surface.
       later(() => {
         expansionDoneRef.current = true;
         router.push(`${url.pathname}${url.search}${url.hash}`);
@@ -206,7 +206,9 @@ export function ColumnTransitionOverlay() {
   if (phase === "idle" || !href || !origin || typeof document === "undefined") return null;
   return createPortal(
     <div className={`${styles.layer} ${styles[direction]} ${styles[phase]}`} style={originStyle(origin)} role="status" aria-live="polite" aria-label={direction === "toColumn" ? "원장 칼럼으로 이동 중" : "홈페이지로 이동 중"}>
-      <span className={styles.surface} aria-hidden="true" />
+      <span className={styles.surface} aria-hidden="true">
+        {direction === "toHome" ? <span className={styles.homeWord}>Glory</span> : null}
+      </span>
     </div>,
     document.body,
   );
