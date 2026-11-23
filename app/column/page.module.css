@@ -65,6 +65,7 @@
 .feature { position:relative; padding-top:38px; padding-bottom:188px; }
 .featureMeta { width:min(1180px,calc(100% - 48px)); min-height:54px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; text-transform:uppercase; }
 .featureVisual { position:relative; height:720px; overflow:hidden; }
+.featureImageParallax { position:absolute; inset:-96px 0; transform:translate3d(0,var(--column-parallax-y,0),0); will-change:transform; }
 .featureImage { position:absolute!important; inset:0; width:100%!important; height:100%!important; border-radius:0!important; }
 .featureImage img { object-fit:cover; }
 .featureShade { position:absolute; inset:0; background:linear-gradient(90deg,rgb(28 22 18 / 62%),rgb(28 22 18 / 12%) 58%,transparent); pointer-events:none; }
@@ -152,7 +153,7 @@
 .issueBar[data-column-motion-active] i { transform:scaleX(1); transition:transform 1.4s cubic-bezier(.77,0,.18,1); }
 
 .feature[data-column-motion-ready] [data-column-reveal="feature-image"] { clip-path:inset(10% 8%); }
-.featureImage { inset:-44px 0!important; height:auto!important; transform:translate3d(0,var(--column-parallax-y,0),0); will-change:transform; }
+.featureImage { inset:0!important; }
 .feature[data-column-motion-ready] .featureImage img { transform:scale(1.2); }
 .feature[data-column-motion-active] [data-column-reveal="feature-image"] { clip-path:inset(0); transition:clip-path 1.4s cubic-bezier(.77,0,.18,1); }
 .feature[data-column-motion-active] .featureImage img { animation:featureImageSettle 2s cubic-bezier(.2,.8,.2,1) both; }

@@ -79,14 +79,15 @@
   z-index: -1;
   opacity: var(--vision-outline-opacity);
   transform: translate(-50%, -50%);
-  font-size: clamp(140px, 18.0556vw, 260px);
-  letter-spacing: clamp(4px, .6944vw, 10px);
+  font-size: clamp(110px, 11.8056vw, 170px);
+  letter-spacing: 6px;
+  line-height: 1;
   white-space: nowrap;
 }
 .visionInner { position: relative; width: min(100%, 1040px); display: flex; flex-direction: column; align-items: center; text-align: center; }
 .visionCopy { width: min(100%, 860px); display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .visionCopy > span { color: var(--vision-label-color); font-family: var(--font-en); font-size: 13px; letter-spacing: 4px; }
-.vision h2 { margin: 0; color: var(--vision-title-color); font-family: var(--font-sans); font-size: 38px; font-weight: 300; letter-spacing: 0; line-height: 1.35; }
+.vision h2 { margin: 0; color: var(--vision-title-color); font-size: 34px; font-weight: 300; line-height: 1.55; }
 .vision h2 strong { font-weight: 700; }
 .visionCopy > p { margin: 0; color: var(--vision-body-color); font-size: 16px; line-height: 1.9; }
 .signature { margin-top: 8px; display: flex; align-items: center; gap: 16px; }
@@ -225,7 +226,7 @@
   .visionInner { width: 100%; }
   .visionCopy { gap: 12px; }
   .visionCopy > span { font-size: 10px; letter-spacing: 3px; }
-  .vision h2 { font-size: 26px; line-height: 1.35; }
+  .vision h2 { font-size: 26px; line-height: 1.4; }
   .visionCopy > p { font-size: 14px; line-height: 1.7; }
   .signature { margin-top: 0; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; }
   .signature span { font-size: 12px; }

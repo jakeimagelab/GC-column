@@ -787,3 +787,45 @@ passed
 ## 최종 결과
 
 passed
+
+---
+
+# 홈 비전 외곽선·칼럼 대표 사진 패럴럭스 최종 QA
+
+## 증거와 환경
+
+- 홈 비전 기준: `/var/folders/qz/9f9fdlpn72gdc0qtrn0l7vgr0000gn/T/TemporaryItems/NSIRD_screencaptureui_ni9ZrI/스크린샷 2026-11-24 오전 12.20.04.png`
+- 칼럼 대표 사진 기준: `/var/folders/qz/9f9fdlpn72gdc0qtrn0l7vgr0000gn/T/TemporaryItems/NSIRD_screencaptureui_YTjc9m/스크린샷 2026-11-24 오전 12.20.37.png`
+- 구현 캡처: `output/playwright/home-vision-1940.png`, `output/playwright/column-feature-parallax-before.png`, `output/playwright/column-feature-parallax-after.png`, `output/playwright/column-feature-parallax-3840.png`
+- 같은 비교 입력: `output/design-qa/home-vision-reference-current.png`, `output/design-qa/column-feature-reference-current.png`
+- 검수 viewport: 3840×1440, 1440×900, 390×844, DPR 1
+
+## 비교 결과
+
+- 홈 비전의 `GLORY`는 바로 앞 `DIRECTOR`와 동일한 `OutlineWord` 리빌 방식, 170px 상한, 6px 자간, line-height 1을 사용한다. 기존의 260px 대형 글자와 별도 tracking 모션을 제거했다.
+- 비전의 한글 제목은 기존 Noto Sans KR 300/700 계층과 34px 리듬으로 되돌려 과도하게 커지거나 다른 글꼴처럼 보이던 상태를 제거했다.
+- 칼럼 대표 사진은 `featureVisual` 자체가 아니라 192px 세로 오버스캔을 가진 내부 이미지 레이어만 이동한다. 따라서 제목·흰 카드·섹션 레이아웃은 고정되고 사진만 스크롤과 다른 속도로 움직인다.
+- 1440px 검수에서 이미지 레이어 transform이 `translateY(-54.35px)`에서 `translateY(28.40px)`로 변해 82.75px의 실제 패럴럭스 이동을 확인했다.
+- 390px에서는 같은 구간이 `translateY(-13.51px)`에서 `translateY(17.89px)`로 이동하고, 모바일 거리 배율 0.5와 `scrollWidth === clientWidth === 390`을 유지한다.
+
+## 필수 충실도 검수
+
+- 폰트·타이포그래피: `DIRECTOR`와 `GLORY`의 Montserrat 외곽선 자형, 굵기, 자간, 리빌 방식을 통일했다.
+- 간격·레이아웃: 패럴럭스는 transform만 사용해 카드와 다음 섹션 위치 및 CLS에 영향을 주지 않는다.
+- 색·토큰: 비전 배경과 외곽선은 기존 paper/#CDBEAD 토큰을 유지하고, 칼럼 이미지는 기존 그라디언트와 브랜드 색을 보존한다.
+- 이미지 품질: XERF 장비 이미지는 `object-fit: cover`를 유지하며 최대 이동량보다 큰 오버스캔으로 상하 빈 가장자리가 드러나지 않는다.
+- 카피·콘텐츠: 문구와 줄바꿈은 변경하지 않았다.
+
+## 검증
+
+- [x] 패럴럭스가 기존 passive scroll + requestAnimationFrame 경로만 사용
+- [x] reduced-motion에서 패럴럭스 변수 기본값 0으로 즉시 표시
+- [x] 데스크톱·모바일 브라우저 콘솔 오류 0건
+- [x] 390px 문서 가로 넘침 없음
+- [x] `git diff --check` 통과
+- [x] `npm run build` 통과
+- [x] `npm run lint` 오류 0건; 수정 범위 밖 기존 경고 8건
+
+## 최종 결과
+
+passed

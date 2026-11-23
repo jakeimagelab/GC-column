@@ -133,8 +133,10 @@ export default async function ColumnMainPage() {
             <span {...textEditProps("column.feature.eyebrow")}>{getText(content, "column.feature.eyebrow")}</span>
             <span {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
           </div>
-          <div className={styles.featureVisual} data-column-reveal="feature-image" data-column-parallax="80">
-            <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId={feature?.listImage ? undefined : "column.feature.image"} image={featureImage} priority sizes="100vw" />
+          <div className={styles.featureVisual} data-column-reveal="feature-image">
+            <div className={styles.featureImageParallax} data-column-parallax="160">
+              <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId={feature?.listImage ? undefined : "column.feature.image"} image={featureImage} priority sizes="100vw" />
+            </div>
             <div className={styles.featureShade} aria-hidden="true" />
             <div className={styles.featureTitle} data-column-reveal="feature-title">
               <span {...textEditProps("column.feature.number")}>{getText(content, "column.feature.number")}</span>
