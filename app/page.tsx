@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { ClinicOpenStatus } from "@/components/ClinicOpenStatus";
-import { ColumnTransitionOverlay } from "@/components/ColumnTransitionOverlay";
 import { DevEditorMount } from "@/components/DevEditorMount";
 import { EditableRichText } from "@/components/EditableRichText";
 import { EquipmentCarousel } from "@/components/EquipmentCarousel";
@@ -159,7 +158,6 @@ export default async function HomePage() {
 
       <JsonLd value={pageGraph} />
       <FloatingQuickMenu content={content} />
-      <ColumnTransitionOverlay gloryLabel={getText(content, "home.transition.glory")} columnLabel={getText(content, "home.transition.column")} />
       <DevEditorMount page="home" content={content} />
     </main>
   );

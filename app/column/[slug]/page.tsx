@@ -122,6 +122,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     "--brand": primaryTreatment?.brandColor ?? "#8c7b6b",
     "--brand-strong": column.primaryTreatment === "xerf" ? "#e2897e" : primaryTreatment?.brandColor ?? "#8c7b6b",
     "--brand-label": column.primaryTreatment === "xerf" ? "#c8665c" : primaryTreatment?.brandColor ?? "#8c7b6b",
+    "--brand-soft-head": column.primaryTreatment === "xerf" ? "#fce3df" : "#eee3d8",
     "--brand-soft": column.primaryTreatment === "xerf" ? "#fdf0ee" : "#f2ede6",
     "--brand-highlight": column.primaryTreatment === "xerf" ? "#fbd5cf" : "#eee3d8",
     "--article-cover-image": `url(${JSON.stringify(column.heroImage || "/uploads/glory-column-editorial-campaign-01.png")})`,
@@ -253,7 +254,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
                   {section.figure?.kind === "image" ? (
                     <figure className={styles.comparisonGraphic}>
-                      <Image src={section.figure.src} alt={section.figure.alt} width={4096} height={2304} sizes="(max-width: 640px) 100vw, 788px" />
+                      <Image src={section.figure.src} alt={section.figure.alt} width={3600} height={2320} sizes="(max-width: 640px) 100vw, 788px" />
                       <figcaption>{section.figure.caption}</figcaption>
                     </figure>
                   ) : null}

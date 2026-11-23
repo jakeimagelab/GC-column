@@ -8,7 +8,7 @@
 .breadcrumb a { color:inherit; }
 .breadcrumb [aria-current="page"] { color:#fff; }
 .issueLabel { margin-top:40px; display:block; color:rgb(255 255 255 / 68%); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; }
-.articleCover h1 { max-width:760px; margin:24px 0 44px; font-family:var(--font-magazine); font-size:56px; font-weight:400; letter-spacing:-.04em; line-height:1.25; }
+.articleCover h1 { max-width:none; margin:24px 0 44px; font-family:var(--font-magazine); font-size:52px; font-weight:400; letter-spacing:-.04em; line-height:1.25; }
 .bylineRow { min-height:78px; padding-top:18px; border-top:1px solid rgb(255 255 255 / 28%); display:flex; align-items:center; justify-content:space-between; gap:28px; }
 .byline { display:flex; align-items:center; gap:14px; }
 .avatar { width:52px!important; height:52px!important; border-radius:50%; overflow:hidden; flex:none; }
@@ -88,7 +88,7 @@
 .twoCol article+article { border-left:1px solid var(--line); }
 .twoCol h3 { margin:14px 0 16px; font-family:var(--font-magazine); font-size:23px; font-weight:400; line-height:1.5; }
 .twoCol p { margin:0; font-size:14px; line-height:1.85; white-space:pre-line; }
-.tableViewport { position:relative; margin-top:42px; }
+.tableViewport { position:relative; margin-top:40px; }
 .tableHint { display:none; }
 .tableScroll { overflow:auto; }
 .tableScroll table { width:100%; border-collapse:collapse; font-size:14px; }
@@ -98,7 +98,8 @@
 .tableScroll tbody th { font-weight:700; }
 .tableScroll td { color:#5e5e5e; }
 .tableScroll th i { margin-right:8px; }
-.tableScroll .primaryCell { background:var(--brand-soft); }
+.tableScroll thead .primaryCell { background:var(--brand-soft-head,var(--brand-soft)); }
+.tableScroll tbody .primaryCell { background:var(--brand-soft); }
 .judgementGrid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); }
 .judgementGrid>div { padding:30px; background:#fff; }
 .judgementGrid b { color:var(--brand-strong); font-family:var(--font-en); font-size:10px; letter-spacing:.16em; line-height:1.6; }
@@ -162,7 +163,7 @@
 
 /* Canvas mobile composition */
 @media(max-width:640px){
-  :global(html),:global(body){max-width:100%;overflow-x:hidden}
+  :global(html),:global(body){max-width:100%;overflow-x:clip}
   .page{width:100%;overflow-x:clip}
   .articleCover{min-height:570px;padding:0;background:linear-gradient(180deg,rgba(20,20,20,.25) 0%,rgba(20,20,20,.1) 30%,rgba(20,20,20,.82) 62%,rgba(20,20,20,.96) 100%),var(--article-cover-image) 72% 30% / cover no-repeat,var(--cover)}
   .articleCoverInner{width:auto;height:570px;margin:0;padding:34px 22px 28px;display:flex;flex-direction:column}

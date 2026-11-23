@@ -63,6 +63,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const autoPauseUntilRef = useRef(0);
   const dragState = useRef({ active: false, startX: 0, startScrollLeft: 0, moved: false });
   const preventClick = useRef(false);
   const [virtualIndex, setVirtualIndex] = useState(canRotate ? items.length : 0);
@@ -168,14 +169,18 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     const track = trackRef.current;
     if (!viewport || !track) return;
     let frame = 0;
-    let previous = 0;
+    let position = viewport.scrollLeft;
+    let previous = performance.now();
     const startAt = performance.now() + 1200;
     const rotate = (time: number) => {
       const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
       const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
-      if (time >= startAt && previous && loopWidth > 0) {
-        viewport.scrollLeft += Math.min(time - previous, 40) * 0.026;
-        if (viewport.scrollLeft >= loopWidth) viewport.scrollLeft -= loopWidth;
+      if (time < autoPauseUntilRef.current) {
+        position = viewport.scrollLeft;
+      } else if (time >= startAt && loopWidth > 0) {
+        position += Math.min(Math.max(time - previous, 0), 40) * 0.026;
+        if (position >= loopWidth) position %= loopWidth;
+        viewport.scrollLeft = Math.floor(position);
       }
       previous = time;
       frame = window.requestAnimationFrame(rotate);
@@ -203,6 +208,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     const viewport = viewportRef.current;
     const track = trackRef.current;
     if (!viewport || !track) return;
+    autoPauseUntilRef.current = performance.now() + 1400;
     const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
     const distance = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : cards[0]?.offsetWidth ?? viewport.clientWidth;
     const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
@@ -211,8 +217,11 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (editMode || event.pointerType !== "mouse" || event.button !== 0) return;
+    if (editMode) return;
+    autoPauseUntilRef.current = performance.now() + 1400;
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
     dragState.current = { active: true, startX: event.clientX, startScrollLeft: event.currentTarget.scrollLeft, moved: false };
+    autoPauseUntilRef.current = Number.POSITIVE_INFINITY;
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
   };
@@ -231,6 +240,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     if (!drag.active) return;
     drag.active = false;
     setDragging(false);
+    autoPauseUntilRef.current = performance.now() + 1400;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     if (!drag.moved) return;
     preventClick.current = true;
@@ -274,6 +284,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointerDrag}
         onPointerCancel={finishPointerDrag}
+        onWheel={() => { autoPauseUntilRef.current = performance.now() + 1400; }}
         onClickCapture={(event) => { if (preventClick.current) { event.preventDefault(); event.stopPropagation(); } }}
       >
         {editMode ? (

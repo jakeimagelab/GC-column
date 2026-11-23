@@ -23,20 +23,30 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
       const element = document.getElementById(item.id);
       return element ? [element] : [];
     });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]?.target.id) setActiveId(visible[0].target.id);
-      },
-      { rootMargin: "-18% 0px -66% 0px", threshold: [0, 0.2, 0.8] },
-    );
-
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, [items]);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const activationLine = mobileBar ? 132 : window.innerHeight * 0.22;
+      let current = elements[0]?.id ?? "";
+      for (const element of elements) {
+        if (element.getBoundingClientRect().top > activationLine) break;
+        current = element.id;
+      }
+      if (current) setActiveId((previous) => previous === current ? previous : current);
+    };
+    const schedule = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [items, mobileBar]);
 
   useEffect(() => {
     if (!mobileBar) return;

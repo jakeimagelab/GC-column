@@ -33,7 +33,7 @@ export const xerfVsThermage: Column = {
   concerns: ["sagging"],
   primaryTreatment: "xerf",
   heroImage: "/uploads/glory-column-xerf-hero.jpg",
-  listImage: "/uploads/glory-column-hero-consultation.webp",
+  listImage: "/uploads/glory-column-xerf-hero.jpg",
   heroOverlay:
     "linear-gradient(90deg, rgba(20,20,20,.94) 0%, rgba(24,20,18,.82) 34%, rgba(40,22,16,.35) 58%, rgba(20,20,20,0) 76%)",
   title: "세르프(XERF)와 써마지FLX의 차이, 누구에게 맞을까요?",
@@ -85,6 +85,15 @@ export const xerfVsThermage: Column = {
         src: "/uploads/glory-column-treatment-depth-comparison.png",
         alt: "피부 구조별 써마지·세르프·울쎄라 에너지 전달 방식 비교",
         caption: "피부 구조와 장비별 에너지 전달 방식 비교",
+      },
+      table: {
+        caption: "써마지·세르프·울쎄라 비교",
+        head: ["구분", "써마지", "세르프", "울쎄라"],
+        rows: [
+          ["에너지", "고주파 (6.78MHz)", "고주파 + DEEP 모드 (2MHz)", "초음파"],
+          ["주로 닿는 층", "진피층", "진피층 중심 + 피하지방·근막층", "피하지방·근막층"],
+          ["에너지 방식", "모노폴라 RF", "넓은 면적, 전체 층에 고르게", "좁은 라인으로 선택적으로"],
+        ],
       },
     },
     {

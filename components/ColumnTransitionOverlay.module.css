@@ -1,21 +1,45 @@
-.layer { position: fixed; z-index: 10000; inset: 0; pointer-events: all; }
-.dimmer { position: absolute; inset: 0; background: rgba(20, 16, 12, .45); animation: transitionDim .8s cubic-bezier(.7,0,.2,1) both; }
-.cover { position: absolute; inset: 0; overflow: hidden; background: #3a3028; display: flex; align-items: center; justify-content: center; animation: transitionCover .8s cubic-bezier(.7,0,.2,1) both; }
+.layer { position:fixed; z-index:10000; inset:0; pointer-events:all; }
+.dimmer { position:absolute; inset:0; background:rgba(20,16,12,.48); }
+.cover { position:absolute; inset:0; overflow:hidden; background:#3a3028; display:flex; align-items:center; justify-content:center; will-change:transform; }
 .masthead { color: #fff; display: flex; align-items: baseline; gap: clamp(22px, 3vw, 46px); font-family: var(--font-en); font-size: clamp(76px, 10.4167vw, 150px); line-height: .88; letter-spacing: -.055em; white-space: nowrap; }
 .masthead strong { font-weight: 700; }
 .masthead span { font-weight: 300; }
 .masthead i { font-size: .58em; font-style: normal; font-weight: 300; }
 
+.entering .dimmer { animation:transitionDimIn 1.05s cubic-bezier(.7,0,.2,1) both; }
+.covered .dimmer { opacity:1; }
+.leaving .dimmer { animation:transitionDimOut .82s cubic-bezier(.7,0,.2,1) both; }
+.entering.toColumn .cover { animation:coverInFromRight 1.05s cubic-bezier(.72,0,.18,1) both; }
+.entering.toHome .cover { animation:coverInFromLeft 1.05s cubic-bezier(.72,0,.18,1) both; }
+.covered .cover { transform:translateX(0); }
+.leaving.toColumn .cover { animation:coverOutToLeft .82s cubic-bezier(.72,0,.18,1) both; }
+.leaving.toHome .cover { animation:coverOutToRight .82s cubic-bezier(.72,0,.18,1) both; }
+.entering .masthead { animation:mastheadIn .62s .32s cubic-bezier(.22,.61,.36,1) both; }
+.covered .masthead { opacity:1; transform:none; }
+.leaving.toColumn .masthead { animation:mastheadOutLeft .38s cubic-bezier(.4,0,1,1) both; }
+.leaving.toHome .masthead { animation:mastheadOutRight .38s cubic-bezier(.4,0,1,1) both; }
+
 :global(html[data-column-transition="active"]),
 :global(html[data-column-transition="active"] body) { overflow: hidden; }
-:global(html[data-column-transition="active"] main.pageFrame) { transform: translateX(-8%); transition: transform .8s cubic-bezier(.7,0,.2,1); }
+:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="entering"] body > main) { transform:translateX(-6%); transition:transform 1.05s cubic-bezier(.72,0,.18,1); }
+:global(html[data-column-transition-direction="to-home"][data-column-transition-phase="entering"] body > main) { transform:translateX(6%); transition:transform 1.05s cubic-bezier(.72,0,.18,1); }
+:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="covered"] body > main) { transform:translateX(4%); }
+:global(html[data-column-transition-direction="to-home"][data-column-transition-phase="covered"] body > main) { transform:translateX(-4%); }
+:global(html[data-column-transition-phase="leaving"] body > main) { transform:translateX(0); transition:transform .82s cubic-bezier(.72,0,.18,1); }
 
-@keyframes transitionCover { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes transitionDim { from { opacity: 0; } to { opacity: 1; } }
+@keyframes coverInFromRight { from { transform:translateX(100%); } to { transform:translateX(0); } }
+@keyframes coverInFromLeft { from { transform:translateX(-100%); } to { transform:translateX(0); } }
+@keyframes coverOutToLeft { from { transform:translateX(0); } to { transform:translateX(-100%); } }
+@keyframes coverOutToRight { from { transform:translateX(0); } to { transform:translateX(100%); } }
+@keyframes transitionDimIn { from { opacity:0; } to { opacity:1; } }
+@keyframes transitionDimOut { from { opacity:1; } to { opacity:0; } }
+@keyframes mastheadIn { from { opacity:0; transform:translateY(24px) scale(.985); } to { opacity:1; transform:none; } }
+@keyframes mastheadOutLeft { from { opacity:1; transform:none; } to { opacity:0; transform:translateX(-28px); } }
+@keyframes mastheadOutRight { from { opacity:1; transform:none; } to { opacity:0; transform:translateX(28px); } }
 
 @media (prefers-reduced-motion: reduce) {
   .layer { display: none; }
-  :global(html[data-column-transition="active"] main.pageFrame) { transform: none; transition: none; }
+  :global(html[data-column-transition="active"] body > main) { transform:none; transition:none; }
 }
 
 @media (max-width: 640px) {

@@ -79,7 +79,7 @@
 
 /* Canvas mobile composition */
 @media(max-width:640px){
-  :global(html),:global(body){max-width:100%;overflow-x:hidden}
+  :global(html),:global(body){max-width:100%;overflow-x:clip}
   .page{width:100%;overflow-x:clip}
   .cover{min-height:387px;padding:56px 0 0;background:#3a3028;overflow:visible}
   .coverInner{width:auto;margin:0;padding:40px 22px 72px}
