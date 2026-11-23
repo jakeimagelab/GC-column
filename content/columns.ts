@@ -33,7 +33,7 @@ export const xerfVsThermage: Column = {
   concerns: ["sagging"],
   primaryTreatment: "xerf",
   heroImage: "/uploads/glory-column-xerf-hero.jpg",
-  listImage: "/uploads/glory-column-hero-consultation.webp",
+  listImage: "/uploads/glory-column-xerf-hero.jpg",
   heroOverlay:
     "linear-gradient(90deg, rgba(20,20,20,.94) 0%, rgba(24,20,18,.82) 34%, rgba(40,22,16,.35) 58%, rgba(20,20,20,0) 76%)",
   title: "세르프(XERF)와 써마지FLX의 차이, 누구에게 맞을까요?",

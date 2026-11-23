@@ -831,9 +831,9 @@
   },
   "column.feature.image": {
     "type": "image",
-    "src": "/uploads/glory-column-editorial-campaign-01.png",
-    "label": "원장 칼럼 특집 화보",
-    "alt": "글로리의원 리프팅 장비와 인물을 담은 특집 화보",
+    "src": "/uploads/glory-column-xerf-hero.jpg",
+    "label": "세르프 칼럼 대표 이미지",
+    "alt": "글로리의원 공간에 놓인 세르프 리프팅 장비",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50
