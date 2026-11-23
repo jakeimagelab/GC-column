@@ -127,7 +127,7 @@ export function ColumnSearch({
 
   return (
     <div className={`${styles.search} ${variant === "bookmark" ? styles.bookmark : ""}`} id={variant === "default" ? "search" : undefined} data-column-search>
-      <div className={styles.inputRow} data-column-search-box>
+      <div className={`${styles.inputRow} ${suggestionsOpen ? styles.inputRowOpen : ""}`} data-column-search-box>
         <label htmlFor={idPrefix} {...editableProps("column.search.label")}>{getText(content, "column.search.label")}</label>
         <MagnifyingGlassIcon className={styles.searchIcon} aria-hidden="true" />
         <input

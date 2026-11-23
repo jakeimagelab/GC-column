@@ -129,6 +129,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
   }, [columns, searchQuery]);
 
   const top = hits[0];
+  const hasOtherResults = hits.length > 1;
   const chooseQuery = (value: string) => {
     setQuery(value);
     runSearch(value);
@@ -149,7 +150,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
         <div><span {...textEditProps("home.question.eyebrow")}>{getText(content, "home.question.eyebrow")}</span><h2 id="home-question-title" {...textEditProps("home.question.title")}>{getText(content, "home.question.title")}</h2></div>
         <p {...textEditProps("home.question.description")}>{getText(content, "home.question.description")}</p>
       </div>
-      <div className={styles.inputRow} data-scroll-world-layer="depth">
+      <div className={`${styles.inputRow} ${suggestionsOpen ? styles.inputRowOpen : ""}`} data-scroll-world-layer="depth">
         <label htmlFor="ask">{getText(content, "home.question.inputLabel")}</label>
         <div className={`${styles.field} ${typingText ? styles.typing : ""}`}>
           {typingText ? <span className={styles.typingGhost} aria-hidden="true">{typingText}<i /></span> : null}
@@ -220,7 +221,7 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
       {searchQuery ? (
         <div className={`${styles.resultRegion} ${resultsVisible ? styles.resultRegionVisible : ""}`} aria-live="polite" data-scroll-world-layer="depth">
           {top ? (
-            <div className={styles.results}>
+            <div className={`${styles.results} ${hasOtherResults ? "" : styles.resultsSingle}`}>
               <Link className={styles.topResult} href={`/column/${top.slug}`}>
                 <small><span {...textEditProps("home.question.closest")}>{getText(content, "home.question.closest")}</span> · {top.category}</small>
                 <b>{top.title}</b>
@@ -228,12 +229,14 @@ export function HomeQuestionSearch({ columns, content }: HomeQuestionSearchProps
                 <span {...textEditProps("home.question.reviewed")}>{getText(content, "home.question.reviewed")}</span>
                 <strong {...textEditProps("home.question.read")}>{getText(content, "home.question.read")}</strong>
               </Link>
-              <div className={styles.otherResults}>
-                <b><span {...textEditProps("home.question.related")}>{getText(content, "home.question.related")}</span> {Math.max(hits.length - 1, 0)}</b>
-                {hits.slice(1, 4).map((column) => (
-                  <Link href={`/column/${column.slug}`} key={column.slug}><small>{column.category}</small><span>{column.title}</span></Link>
-                ))}
-              </div>
+              {hasOtherResults ? (
+                <div className={styles.otherResults}>
+                  <b><span {...textEditProps("home.question.related")}>{getText(content, "home.question.related")}</span> {hits.length - 1}</b>
+                  {hits.slice(1, 4).map((column) => (
+                    <Link href={`/column/${column.slug}`} key={column.slug}><small>{column.category}</small><span>{column.title}</span></Link>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ) : (
             <div className={styles.empty}>

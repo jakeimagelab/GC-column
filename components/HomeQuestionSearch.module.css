@@ -7,6 +7,7 @@
 .heading h2 { margin: 0; font-size: 26px; }
 .heading p { margin: 0; color: var(--muted); font-size: 13px; }
 .inputRow { position: relative; padding: 6px 0 10px; border-bottom: 2px solid var(--ink); display: flex; align-items: center; gap: 12px; }
+.inputRowOpen { z-index: 50; }
 .inputRow label { position: absolute; left: -9999px; }
 .field { position: relative; min-width: 0; flex: 1; }
 .inputRow input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 22px; }
@@ -36,6 +37,7 @@
 .resultRegion { opacity: 0; transition: opacity 0.2s ease; }
 .resultRegionVisible { opacity: 1; }
 .results { padding-top: 8px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; }
+.resultsSingle { grid-template-columns: minmax(0, 1fr); }
 .topResult { padding: 26px 28px; background: var(--paper); display: flex; flex-direction: column; gap: 10px; }
 .topResult small { color: var(--brown); font-size: 12px; font-weight: 500; }
 .topResult b { font-size: 20px; line-height: 1.45; }

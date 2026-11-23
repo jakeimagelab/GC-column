@@ -873,6 +873,51 @@ blocked
 
 ---
 
+# 칼럼 책갈피 회귀·홈 검색 겹침 QA (2026-11-24)
+
+## 기준과 구현 증거
+
+- 기준: 캔버스 `확정 · 원장 칼럼`의 `MotionBookmark` 상태 정의와 이번 요청의 좌표·진행률·색상 수치
+- 휠 1회: `output/playwright/column-bookmark-wheel-1-searchfix.png`
+- 휠 2회: `output/playwright/column-bookmark-wheel-2-searchfix.png`
+- 책갈피 완료: `output/playwright/column-bookmark-complete-searchfix.png`
+- 맨 위 복귀: `output/playwright/column-bookmark-reverse-searchfix.png`
+- 느린 정방향·역방향 스크럽: `output/playwright/column-bookmark-slow-scroll.gif`
+- 홈 전환 직후 스크롤: `output/playwright/home-to-column-immediate-scroll.png`
+- 홈 자동완성: `output/playwright/home-search-autocomplete-1440.png`, `output/playwright/home-search-autocomplete-390.png`
+- 책갈피 검색 자동완성: `output/playwright/column-bookmark-search-autocomplete.png`
+
+## 책갈피·헤더 상태 검증
+
+- 120px에서 복제 제목 텍스트가 `Glory's\nColumn` 두 줄 모두 유지되고, 원본은 숨김·복제본은 표시 상태다. 헤더는 fixed, 높이 64.41px로 연속 보간됐다.
+- 240px에서 제목·검색창이 같은 프레임 진행률로 축소·이동하고 헤더는 56.78px까지 줄었다. 프레임별 CSS transition 없이 14% 추종 루프만 사용한다.
+- 640px에서 책갈피는 `84×300px`, top 56px, 헤더는 56px이며 둘 다 `#3A3028`이다. 검색 복제본은 opacity 0, 책갈피 버튼은 활성 상태다.
+- 0px로 복귀하면 복제본 opacity 0, 원본 제목·검색 visibility visible, 책갈피 높이 0, 헤더 72px·absolute 상태가 복구된다.
+- 홈에서 칼럼으로 전환 직후 스크롤해도 제목 두 줄이 함께 표시되고 `scrollWidth === innerWidth === 1440`을 유지했다.
+- 검색 패널은 Esc로 닫히며 `aria-expanded`가 `false`로 돌아온다.
+
+## 홈·책갈피 자동완성 검증
+
+- 홈 1440px에서 목록 열림 시 input row z-index 50, 목록 z-index 80, 배경 `rgb(255,255,255)`, 그림자 `0 18px 40px rgba(31,24,19,.16)`이다.
+- 목록이 열린 전후 `popular`와 `concernSection`의 y 좌표가 동일해 아래 콘텐츠는 이동하지 않는다. 겹치는 지점의 `elementFromPoint`가 목록 내부 행을 반환해 칩·고민 카드 위에 그려짐을 확인했다.
+- 홈 390px에서도 같은 쌓임 순서를 유지하고 `scrollWidth === 390`이다.
+- `세르프`는 결과 자식이 1개이며 단일 열 전체 폭을 사용하고 `관련 칼럼 0` 문구가 없다.
+- `울쎄라`는 `관련 칼럼 1`, 결과 자식 2개로 관련 칼럼 블록이 정상 표시된다.
+- 책갈피 패널도 input row z-index 50, 목록 z-index 80이며 키워드 칩과 겹치는 좌표에서 목록이 최상단이다.
+
+## 자동 검증
+
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+- [x] React 검토: 파생 boolean은 렌더에서 계산, 새 전역 listener·waterfall 없음, 기존 combobox/listbox 접근성 유지
+
+## 최종 결과
+
+passed
+
+---
+
 # 홈 비전 외곽선·칼럼 책갈피 회귀 QA (2026-11-24)
 
 ## 비교 기준과 증거

@@ -16,6 +16,8 @@
   gap: 18px;
 }
 
+.inputRowOpen { z-index: 50; }
+
 .inputRow label {
   flex: none;
   color: #3a3028;
