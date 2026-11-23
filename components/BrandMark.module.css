@@ -1,8 +1,8 @@
 .mark {
   position: relative;
-  width: 202px;
-  height: 54px;
-  overflow: visible;
+  width: 174px;
+  height: 52px;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   flex: none;
@@ -14,26 +14,35 @@
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
 }
 
 .monogram {
-  width: 24px;
-  height: 30px;
+  position: relative;
+  width: 52px;
+  height: 50px;
   flex: none;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-en);
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1;
 }
 
+.monogram svg { width: 100%; height: 100%; overflow: visible; }
+
+.monogram text {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 52px;
+  font-weight: 400;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.monogram text:nth-child(2) { opacity: .52; }
+.monogram text:nth-child(3) { opacity: .3; }
+
 .wordmark b {
-  font-size: 23px;
-  font-weight: 350;
-  letter-spacing: 1.5px;
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 2px;
   line-height: 1;
 }
 
@@ -49,7 +58,7 @@
 }
 
 .compact .wordmark, .plainMark .wordmark { gap: 7px; }
-.compact .monogram, .plainMark .monogram { width: 22px; height: 30px; }
+.compact .monogram, .plainMark .monogram { width: 43px; height: 42px; }
 .compact .wordmark b, .plainMark .wordmark b { font-size: 20px; letter-spacing: 1.5px; }
 
 .image {
@@ -62,7 +71,7 @@
 
 @media (max-width: 640px) {
   .mark, .compact, .plainMark { width: 146px; min-width: 146px; height: 44px; }
-  .monogram, .compact .monogram, .plainMark .monogram { width: 22px; height: 30px; }
+  .monogram, .compact .monogram, .plainMark .monogram { width: 43px; height: 42px; }
   .wordmark b, .compact .wordmark b, .plainMark .wordmark b { font-size: 20px; letter-spacing: 1.5px; }
   .image {
     object-position: var(--image-mobile-focus-x) var(--image-mobile-focus-y);

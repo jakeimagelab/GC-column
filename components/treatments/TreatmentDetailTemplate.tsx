@@ -44,6 +44,16 @@ function GlanceLines({ text }: { text: string }) {
   });
 }
 
+function PromiseQuote({ text }: { text: string }) {
+  const lines = cleanReviewText(text).split("\n");
+  return lines.map((line, index) => (
+    <Fragment key={`${line}-${index}`}>
+      {index === 0 ? line : <strong>{line}</strong>}
+      {index < lines.length - 1 ? <br /> : null}
+    </Fragment>
+  ));
+}
+
 function ReviewMark({ dark = false }: { dark?: boolean }) {
   return showReview ? <span className={`${styles.reviewMark} ${dark ? styles.reviewMarkDark : ""}`}>[원장 확인]</span> : null;
 }
@@ -218,7 +228,11 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
       {device && showDeviceDark ? <section className={styles.deviceSection} aria-labelledby="device-title">
         <span className={styles.genuineBackdrop} aria-hidden="true">GENUINE</span>
         <div className={styles.deviceInner}>
-          <div className={styles.deviceHeader}><p className={styles.darkEyebrow}>HANDPIECE · TIPS</p><h2 id="device-title">{device.handpieceTips ? <>하나의 핸드피스,<br /><b>부위에 맞춘 정품 팁</b></> : <>정품 장비와,<br /><b>확인 절차</b></>}</h2></div>
+          <div className={styles.deviceHeader}>
+            <p className={styles.darkEyebrow}>HANDPIECE · TIPS</p>
+            <h2 id="device-title">{device.handpieceTips ? <>하나의 핸드피스,<br /><b>부위에 맞춘 정품 팁</b></> : <>정품 장비와,<br /><b>확인 절차</b></>}</h2>
+            {device.handpieceTips ? <p className={styles.deviceIntro}>써마지FLX는 핸드피스 하나로 얼굴부터 바디까지 시술하고,<br />부위에 따라 크기가 다른 일회용 팁을 끼워 사용합니다.</p> : null}
+          </div>
           {device.handpieceTips ? <div className={styles.handpieceLayout}>
             <TreatmentReveal mode="clip" className={styles.handpieceFeature}>
               <div className={styles.handpieceGlow}>{device.handpieceTips.handpiece.src ? <Image src={device.handpieceTips.handpiece.src} alt={device.handpieceTips.handpiece.alt} width={230} height={355} /> : null}</div>
@@ -256,7 +270,7 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
       <TreatmentReveal className={styles.promiseSection}>
         <section className={styles.promiseInner} aria-labelledby="promise-title">
           <span className={styles.quoteMark} aria-hidden="true">“</span>
-          <h2 id="promise-title"><Lines text={treatment.promise.quote} /></h2>
+          <h2 id="promise-title"><PromiseQuote text={treatment.promise.quote} /></h2>
           <p>{treatment.promise.signature}</p>
           <div className={styles.promiseGrid}>{treatment.promise.items.map((item, index) => <article key={item}><small>PROMISE {String(index + 1).padStart(2, "0")}</small><p><Lines text={item} /></p></article>)}</div>
         </section>

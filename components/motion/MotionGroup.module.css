@@ -1,6 +1,6 @@
 .group {
+  --motion-scale: 1;
   --reveal-distance: 32px;
-  --reveal-duration: .9s;
   --reveal-ease: cubic-bezier(.2,.8,.2,1);
   --draw-ease: cubic-bezier(.77,0,.18,1);
 }
@@ -8,31 +8,31 @@
 .group [data-motion-item] { opacity:1; transform:none; }
 
 .armed[data-reveal="up"] [data-motion-item] { opacity:0; transform:translate3d(0,var(--reveal-distance),0); }
-.playing[data-reveal="up"] [data-motion-item] { animation:motionGroupFadeUp var(--reveal-duration) var(--reveal-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="up"] [data-motion-item] { animation:motionGroupFadeUp calc(.9s * var(--motion-scale)) var(--reveal-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="line"] [data-motion-item] { transform:scaleX(0); transform-origin:left center; }
-.playing[data-reveal="line"] [data-motion-item] { animation:motionGroupLine 1.4s var(--draw-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="line"] [data-motion-item] { animation:motionGroupLine calc(1.4s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="mask"] [data-motion-item] { overflow:clip; }
 .armed[data-reveal="mask"] [data-motion-item] > [data-reveal-inner] { transform:translateY(110%); }
-.playing[data-reveal="mask"] [data-motion-item] > [data-reveal-inner] { animation:motionGroupMask 1.05s var(--draw-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="mask"] [data-motion-item] > [data-reveal-inner] { animation:motionGroupMask calc(1.05s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="clip"] [data-motion-item] { clip-path:inset(0 0 100% 0); }
-.playing[data-reveal="clip"] [data-motion-item] { animation:motionGroupClip 1.3s var(--draw-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="clip"] [data-motion-item] { animation:motionGroupClip calc(1.3s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="draw"] [data-motion-item] { clip-path:inset(0 100% 0 0); }
-.playing[data-reveal="draw"] [data-motion-item] { animation:motionGroupDraw 1.3s var(--draw-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="draw"] [data-motion-item] { animation:motionGroupDraw calc(1.3s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="zoom"] [data-motion-item] { opacity:0; clip-path:inset(10% 8%); }
 .armed[data-reveal="zoom"] [data-motion-item] img { transform:scale(1.12); }
-.playing[data-reveal="zoom"] [data-motion-item] { animation:motionGroupZoom 1.4s var(--draw-ease) var(--reveal-delay,0s) both; }
-.playing[data-reveal="zoom"] [data-motion-item] img { animation:motionGroupImageZoom 2s var(--reveal-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="zoom"] [data-motion-item] { animation:motionGroupZoom calc(1.4s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
+.playing[data-reveal="zoom"] [data-motion-item] img { animation:motionGroupImageZoom calc(2s * var(--motion-scale)) var(--reveal-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="highlight"] [data-motion-item] { background-size:0 100%; }
-.playing[data-reveal="highlight"] [data-motion-item] { animation:motionGroupHighlight 1.3s var(--draw-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="highlight"] [data-motion-item] { animation:motionGroupHighlight calc(1.3s * var(--motion-scale)) var(--draw-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 .armed[data-reveal="table"] [data-motion-item] { opacity:0; transform:translateY(12px); }
-.playing[data-reveal="table"] [data-motion-item] { animation:motionGroupTable .72s var(--reveal-ease) var(--reveal-delay,0s) both; }
+.playing[data-reveal="table"] [data-motion-item] { animation:motionGroupTable calc(.72s * var(--motion-scale)) var(--reveal-ease) calc(var(--reveal-delay,0s) * var(--motion-scale)) both; }
 
 @keyframes motionGroupFadeUp { from { opacity:0; transform:translate3d(0,var(--reveal-distance),0); } to { opacity:1; transform:none; } }
 @keyframes motionGroupLine { from { transform:scaleX(0); } to { transform:scaleX(1); } }
@@ -45,11 +45,7 @@
 @keyframes motionGroupTable { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
 
 @media (max-width:640px) {
-  .group { --reveal-distance:16px; --reveal-duration:.63s; }
-  .playing[data-reveal="line"] [data-motion-item],
-  .playing[data-reveal="clip"] [data-motion-item],
-  .playing[data-reveal="draw"] [data-motion-item],
-  .playing[data-reveal="zoom"] [data-motion-item] { animation-duration:.92s; }
+  .group { --motion-scale:.75; --reveal-distance:16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

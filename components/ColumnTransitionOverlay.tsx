@@ -13,7 +13,7 @@ type StoredRect = { top:number; left:number; width:number; height:number; viewpo
 
 const ORIGIN_KEY = "glory:column-transition-origin";
 const SLIDE_DURATION = 850;
-const SLIDE_DURATION_MOBILE = 600;
+const SLIDE_DURATION_MOBILE = 640;
 const ARRIVAL_SEAM_DURATION = 120;
 const HOME_COVER_DURATION = 350;
 const HOME_COLLAPSE_DURATION = 700;
@@ -48,6 +48,8 @@ function originStyle(rect:StoredRect):CSSProperties {
     "--column-origin-right":`${Math.max(0,window.innerWidth-rect.left-rect.width)}px`,
     "--column-origin-bottom":`${Math.max(0,window.innerHeight-rect.top-rect.height)}px`,
     "--column-origin-left":`${Math.max(0,rect.left)}px`,
+    "--column-origin-x":`${Math.max(0,rect.left+rect.width/2)}px`,
+    "--column-origin-y":`${Math.max(0,rect.top+rect.height/2)}px`,
   } as CSSProperties;
 }
 
@@ -115,9 +117,8 @@ export function ColumnTransitionOverlay() {
     if (nextDirection === "toColumn") {
       const duration = window.matchMedia("(max-width: 640px)").matches ? SLIDE_DURATION_MOBILE : SLIDE_DURATION;
       setPhase("sliding");
-      // Keep the home route in place while the full-height magazine cover enters.
-      // Once it completely covers the viewport, swap the route behind the same
-      // brown surface so no card/photo can flash between the two pages.
+      // Grow the magazine cover from the clicked card. Once the cover fully
+      // fills the viewport, swap the route behind the identical brown surface.
       later(() => {
         expansionDoneRef.current = true;
         router.push(`${url.pathname}${url.search}${url.hash}`);
@@ -175,6 +176,13 @@ export function ColumnTransitionOverlay() {
 
   useEffect(() => {
     const root = document.documentElement;
+    const originProperties = ["--column-origin-x","--column-origin-y"] as const;
+    if (origin) {
+      root.style.setProperty("--column-origin-x",`${Math.max(0,origin.left+origin.width/2)}px`);
+      root.style.setProperty("--column-origin-y",`${Math.max(0,origin.top+origin.height/2)}px`);
+    } else {
+      originProperties.forEach((property) => root.style.removeProperty(property));
+    }
     if (phase === "idle") {
       delete root.dataset.columnTransition;
       delete root.dataset.columnTransitionDirection;
@@ -184,13 +192,15 @@ export function ColumnTransitionOverlay() {
     root.dataset.columnTransition = phase === "arrived" ? "arrived" : "active";
     root.dataset.columnTransitionDirection = direction === "toColumn" ? "to-column" : "to-home";
     root.dataset.columnTransitionPhase = phase;
-  },[direction,phase]);
+  },[direction,origin,phase]);
 
   useEffect(() => () => {
     clearTimers();
     delete document.documentElement.dataset.columnTransition;
     delete document.documentElement.dataset.columnTransitionDirection;
     delete document.documentElement.dataset.columnTransitionPhase;
+    document.documentElement.style.removeProperty("--column-origin-x");
+    document.documentElement.style.removeProperty("--column-origin-y");
   },[clearTimers]);
 
   if (phase === "idle" || !href || !origin || typeof document === "undefined") return null;

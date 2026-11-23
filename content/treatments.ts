@@ -19,7 +19,7 @@ const treatmentData: Omit<Treatment, "detailPath">[] = [
   },
   {
     slug: "thermage-flx",
-    brandColor: "#4A2878",
+    brandColor: "#4B2D73",
     name: "써마지 FLX",
     menuName: "써마지FLX",
     categorySlug: "lifting",

@@ -361,12 +361,35 @@
 
 @media(max-width:640px) {
   .page [data-detail-reveal-ready][data-detail-reveal="up"] { transform:translateY(16px); }
-  .page [data-detail-reveal-active][data-detail-reveal="up"] { animation-duration:.63s; }
+  .page [data-detail-reveal-active][data-detail-reveal="up"] { animation-duration:.675s; }
   .page [data-detail-reveal-ready][data-detail-reveal="section"]>h2 { transform:translateY(15px); }
   .page [data-detail-reveal-active][data-detail-reveal="section"] .sectionMarker,
-  .page [data-detail-reveal-active][data-detail-reveal="figure"] { animation-duration:.91s; }
-  .page [data-detail-reveal-active][data-detail-reveal="section"]>h2 { animation-duration:.6s; }
-  .articleCover[data-detail-entry-ready] .articleCoverMedia { animation-duration:1.68s; }
+  .page [data-detail-reveal-active][data-detail-reveal="figure"] { animation-duration:.975s; }
+  .page [data-detail-reveal-active][data-detail-reveal="figure"] img { animation-duration:1.35s; }
+  .page [data-detail-reveal-active][data-detail-reveal="section"]>h2 { animation-duration:.6375s; animation-delay:.1125s; }
+  .page [data-detail-reveal-active][data-detail-reveal="table"] tbody tr { animation-duration:.54s; }
+  .page [data-detail-reveal-active][data-detail-reveal="table"] thead .primaryCell,
+  .page [data-detail-reveal-active][data-detail-reveal="table"] tbody .primaryCell { animation-duration:.75s; animation-delay:.525s; }
+  .faqBand[data-detail-reveal-active] header { animation-duration:.6375s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]) { animation-duration:.54s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(2)) { animation-delay:.0525s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(3)) { animation-delay:.105s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(4)) { animation-delay:.1575s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(5)) { animation-delay:.21s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(6)) { animation-delay:.2625s; }
+  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(7)) { animation-delay:.315s; }
+  .visitPrep[data-detail-reveal-active] .visitHeading,
+  .visitPrep[data-detail-reveal-active] .visitGrid>div { animation-duration:.6s; }
+  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(1) { animation-delay:.09s; }
+  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(2) { animation-delay:.18s; }
+  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(3) { animation-delay:.27s; }
+  .articleCover[data-detail-entry-ready] .articleCoverMedia { animation-duration:1.8s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="breadcrumb"] { animation-duration:.5625s; animation-delay:.1125s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="issue"] { animation-duration:.5625s; animation-delay:.1875s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="title-1"] { animation-duration:.825s; animation-delay:.2625s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="title-2"] { animation-duration:.825s; animation-delay:.3525s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="title-3"] { animation-duration:.825s; animation-delay:.4425s; }
+  .articleCover[data-detail-entry-ready] [data-detail-entry="byline"] { animation-duration:.6s; animation-delay:.6375s; }
 }
 
 @media(prefers-reduced-motion:reduce) {

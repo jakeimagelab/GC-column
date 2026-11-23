@@ -672,3 +672,36 @@ passed
 ## 최종 결과
 
 passed
+
+---
+
+# 써마지FLX 타이포·모바일 모션 최종 QA
+
+## 증거
+
+- 기준 PDF: `시술 상세 템플릿 — 장비형 (써마지FLX).pdf`
+- 구현 전체 캡처: `output/playwright/thermage-typography-final-1440-loaded.png`
+- 상단 나란히 비교: `output/playwright/thermage-compare-page1.png`
+- 핸드피스·팁 나란히 비교: `output/playwright/thermage-compare-page3.png`
+- CSS viewport: 1440×900, `NEXT_PUBLIC_SHOW_REVIEW=true`
+
+## 비교 결과
+
+- 히어로를 816px 리듬으로 맞추고 제목을 64px, 300/700, 자간 0, 줄높이 1.15로 조정했다.
+- 본문 색 `#231F1C`, 보조색 `#6B6560`, 써마지 보라 `#4B2D73`을 적용했다.
+- 섹션 영문 라벨·제목·리드·비교표·진행 단계·다짐·FAQ·상담 띠·푸터의 크기와 굵기를 PDF와 나란히 비교했다.
+- 핸드피스의 배경 광원을 제거하고 380px 테두리 프레임, -18도 회전, 내용 높이 팁 카드를 적용했다.
+- 공개 모드는 검토 전용 `1인 1팁`을 숨기고 검토 모드만 3칸을 표시한다.
+- 칼럼 모션은 모바일에서 시간·지연을 모두 0.75배, 패럴랙스 거리를 0.5배로 통일했다.
+- 홈→칼럼 전환은 클릭한 사각형에서 전체 화면으로 펼쳐지고, reduced-motion은 0.2초 페이드로 대체된다.
+
+## 검증
+
+- [x] 수정 TSX 접근성·이벤트 정리·수동 전역 리스너 해제 확인
+- [x] 프로덕션 빌드와 TypeScript 통과
+- [x] ESLint 오류 0건; 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+
+## 최종 결과
+
+passed

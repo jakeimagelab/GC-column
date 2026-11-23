@@ -16,8 +16,8 @@ type TreatmentHeroProps = {
   kakaoUrl: string;
 };
 
-const HERO_CENTER_X = 1240;
-const HERO_CENTER_Y = 780;
+const HERO_CENTER_X = 1660;
+const HERO_CENTER_Y = 960;
 
 const HERO_RAYS = Array.from({ length: 70 }, (_, index) => {
   const angle = (185 + index * 1.45) * Math.PI / 180;
@@ -91,8 +91,8 @@ export function TreatmentHero({ hero, categoryName, categoryPath, accent, accent
           </filter>
         </defs>
         <rect width="1440" height="820" fill={`url(#${backgroundId})`} />
-        <circle className={styles.glowCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#EADFFB" strokeWidth="26" opacity=".28" filter={`url(#${glowId})`} pathLength="1" />
-        <circle className={styles.mainCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#F7F1FF" strokeWidth="1" opacity=".2" pathLength="1" />
+        <circle className={styles.glowCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#EADFFB" strokeWidth="26" opacity=".2" filter={`url(#${glowId})`} pathLength="1" />
+        <circle className={styles.mainCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#F7F1FF" strokeWidth="1" opacity=".16" pathLength="1" />
         <g className={styles.rays}>
           {HERO_RAYS.map((ray, index) => (
             <line

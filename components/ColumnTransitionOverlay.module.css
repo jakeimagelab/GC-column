@@ -1,25 +1,26 @@
 .layer { position:fixed; z-index:10000; inset:0; pointer-events:all; contain:strict; }
-.surface { position:absolute; inset:0; background:#3a3028; display:block; box-shadow:-28px 0 72px rgb(31 24 19 / 22%); will-change:transform,clip-path,opacity; }
-.sliding .surface { animation:columnHeroSlideIn .85s cubic-bezier(.77,0,.18,1) both; }
-.arrived .surface { transform:none; clip-path:inset(0); opacity:1; }
+.surface { position:absolute; inset:0; background:#3a3028; display:block; will-change:clip-path,opacity; }
+.sliding .surface { animation:columnExpandFromOrigin .85s cubic-bezier(.77,0,.18,1) both; }
+.arrived .surface { transform:none; clip-path:inset(0); animation:columnArrivalFade .12s linear both; }
 .covering .surface { clip-path:inset(0); animation:homeCover .35s cubic-bezier(.2,.8,.2,1) both; }
 .collapsing .surface { animation:collapseToOrigin .7s cubic-bezier(.77,0,.18,1) both; }
 .reduced .surface { clip-path:inset(0); animation:reducedFade .2s linear both; }
 
 :global(html[data-column-transition="active"]),:global(html[data-column-transition="active"] body),
 :global(html[data-column-transition="arrived"]),:global(html[data-column-transition="arrived"] body) { overflow:hidden; }
-:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="sliding"] body > main) { transform:translate3d(-4vw,0,0) scale(.985); transform-origin:50% 40%; filter:brightness(.58); transition:transform .85s cubic-bezier(.77,0,.18,1),filter .85s cubic-bezier(.2,.8,.2,1); }
+:global(html[data-column-transition-direction="to-column"][data-column-transition-phase="sliding"] body > main) { transform:scale(.94); transform-origin:var(--column-origin-x) var(--column-origin-y); filter:brightness(.45); transition:transform .85s cubic-bezier(.77,0,.18,1),filter .85s cubic-bezier(.2,.8,.2,1); }
 :global(html[data-column-transition-direction="to-column"][data-column-transition-phase="arrived"] body > main),
 :global(html[data-column-transition-direction="to-home"][data-column-transition-phase="collapsing"] body > main) { transform:none; filter:none; }
 
-@keyframes columnHeroSlideIn { from { transform:translate3d(100%,0,0); } to { transform:none; } }
+@keyframes columnExpandFromOrigin { from { clip-path:inset(var(--column-origin-top) var(--column-origin-right) var(--column-origin-bottom) var(--column-origin-left) round 2px); } to { clip-path:inset(0 round 0); } }
+@keyframes columnArrivalFade { from { opacity:1; } to { opacity:0; } }
 @keyframes homeCover { from { opacity:0; } to { opacity:1; } }
 @keyframes collapseToOrigin { from { clip-path:inset(0 round 0); opacity:1; } to { clip-path:inset(var(--column-origin-top) var(--column-origin-right) var(--column-origin-bottom) var(--column-origin-left) round 2px); opacity:1; } }
 @keyframes reducedFade { 0% { opacity:0; } 45% { opacity:1; } 100% { opacity:0; } }
 
 @media(max-width:640px) {
-  .sliding .surface { animation-duration:.6s; }
-  :global(html[data-column-transition-direction="to-column"][data-column-transition-phase="sliding"] body > main) { transform:translate3d(-2vw,0,0) scale(.992); transition-duration:.6s; }
+  .sliding .surface { animation-duration:.64s; }
+  :global(html[data-column-transition-direction="to-column"][data-column-transition-phase="sliding"] body > main) { transform:scale(.97); transition-duration:.64s; }
 }
 @media(prefers-reduced-motion:reduce) {
   .sliding .surface,.arrived .surface,.covering .surface,.collapsing .surface { animation:reducedFade .2s linear both; clip-path:inset(0); }

@@ -9,7 +9,7 @@ export const thermageFlxTreatment: DeviceTreatmentDetail = {
   name: "써마지FLX",
   nameEn: "Thermage FLX",
   kind: "device",
-  accent: "#4A2878",
+  accent: "#4B2D73",
   accentSoft: "#F3EFF8",
   accentLight: "#C9B6E4",
   hero: {

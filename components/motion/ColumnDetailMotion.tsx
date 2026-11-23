@@ -18,6 +18,7 @@ export function ColumnDetailMotion() {
     let frame = 0;
     let viewportHeight = window.innerHeight;
     let mobileScale = window.innerWidth <= 640 ? .5 : 1;
+    let timingScale = window.innerWidth <= 640 ? .75 : 1;
     let entryStarted = false;
     let transitionObserver:MutationObserver | null = null;
 
@@ -48,7 +49,7 @@ export function ColumnDetailMotion() {
     reveals.forEach((node) => {
       node.setAttribute("data-detail-reveal-ready","");
       node.querySelectorAll<HTMLElement>("tbody tr,[data-detail-stagger-item]").forEach((item,index) => {
-        item.style.setProperty("--detail-delay",`${index*.1}s`);
+        item.style.setProperty("--detail-delay",`${index*.1*timingScale}s`);
       });
     });
 
@@ -81,6 +82,12 @@ export function ColumnDetailMotion() {
     const resize = () => {
       viewportHeight = window.innerHeight;
       mobileScale = window.innerWidth <= 640 ? .5 : 1;
+      timingScale = window.innerWidth <= 640 ? .75 : 1;
+      reveals.forEach((node) => {
+        node.querySelectorAll<HTMLElement>("tbody tr,[data-detail-stagger-item]").forEach((item,index) => {
+          item.style.setProperty("--detail-delay",`${index*.1*timingScale}s`);
+        });
+      });
       schedule();
     };
     const parallaxObserver = new IntersectionObserver((entries) => {
@@ -106,6 +113,7 @@ export function ColumnDetailMotion() {
       hero.removeAttribute("data-detail-entry-armed");
       hero.removeAttribute("data-detail-entry-ready");
       reveals.forEach((node) => node.removeAttribute("data-detail-reveal-ready"));
+      reveals.forEach((node) => node.querySelectorAll<HTMLElement>("tbody tr,[data-detail-stagger-item]").forEach((item) => item.style.removeProperty("--detail-delay")));
       parallaxNodes.forEach((node) => node.style.removeProperty("--detail-parallax-y"));
     };
   },[]);
