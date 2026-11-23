@@ -904,6 +904,7 @@ blocked
 - [x] 홈 비전 디졸브와 Feature 패럴랙스에 동일한 14% 스무딩 적용
 - [x] 390px에서 `document.documentElement.scrollWidth === 390`
 - [x] 1023px 이하 책갈피 레이어 숨김
+- [x] 칼럼 메인 헤더 높이 390px에서 56px, 641~1023px에서 64px 유지
 - [x] reduced-motion·개발 편집 모드 우회 유지
 - [x] `npm run build` 통과 — 46개 페이지 생성
 - [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
