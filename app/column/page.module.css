@@ -2,6 +2,9 @@
 .page h1,.page h2,.page h3,.page p { text-wrap:pretty; }
 .mobileMasthead,.featureCardMeta,.mobileFeatureTitle,.mobileQuestionsHeader,.mobileQuestionStats,.treatmentVisual,.mobileArchiveTitle,.mobileConsultTitle,.mobileConsultLocation,.mobileBottomBar,.mobileBreak { display:none; }
 .desktopSpace { display:inline; }
+.heroStage { height:100svh; min-height:654px; background:var(--paper); display:flex; flex-direction:column; }
+.heroStage>.cover { min-height:0; flex:1 1 auto; }
+.heroStage>.searchShell { flex:0 0 auto; }
 .cover { position:relative; min-height:634px; padding-top:78px; background:var(--cover); color:#fff; overflow:hidden; }
 .coverInner { width:min(1070px,calc(100% - 96px)); margin:68px auto 0; }
 .verticalLabel { position:absolute; top:120px; left:42px; font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; writing-mode:vertical-rl; opacity:.72; white-space:nowrap; }
@@ -79,6 +82,8 @@
 
 /* Canvas mobile composition */
 @media(max-width:640px){
+  .heroStage{height:100svh;min-height:660px}
+  .heroStage>.cover{min-height:0;flex:1 1 auto}
   :global(html),:global(body){max-width:100%;overflow-x:clip}
   .page{width:100%;overflow-x:clip}
   .cover{min-height:387px;padding:56px 0 0;background:#3a3028;overflow:visible}

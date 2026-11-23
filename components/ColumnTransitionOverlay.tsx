@@ -12,7 +12,7 @@ type TransitionPhase = "idle" | "entering" | "covered" | "leaving";
 
 const ENTER_DURATION = 1050;
 const COVER_HOLD_DURATION = 260;
-const EXIT_DURATION = 820;
+const EXIT_DURATION = 900;
 const ROUTE_TIMEOUT = 2400;
 
 type ColumnTransitionOverlayProps = {

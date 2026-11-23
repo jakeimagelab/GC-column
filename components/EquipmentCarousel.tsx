@@ -26,7 +26,6 @@ function EquipmentCard({ item, content, duplicate = false, editMode = false, onE
   const cardContent = <>
     <div className={styles.imageWrap}>
       <ImageSlot className={styles.equipmentSlot} label="" alt="" editId={duplicate ? undefined : `${editPrefix}.image`} image={item.image} />
-      <div className={styles.benefitPanel} aria-hidden="true"><small {...(!duplicate ? { "data-edit-id": "home.equipment.hoverLabel", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.hoverLabel")}</small><span {...(!duplicate ? { "data-edit-id": `${editPrefix}.hover`, "data-edit-type": "text" } : {})}>{item.hover ?? item.desc}</span></div>
     </div>
     <b>{duplicate ? item.name : <EditableRichText id={`${editPrefix}.name`} value={item.name} />}</b>
     <span>{duplicate ? item.desc : <EditableRichText id={`${editPrefix}.desc`} value={item.desc} />}</span>
@@ -171,14 +170,14 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     let frame = 0;
     let position = viewport.scrollLeft;
     let previous = performance.now();
-    const startAt = performance.now() + 1200;
+    const startAt = performance.now() + 700;
     const rotate = (time: number) => {
       const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
       const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
       if (time < autoPauseUntilRef.current) {
         position = viewport.scrollLeft;
       } else if (time >= startAt && loopWidth > 0) {
-        position += Math.min(Math.max(time - previous, 0), 40) * 0.026;
+        position += Math.min(Math.max(time - previous, 0), 40) * 0.06;
         if (position >= loopWidth) position %= loopWidth;
         viewport.scrollLeft = Math.floor(position);
       }
@@ -224,6 +223,16 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     autoPauseUntilRef.current = Number.POSITIVE_INFINITY;
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragging(true);
+  };
+
+  const handlePointerEnter = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (editMode || event.pointerType !== "mouse") return;
+    autoPauseUntilRef.current = Number.POSITIVE_INFINITY;
+  };
+
+  const handlePointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (editMode || event.pointerType !== "mouse" || dragState.current.active) return;
+    autoPauseUntilRef.current = performance.now() + 420;
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -280,6 +289,8 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         ref={viewportRef}
         data-scroll-world-layer="depth"
         onScroll={updateManualPosition}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointerDrag}

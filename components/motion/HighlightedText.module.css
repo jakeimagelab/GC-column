@@ -4,7 +4,10 @@
 
 .paragraph mark {
   padding: 0 2px;
-  background: linear-gradient(transparent 58%, rgba(214,190,150,.55) 58%) no-repeat 0 0 / 100% 100%;
+  background-image: linear-gradient(transparent 58%, var(--brand-highlight, rgba(214,190,150,.55)) 58%);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 100%;
   color: inherit;
 }
 
@@ -34,7 +37,11 @@
 }
 
 .playing mark:nth-of-type(2) {
-  transition-delay: .5s;
+  transition-delay: .36s;
+}
+
+.playing mark:nth-of-type(3) {
+  transition-delay: .72s;
 }
 
 @media (prefers-reduced-motion: reduce) {

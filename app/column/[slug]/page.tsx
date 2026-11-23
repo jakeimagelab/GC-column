@@ -124,7 +124,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     "--brand-label": column.primaryTreatment === "xerf" ? "#c8665c" : primaryTreatment?.brandColor ?? "#8c7b6b",
     "--brand-soft-head": column.primaryTreatment === "xerf" ? "#fce3df" : "#eee3d8",
     "--brand-soft": column.primaryTreatment === "xerf" ? "#fdf0ee" : "#f2ede6",
-    "--brand-highlight": column.primaryTreatment === "xerf" ? "#fbd5cf" : "#eee3d8",
+    "--brand-highlight": column.primaryTreatment === "xerf" ? "rgba(255,71,20,.24)" : "#eee3d8",
     "--article-cover-image": `url(${JSON.stringify(column.heroImage || "/uploads/glory-column-editorial-campaign-01.png")})`,
     "--article-overlay": column.heroOverlay ?? "linear-gradient(90deg, rgba(58,48,40,.97) 0%, rgba(58,48,40,.88) 38%, rgba(58,48,40,.45) 70%, rgba(58,48,40,.3) 100%)",
   } as CSSProperties;

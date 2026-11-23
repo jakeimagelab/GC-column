@@ -550,9 +550,9 @@
   },
   "home.latest.featureImage": {
     "type": "image",
-    "src": "/uploads/glory-column-editorial-campaign-01.png",
-    "label": "홈페이지 특집 칼럼 대표 이미지",
-    "alt": "글로리의원 리프팅 칼럼 캠페인 이미지",
+    "src": "/uploads/glory-column-hero-consultation.webp",
+    "label": "홈페이지 원장 칼럼 상담 이미지",
+    "alt": "글로리의원 이호 대표원장이 환자와 상담하는 모습",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50

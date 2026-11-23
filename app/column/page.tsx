@@ -86,31 +86,33 @@ export default async function ColumnMainPage() {
 
   return (
     <main className={styles.page}>
-      <MotionGroup as="section" className={styles.cover}>
-        <ColumnHeader content={content} variant="overlay" page="main" />
-        <span className={styles.verticalLabel} data-motion-item {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
-        <div className={styles.coverInner}>
-          <div className={styles.coverMeta} data-motion-item>
-            <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
-            <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
+      <div className={styles.heroStage} data-scroll-world-scene data-scroll-world-strength="subtle">
+        <MotionGroup as="section" className={styles.cover}>
+          <ColumnHeader content={content} variant="overlay" page="main" />
+          <span className={styles.verticalLabel} data-motion-item {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          <div className={styles.coverInner} data-scroll-world-layer="copy">
+            <div className={styles.coverMeta} data-motion-item>
+              <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
+              <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
+            </div>
+            <h1 className={`${styles.masthead} ${styles.desktopMasthead}`}>
+              <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
+              <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
+            </h1>
+            <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
+              <span data-motion-item>{getText(content, "column.cover.titleTop")}&apos;s</span>
+              <span data-motion-item>Column</span>
+            </h1>
+            <p data-motion-item {...textEditProps("column.cover.description")}>
+              {coverDescriptionLead}
+              {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
+            </p>
           </div>
-          <h1 className={`${styles.masthead} ${styles.desktopMasthead}`}>
-            <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
-            <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
-          </h1>
-          <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
-            <span data-motion-item>{getText(content, "column.cover.titleTop")}&apos;s</span>
-            <span data-motion-item>Column</span>
-          </h1>
-          <p data-motion-item {...textEditProps("column.cover.description")}>
-            {coverDescriptionLead}
-            {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
-          </p>
-        </div>
-      </MotionGroup>
+        </MotionGroup>
 
-      <div className={styles.searchShell}>
-        <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+        <div className={styles.searchShell} data-scroll-world-layer="depth">
+          <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+        </div>
       </div>
 
       <div className={styles.issueBar} aria-label="발행 정보">

@@ -25,11 +25,7 @@
 .imageWrap { position: relative; height: 330px; display: flex; align-items: flex-end; justify-content: center; }
 .equipmentSlot { width: min(150px, 100%) !important; height: 310px; border: 0; border-radius: 0; background: transparent; color: var(--brown); box-shadow: none; filter: drop-shadow(0 16px 12px rgba(58, 51, 45, .18)); font-size: 12px; transition: transform .5s cubic-bezier(.22,.61,.36,1), filter .5s cubic-bezier(.22,.61,.36,1); }
 .equipmentSlot img { object-fit: contain; }
-.card:hover .equipmentSlot, .card:focus-within .equipmentSlot { transform: translateY(-14px) scale(1.04); box-shadow: none; filter: drop-shadow(0 26px 18px rgba(58, 51, 45, .28)); }
-.benefitPanel { position: absolute; z-index: 4; left: 50%; bottom: 18px; width: min(180px, calc(100% - 16px)); padding: 13px 14px 14px; border: 1px solid rgba(255,255,255,.28); background: rgba(58,52,46,.92); color: #fff; opacity: 0; transform: translate(-50%, 18px) scale(.96); clip-path: inset(100% 0 0); box-shadow: 0 18px 34px rgba(43,43,43,.2); pointer-events: none; transition: opacity .28s ease, transform .6s cubic-bezier(.22,.61,.36,1), clip-path .6s cubic-bezier(.22,.61,.36,1); }
-.benefitPanel small { display: block; margin-bottom: 7px; color: #ddd5cb; font-family: var(--font-en); font-size: 9px; letter-spacing: 2px; }
-.benefitPanel span { display: block; font-size: 12px; line-height: 1.55; white-space: pre-line; }
-.card:hover .benefitPanel, .card:focus .benefitPanel, .card:focus-within .benefitPanel { opacity: 1; transform: translate(-50%, 0) scale(1); clip-path: inset(0); }
+.card:hover .equipmentSlot, .card:focus-visible .equipmentSlot, .card:has(:focus-visible) .equipmentSlot { transform: translateY(-14px) scale(1.04); box-shadow: none; filter: drop-shadow(0 26px 18px rgba(58, 51, 45, .28)); }
 .card > a > b, .disabledCard > b { margin-top: 12px; font-size: 20px; }
 .card > a > span, .disabledCard > span { min-height: 48px; color: #fbf8f4; font-size: 14px; line-height: 1.7; white-space: pre-line; }
 .card > a > small, .disabledCard > small { align-self: flex-start; color: #e8e0d7; font-size: 12px; }
@@ -48,17 +44,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .viewport { scroll-behavior: auto; }
-  .moving, .equipmentSlot, .benefitPanel { transition: none; }
+  .moving, .equipmentSlot { transition: none; }
   .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
 }
 
 :global(.devEditActive) .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
-:global(.devEditActive) .benefitPanel { display: none; }
 :global(.devEditActive) .equipmentSlot,
 :global(.contentBoardCanvas) .equipmentSlot { border: 1px dashed #b9b1a7; background: rgba(255, 255, 255, 0.3); }
 :global(.contentBoardCanvas) .card:hover .equipmentSlot,
-:global(.contentBoardCanvas) .card:focus-within .equipmentSlot { transform: none; box-shadow: none; filter: drop-shadow(0 16px 12px rgba(58, 51, 45, .18)); }
-:global(.contentBoardCanvas) .benefitPanel { display: none; }
+:global(.contentBoardCanvas) .card:focus-visible .equipmentSlot,
+:global(.contentBoardCanvas) .card:has(:focus-visible) .equipmentSlot { transform: none; box-shadow: none; filter: drop-shadow(0 16px 12px rgba(58, 51, 45, .18)); }
 
 @media (max-width: 1024px) {
   .section { height: auto; padding-bottom: 70px; background: linear-gradient(to bottom, #fff 280px, var(--taupe-band) 280px); }
