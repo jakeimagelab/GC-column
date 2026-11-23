@@ -42,11 +42,11 @@ export function useMotionOnce<T extends HTMLElement>(
 
     const play = () => {
       onPlayRef.current?.(element);
-      if (armBeforePlay) {
-        setPlaying();
-        return;
-      }
-      element.classList.add(armedClass);
+      if (!armBeforePlay) element.classList.add(armedClass);
+      // Keep the armed state on screen for one complete frame before playback.
+      // Without the extra frame, elements already near the viewport during
+      // hydration can receive both classes before the browser paints, making
+      // the first highlight/reveal look as if it never animated.
       armFrame = requestAnimationFrame(setPlaying);
     };
 

@@ -8,17 +8,17 @@ import styles from "./ColumnTransitionOverlay.module.css";
 
 type ColumnNavigateDetail = { href?: string };
 type TransitionDirection = "toColumn" | "toHome";
-type TransitionPhase = "idle" | "expanding" | "arrived" | "covering" | "collapsing" | "reduced";
+type TransitionPhase = "idle" | "sliding" | "arrived" | "covering" | "collapsing" | "reduced";
 type StoredRect = { top:number; left:number; width:number; height:number; viewportWidth:number; viewportHeight:number };
 
 const ORIGIN_KEY = "glory:column-transition-origin";
-const EXPAND_DURATION = 850;
-const EXPAND_DURATION_MOBILE = 600;
-const ARRIVAL_FADE_DURATION = 120;
+const SLIDE_DURATION = 850;
+const SLIDE_DURATION_MOBILE = 600;
+const ARRIVAL_SEAM_DURATION = 120;
 const HOME_COVER_DURATION = 350;
 const HOME_COLLAPSE_DURATION = 700;
 const REDUCED_DURATION = 200;
-const ROUTE_TIMEOUT = 2400;
+const ROUTE_TIMEOUT = 3200;
 
 function rectFromElement(element:Element | null):StoredRect {
   const rect = element?.getBoundingClientRect();
@@ -88,7 +88,7 @@ export function ColumnTransitionOverlay() {
   const revealColumn = useCallback(() => {
     if (!expansionDoneRef.current || !routeDoneRef.current) return;
     setPhase("arrived");
-    later(finish,ARRIVAL_FADE_DURATION);
+    later(finish,ARRIVAL_SEAM_DURATION);
   },[finish,later]);
 
   const start = useCallback((nextHref:string,nextDirection:TransitionDirection,source?:Element | null) => {
@@ -113,10 +113,15 @@ export function ColumnTransitionOverlay() {
       return;
     }
     if (nextDirection === "toColumn") {
-      const duration = window.matchMedia("(max-width: 640px)").matches ? EXPAND_DURATION_MOBILE : EXPAND_DURATION;
-      setPhase("expanding");
-      router.push(`${url.pathname}${url.search}${url.hash}`);
-      later(() => { expansionDoneRef.current = true; revealColumn(); },duration);
+      const duration = window.matchMedia("(max-width: 640px)").matches ? SLIDE_DURATION_MOBILE : SLIDE_DURATION;
+      setPhase("sliding");
+      // Keep the home route in place while the full-height magazine cover enters.
+      // Once it completely covers the viewport, swap the route behind the same
+      // brown surface so no card/photo can flash between the two pages.
+      later(() => {
+        expansionDoneRef.current = true;
+        router.push(`${url.pathname}${url.search}${url.hash}`);
+      },duration);
     } else {
       // Intentionally not the forward animation in reverse: first dissolve the
       // column into a full cover, then fold the cover into the remembered card.
@@ -124,7 +129,7 @@ export function ColumnTransitionOverlay() {
       later(() => router.push(`${url.pathname}${url.search}${url.hash}`),HOME_COVER_DURATION);
     }
     later(finish,ROUTE_TIMEOUT);
-  },[finish,later,revealColumn,router]);
+  },[finish,later,router]);
 
   useEffect(() => {
     router.prefetch("/column");
