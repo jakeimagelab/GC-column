@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ButtonLink";
 import { ColumnHeader } from "@/components/ColumnHeader";
@@ -16,6 +17,7 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
 import { DoctorReveal } from "@/components/motion/DoctorReveal";
+import { HomeVisionDissolve } from "@/components/motion/HomeVisionDissolve";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
@@ -97,16 +99,23 @@ export default async function HomePage() {
         </div>
       </DoctorReveal>
 
-      <section className={styles.vision} id="vision" data-scroll-world-scene>
-        <OutlineWord text="GLORY" fill="var(--paper)" scrollWorldLayer="counter" trackingMotion />
-        <div className={styles.visionInner} data-scroll-world-layer="copy">
-          <div className={styles.visionCopy}><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} fallbackText="" /></div></div>
-          <MotionGroup className={styles.principles}>
-            {principles.map((principle) => {
-              const prefix = `home.vision.principles.${principle.num}`;
-              return <article data-motion-item key={principle.num}><small {...textEditProps(`${prefix}.num`)}>{principle.num}</small><h3 {...textEditProps(`${prefix}.title`)}>{principle.title}</h3><p {...textEditProps(`${prefix}.desc`)}>{principle.desc}</p></article>;
-            })}
-          </MotionGroup>
+      <section className={styles.vision} id="vision" data-home-vision data-scroll-world-scene>
+        <HomeVisionDissolve />
+        <div className={styles.visionSticky}>
+          <div className={styles.visionBackdrop} aria-hidden="true">
+            <Image src="/uploads/glory-treatment-pigment-1.webp" alt="" fill sizes="100vw" />
+            <i />
+          </div>
+          <OutlineWord className={styles.visionOutline} text="GLORY" fill="transparent" stroke="#cdbead" trackingMotion />
+          <div className={styles.visionInner}>
+            <div className={styles.visionCopy}><span {...textEditProps("home.vision.eyebrow")}>{getText(content, "home.vision.eyebrow")}</span><h2><EditableRichText id="home.vision.title" value={getText(content, "home.vision.title")} /></h2><p><EditableRichText id="home.vision.description" value={getText(content, "home.vision.description")} /></p><div className={styles.signature}><span {...textEditProps("home.vision.signatureTitle")}>{getText(content, "home.vision.signatureTitle")}</span><b className={nanumPenScript.className} {...textEditProps("home.vision.signatureName")}>{getText(content, "home.vision.signatureName")}</b><SignatureMotion className={styles.signatureImage} editId="home.vision.signatureImage" image={getImage(content, "home.vision.signatureImage")} fallbackText="" /></div></div>
+            <div className={styles.principles}>
+              {principles.map((principle) => {
+                const prefix = `home.vision.principles.${principle.num}`;
+                return <article key={principle.num}><small {...textEditProps(`${prefix}.num`)}>{principle.num}</small><h3 {...textEditProps(`${prefix}.title`)}>{principle.title}</h3><p {...textEditProps(`${prefix}.desc`)}>{principle.desc}</p></article>;
+              })}
+            </div>
+          </div>
         </div>
       </section>
 

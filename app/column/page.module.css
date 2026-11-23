@@ -2,7 +2,7 @@
 .page h1,.page h2,.page h3,.page p { text-wrap:pretty; }
 .mobileMasthead,.featureCardMeta,.mobileFeatureTitle,.mobileQuestionsHeader,.mobileQuestionStats,.treatmentVisual,.mobileArchiveTitle,.mobileConsultTitle,.mobileConsultLocation,.mobileBottomBar,.mobileBreak { display:none; }
 .desktopSpace { display:inline; }
-.heroStage { background:var(--paper); }
+.heroStage { position:relative; background:var(--paper); }
 .cover { position:relative; min-height:634px; padding-top:78px; background:var(--cover); color:#fff; overflow:hidden; }
 .coverInner { width:min(1070px,calc(100% - 96px)); margin:68px auto 0; }
 .verticalLabel { position:absolute; top:120px; left:42px; font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; writing-mode:vertical-rl; opacity:.72; white-space:nowrap; }

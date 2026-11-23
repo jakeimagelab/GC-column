@@ -66,6 +66,54 @@
 
 passed
 
+---
+
+# 홈 비전 디졸브·칼럼 고정 헤더·상담 사진 최종 QA
+
+## 증거와 상태
+
+- 원본 상담 사진: `Glory_F_0073.jpg` (4000×2668)
+- 최적화 에셋: `public/uploads/glory-home-column-doctor-consultation-02.webp` (2800×1868)
+- 원본·구현 결합 비교: `output/playwright/home-column-source-vs-implementation-vertical.png`
+- 기존 시안·교체 구현 결합 비교: `output/playwright/home-column-photo-reference-vs-implementation.png`
+- 홈 원장 칼럼 구현: `output/playwright/home-column-photo-replacement-desktop.png`
+- 비전 디졸브 데스크톱 중간 상태: `output/playwright/home-vision-desktop-progress-030.png`
+- 비전 디졸브 데스크톱 완료 상태: `output/playwright/home-vision-desktop-progress-090-final.png`
+- 비전 디졸브 모바일 완료 상태: `output/playwright/home-vision-mobile-progress-090-final.png`
+- 칼럼 고정 헤더·대표 사진 패럴랙스: `output/playwright/column-header-sticky-feature-parallax-final.png`
+- 검수 viewport: 1440×900, 390×844, DPR 1
+
+## 비교 결과
+
+- 홈 원장 칼럼 사진은 사용자가 제공한 `Glory_F_0073.jpg`로 교체했으며, 원장 얼굴·상담 도구·거울이 카드 안에서 잘리지 않고 보이는 crop을 원본과 구현을 한 화면에 놓고 확인했다.
+- 비전 섹션은 260vh(모바일 220vh) 스크롤 구간과 헤더 아래 sticky 화면을 사용한다. 진행률 .18~.42에서 사진과 지정 그라데이션이 디졸브되고, 사진은 1.08배에서 1배로 축소된다.
+- 제목·서명·본문·라벨·GLORY 외곽선은 사진 디졸브와 같은 진행률로 명암이 전환되며, 외곽선은 최종 흰색 22% 불투명도다.
+- 원칙 카드 01~03은 .46/.59/.72에서 순서대로 시작해 각각 .14 구간 동안 나타난다. 모바일 이동량은 24px이고 세 카드가 고정 화면과 하단 빠른 메뉴 사이에 모두 들어온다.
+- reduced-motion과 `body.devEditActive`에서는 배경 사진을 숨기고 기존 밝은 화면과 카드 전체를 즉시 표시한다.
+- `/column` 헤더를 hero의 transform·isolation 컨테이너 밖으로 옮겨 스크롤 후에도 데스크톱 72px, 모바일 56px 위치에 고정된다.
+- `01 피부를 읽는 기준`은 배경 사진 레이어에만 스크롤 패럴랙스를 적용하고 흰 설명 카드는 고정했다.
+
+## 기능·접근성·성능 확인
+
+- [x] passive scroll listener와 requestAnimationFrame 1회/프레임 계산
+- [x] 컴포넌트 해제 시 scroll·resize·media query·MutationObserver 정리
+- [x] CSS 변수와 transform/opacity만 변경하여 스크롤 중 레이아웃 이동 없음
+- [x] 390px에서 `document.documentElement.scrollWidth === 390`
+- [x] 데스크톱·모바일 스크롤 후 칼럼 헤더 상단 위치 0px 유지
+- [x] 홈 원장 칼럼 사진 alt 유지 및 Next Image 최적화 경로 사용
+- [x] `npm run build` 통과
+- [x] `npm run lint` 오류 0건; 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+
+## 잔여 차이와 판단
+
+- P0/P1/P2 이슈 없음.
+- P3: 원본 사진은 3:2 비율, 홈 카드 슬롯은 16:10 비율이므로 상하가 소폭 crop된다. 인물 얼굴과 상담 도구를 보존하는 중앙 crop으로 처리했으며 왜곡은 없다.
+
+## 최종 결과
+
+passed
+
 # 칼럼 전환·비교표·모바일 목차 최종 QA (2026-11-23)
 
 ## 비교 자료

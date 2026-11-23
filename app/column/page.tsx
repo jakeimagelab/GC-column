@@ -92,9 +92,9 @@ export default async function ColumnMainPage() {
   return (
     <main className={styles.page} data-column-page>
       <ColumnMainMotion />
+      <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>
         <section className={styles.cover}>
-          <ColumnHeader content={content} variant="overlay" page="main" />
           <span className={styles.verticalLabel} data-column-entry="meta" {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
           <div className={styles.coverInner}>
             <div className={styles.coverMeta} data-column-entry="meta">
@@ -141,7 +141,7 @@ export default async function ColumnMainPage() {
               <h2 id="feature-heading" {...textEditProps("column.feature.title")}>{getText(content, "column.feature.title")}</h2>
             </div>
           </div>
-          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth" columnParallax={60}>
+          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth">
             <article data-motion-item>
               <span className={styles.featureCardMeta} {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
               <h3><Link href={`/column/${feature.slug}`}><span className={styles.desktopFeatureTitle}>{feature.title} →</span><span className={styles.mobileFeatureTitle}>{feature.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요? →</span></> : feature.title}</span></Link></h3>
