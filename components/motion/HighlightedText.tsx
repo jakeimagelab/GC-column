@@ -14,23 +14,32 @@ function textWithDesktopBreaks(value: string, keyPrefix: string): ReactNode[] {
 }
 
 function inlineParts(value: string, showReview: boolean, desktopBreaks: boolean): ReactNode[] {
-  return value.split(INLINE_TOKEN).flatMap((part, index) => {
-    if (!part) return [];
+  const nodes: ReactNode[] = [];
+
+  value.split(INLINE_TOKEN).forEach((part, index) => {
+    if (!part) return;
     if (part.startsWith("==") && part.endsWith("==")) {
-      return [<mark key={`${index}-${part}`}>{part.slice(2, -2)}</mark>];
+      nodes.push(<mark key={`${index}-${part}`}>{part.slice(2, -2)}</mark>);
+      return;
     }
     if (part.startsWith("**") && part.endsWith("**")) {
-      return [<strong key={`${index}-${part}`}>{part.slice(2, -2)}</strong>];
+      nodes.push(<strong key={`${index}-${part}`}>{part.slice(2, -2)}</strong>);
+      return;
     }
     if (part === "[광고 검토]" || part === "[원장 확인]") {
-      return showReview
-        ? [<span className={styles.reviewBadge} key={`${index}-${part}`}>{part.slice(1, -1)}</span>]
-        : [];
+      if (showReview) {
+        nodes.push(<span className={styles.reviewBadge} key={`${index}-${part}`}>{part.slice(1, -1)}</span>);
+      }
+      return;
     }
-    return desktopBreaks
-      ? textWithDesktopBreaks(part, `${index}-${part}`)
-      : [<Fragment key={`${index}-${part}`}>{part}</Fragment>];
+    if (desktopBreaks) {
+      nodes.push(...textWithDesktopBreaks(part, `${index}-${part}`));
+      return;
+    }
+    nodes.push(<Fragment key={`${index}-${part}`}>{part}</Fragment>);
   });
+
+  return nodes;
 }
 
 export function InlineRichText({ value, showReview = false, desktopBreaks = false }: { value: string; showReview?: boolean; desktopBreaks?: boolean }) {

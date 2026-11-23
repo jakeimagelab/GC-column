@@ -16,6 +16,8 @@ export function ColumnMainMotion() {
     const parallaxNodes = Array.from(document.querySelectorAll<HTMLElement>("[data-column-parallax]"));
     const activeParallax = new Set<HTMLElement>();
     const lastParallax = new WeakMap<HTMLElement,string>();
+    const parallaxRevealListeners = new Map<HTMLElement,(event:AnimationEvent) => void>();
+    const parallaxSettleTimers = new Map<HTMLElement,number>();
     let frame = 0;
     let needsMeasure = true;
     let heroTop = 0;
@@ -84,9 +86,17 @@ export function ColumnMainMotion() {
       if (!hero.hasAttribute("data-column-hero-ready")) hero.setAttribute("data-column-hero-ready","");
 
       activeParallax.forEach((node) => {
+        if (node.hasAttribute("data-column-parallax-after-reveal") && !node.hasAttribute("data-column-parallax-ready")) return;
         const nodeRect = node.getBoundingClientRect();
-        const range = Number(node.dataset.columnParallax || 60)*distanceScale;
-        const progress = clamp((viewportHeight-nodeRect.top)/(viewportHeight+nodeRect.height));
+        const featureScope = node.hasAttribute("data-column-feature-card-parallax")
+          ? node.closest<HTMLElement>("[data-column-section-motion='feature']")
+          : null;
+        const progressRect = featureScope?.getBoundingClientRect() ?? nodeRect;
+        const mobileRange = window.innerWidth < 768 ? node.dataset.columnParallaxMobile : undefined;
+        const range = mobileRange !== undefined
+          ? Number(mobileRange)
+          : Number(node.dataset.columnParallax || 60)*distanceScale;
+        const progress = clamp((viewportHeight-progressRect.top)/(viewportHeight+progressRect.height));
         const value = `${((progress-.5)*range).toFixed(2)}px`;
         if (lastParallax.get(node) === value) return;
         node.style.setProperty("--column-parallax-y",value);
@@ -125,6 +135,22 @@ export function ColumnMainMotion() {
       schedule();
     },{ rootMargin:"25% 0px 25% 0px" });
     parallaxNodes.forEach((node) => parallaxObserver.observe(node));
+    parallaxNodes.forEach((node) => {
+      if (!node.hasAttribute("data-column-parallax-after-reveal")) return;
+      const onRevealEnd = (event:AnimationEvent) => {
+        if (!(event.target instanceof HTMLElement) || !event.target.hasAttribute("data-motion-item")) return;
+        node.setAttribute("data-column-parallax-ready","");
+        node.setAttribute("data-column-parallax-settling","");
+        const timer = window.setTimeout(() => {
+          node.removeAttribute("data-column-parallax-settling");
+          parallaxSettleTimers.delete(node);
+        },320);
+        parallaxSettleTimers.set(node,timer);
+        schedule();
+      };
+      node.addEventListener("animationend",onRevealEnd);
+      parallaxRevealListeners.set(node,onRevealEnd);
+    });
 
     const resizeObserver = new ResizeObserver(scheduleMeasure);
     resizeObserver.observe(hero);
@@ -144,7 +170,15 @@ export function ColumnMainMotion() {
       hero.removeAttribute("data-column-entry-ready");
       hero.removeAttribute("data-column-hero-ready");
       ["--column-hero-progress","--column-hero-eased"].forEach((property) => hero.style.removeProperty(property));
-      parallaxNodes.forEach((node) => node.style.removeProperty("--column-parallax-y"));
+      parallaxNodes.forEach((node) => {
+        const listener = parallaxRevealListeners.get(node);
+        if (listener) node.removeEventListener("animationend",listener);
+        const timer = parallaxSettleTimers.get(node);
+        if (timer) window.clearTimeout(timer);
+        node.removeAttribute("data-column-parallax-ready");
+        node.removeAttribute("data-column-parallax-settling");
+        node.style.removeProperty("--column-parallax-y");
+      });
       sections.forEach((section) => {
         section.removeAttribute("data-column-motion-ready");
         section.removeAttribute("data-column-motion-active");

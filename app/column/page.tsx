@@ -145,26 +145,34 @@ export default async function ColumnMainPage() {
               <h2 id="feature-heading" {...textEditProps("column.feature.title")}>{getText(content, "column.feature.title")}</h2>
             </div>
           </div>
-          <MotionGroup className={styles.featureCard} scrollWorldLayer="depth">
-            <article data-motion-item>
-              <span className={styles.featureCardMeta} {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
-              <h3><Link href={`/column/${feature.slug}`}><span className={styles.desktopFeatureTitle}>{feature.title} →</span><span className={styles.mobileFeatureTitle}>{feature.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요? →</span></> : feature.title}</span></Link></h3>
-              <i aria-hidden="true" />
-              <b {...textEditProps("column.feature.conclusion")}>{getText(content, "column.feature.conclusion")}</b>
-              <p>{feature.slug === "xerf-vs-thermage" ? <>
-                세르프는 울쎄라·써마지를 합친 효과를<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
-                어느 정도는 내줄 수 있지만,<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
-                울쎄라의 효과를 완벽하게 따라갈 순 없습니다.
-              </> : feature.summary}</p>
-              <div className={styles.featureTreatments}>
-                <span {...textEditProps("column.feature.treatments")}>{getText(content, "column.feature.treatments")}</span>
-                {feature.treatmentSlugs.flatMap((slug) => {
-                  const treatment = getTreatment(slug);
-                  return treatment ? [<Link href={treatment.detailPath} key={slug}>{treatment.name} →</Link>] : [];
-                })}
-              </div>
-            </article>
-          </MotionGroup>
+          <div
+            className={styles.featureCard}
+            data-column-feature-card-parallax=""
+            data-column-parallax="-60"
+            data-column-parallax-mobile="-32"
+            data-column-parallax-after-reveal=""
+          >
+            <MotionGroup className={styles.featureCardMotion} scrollWorldLayer="depth">
+              <article data-motion-item>
+                <span className={styles.featureCardMeta} {...textEditProps("column.feature.readMeta")}>{getText(content, "column.feature.readMeta")}</span>
+                <h3><Link href={`/column/${feature.slug}`}><span className={styles.desktopFeatureTitle}>{feature.title} →</span><span className={styles.mobileFeatureTitle}>{feature.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요? →</span></> : feature.title}</span></Link></h3>
+                <i aria-hidden="true" />
+                <b {...textEditProps("column.feature.conclusion")}>{getText(content, "column.feature.conclusion")}</b>
+                <p>{feature.slug === "xerf-vs-thermage" ? <>
+                  세르프는 울쎄라·써마지를 합친 효과를<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
+                  어느 정도는 내줄 수 있지만,<br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>
+                  울쎄라의 효과를 완벽하게 따라갈 순 없습니다.
+                </> : feature.summary}</p>
+                <div className={styles.featureTreatments}>
+                  <span {...textEditProps("column.feature.treatments")}>{getText(content, "column.feature.treatments")}</span>
+                  {feature.treatmentSlugs.flatMap((slug) => {
+                    const treatment = getTreatment(slug);
+                    return treatment ? [<Link href={treatment.detailPath} key={slug}>{treatment.name} →</Link>] : [];
+                  })}
+                </div>
+              </article>
+            </MotionGroup>
+          </div>
         </section>
       ) : null}
 
