@@ -124,7 +124,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     "--brand-label": column.primaryTreatment === "xerf" ? "#c8665c" : primaryTreatment?.brandColor ?? "#8c7b6b",
     "--brand-soft-head": column.primaryTreatment === "xerf" ? "#fce3df" : "#eee3d8",
     "--brand-soft": column.primaryTreatment === "xerf" ? "#fdf0ee" : "#f2ede6",
-    "--brand-highlight": column.primaryTreatment === "xerf" ? "rgba(255,71,20,.24)" : "#eee3d8",
+    "--brand-highlight": column.primaryTreatment === "xerf" ? "#fbd5cf" : "#eee3d8",
     "--article-cover-image": `url(${JSON.stringify(column.heroImage || "/uploads/glory-column-editorial-campaign-01.png")})`,
     "--article-overlay": column.heroOverlay ?? "linear-gradient(90deg, rgba(58,48,40,.97) 0%, rgba(58,48,40,.88) 38%, rgba(58,48,40,.45) 70%, rgba(58,48,40,.3) 100%)",
   } as CSSProperties;
@@ -240,8 +240,9 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                     <b>{section.en ?? getText(content, `column.detail.section.${numberedSectionIndex}.eyebrow`)}</b>
                   </div>
                   <h2>{section.heading}</h2>
-                  {section.lead ? <p className={styles.sectionLead}><strong><InlineRichText value={section.lead} showReview={showReview} /></strong></p> : null}
-                  {visibleBody.map((paragraph) => <HighlightedParagraph key={paragraph} value={visibleReviewText(paragraph, showReview)} showReview={showReview} />)}
+                  {visibleBody.length
+                    ? visibleBody.map((paragraph, bodyIndex) => <HighlightedParagraph key={paragraph} value={visibleReviewText(paragraph, showReview)} lead={bodyIndex === 0 ? section.lead : undefined} showReview={showReview} />)
+                    : section.lead ? <HighlightedParagraph value="" lead={section.lead} showReview={showReview} /> : null}
 
                   {sectionIndex === 0 && showReview && column.reviewNotes ? (
                     <details className={styles.reviewNotes}>

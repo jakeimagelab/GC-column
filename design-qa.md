@@ -66,8 +66,6 @@
 
 passed
 
----
-
 # 칼럼 전환·비교표·모바일 목차 최종 QA (2026-11-23)
 
 ## 비교 자료
@@ -362,8 +360,6 @@ passed
 
 passed
 
----
-
 # 홈·칼럼 전환 및 스크롤 강조 마무리 QA
 
 ## 기준과 범위
@@ -631,6 +627,47 @@ passed
 - [x] 검수 모드와 공개 모드 분리
 - [x] 브라우저 콘솔 오류 0건
 - [x] `npm run build` 및 `npx tsc --noEmit` 통과
+
+## 최종 결과
+
+passed
+
+---
+
+# 칼럼 시안 정합 및 써마지 히어로 최종 QA
+
+## 기준 화면과 상태
+
+- 칼럼 메인 기준: `칼럼 메인 — 모바일 (390)@1x.png`와 기존 데스크톱 확정 시안
+- 칼럼 상세 기준: `칼럼 상세 — 모바일 (390) 1 2@1x.png`, `칼럼 상세 — 모바일 (390) 2 2 · 이어서@1x.png`와 기존 데스크톱 확정 시안
+- 시술 상세 기준: `시술 상세 템플릿 — 장비형 (써마지FLX).pdf`
+- 구현 캡처: `output/playwright/column-final-1440.png`, `output/playwright/column-final-390.png`
+- 상세 캡처: `output/playwright/column-detail-hero-final-1440.png`, `output/playwright/column-detail-final-390.png`
+- 강조 확인 캡처: `output/playwright/column-detail-highlight-final-1440.png`
+- 시술 캡처: `output/playwright/thermage-final-1440.png`, `output/playwright/thermage-final-390.png`
+- 검수 viewport: 1440×1000, 390×844, DPR 1
+
+## 비교 결과
+
+- 메인 표지는 데스크톱·모바일 모두 `Glory's / Column`으로 통일하고, 검색창이 표지 경계에 각각 -44px/-30px 겹치도록 맞췄다. 데스크톱 검색창 상단은 표지 시작점 기준 590px이다.
+- 대표 칼럼 사진은 상세 히어로와 분리된 `listImage` 상담 사진을 사용한다. 목록·대표 카드에는 상담 사진, 상세 상단에는 XERF 장비 사진이 표시된다.
+- 상세 본문 강조는 노란색을 제거하고 `#FBD5CF` 하단 형광펜으로 통일했다. 스크롤 진입 전 0%, 진입 후 100% 너비로 그려지는 상태를 확인했다.
+- 섹션 영문 라벨은 모두 대문자, 데스크톱 10px/모바일 9px, 자간 .24em으로 동일하다.
+- 03·04 lead는 별도 문단이 아니라 첫 본문 문단의 `<strong>`으로 결합되어 문단 리듬이 시안과 일치한다.
+- 비교표 caption은 13px/400/#766E66이며 모바일 표는 390px 안에서 고정 레이아웃으로 렌더된다.
+- 칼럼 메인 Q&A 첫 답변은 짧은 결론을 굵게, 이어지는 본문을 400으로 분리했다. 검수 배지는 검수 모드에서만 노출된다.
+- 칼럼 하단 장비 카드의 이미지 바탕은 #F3EEE8, 최근 발행 메타는 `날짜 · 고민` 한 줄이며 제목 배경 박스가 없다.
+- 써마지 히어로 방사형 선은 1px, 최종 불투명도 .18로 낮추고 중심을 장비 뒤 오른쪽 아래에 배치했다.
+
+## 기능·접근성 확인
+
+- [x] 390px에서 `document.documentElement.scrollWidth === 390`
+- [x] 모바일 상세 목차 `position: sticky`, `top: 56px`
+- [x] 스크롤 후 진행 막대 scale 값 증가
+- [x] 핑크 형광펜 애니메이션 및 reduced-motion 완성 상태
+- [x] 메인·상세·시술 상세 브라우저 콘솔 오류 0건
+- [x] 데스크톱·모바일 제목과 칩의 한글 단어 중간 분절 없음
+- [x] `npm run lint`, `npx tsc --noEmit`, `npm run build` 통과
 
 ## 최종 결과
 

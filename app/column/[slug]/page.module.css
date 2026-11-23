@@ -70,11 +70,9 @@
 .sectionMarker { min-height:86px; display:grid; grid-template-columns:120px minmax(0,1fr); align-items:end; gap:20px; }
 .sectionMarker>span { color:transparent; font-family:var(--font-en); font-size:80px; font-weight:300; line-height:1; -webkit-text-stroke:1px var(--brand-strong); }
 .sectionMarker>span { white-space:nowrap; }
-.sectionMarker>b { margin-bottom:9px; color:var(--brand-label); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; white-space:nowrap; justify-self:end; }
+.sectionMarker>b { margin-bottom:9px; color:var(--brand-label); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.24em; text-transform:uppercase; white-space:nowrap; justify-self:end; }
 .articleSection h2,.judgement h2,.precautions h2 { margin:16px 0 28px; font-family:var(--font-magazine); font-size:38px; font-weight:400; letter-spacing:-.04em; line-height:1.4; white-space:pre-line; }
 .articleSection>p { margin:0 0 24px; font-size:17px; line-height:2; }
-.articleSection>.sectionLead { margin-bottom:16px; }
-.sectionLead strong { font-weight:600; }
 .articleSection :global(mark) { padding:0 .1em; color:inherit; }
 .reviewNotes { margin-top:26px; border:1px dashed #ddd7ce; background:#fff; }
 .reviewNotes summary { padding:14px 16px; color:var(--muted); font-size:12px; cursor:pointer; }
@@ -92,7 +90,7 @@
 .tableHint { display:none; }
 .tableScroll { overflow:auto; }
 .tableScroll table { width:100%; border-collapse:collapse; font-size:14px; }
-.tableScroll caption { margin-bottom:14px; text-align:left; font-weight:700; }
+.tableScroll caption { margin-bottom:14px; color:#766e66; font-size:13px; font-weight:400; text-align:left; }
 .tableScroll th,.tableScroll td { min-width:130px; padding:17px 16px; text-align:left; white-space:nowrap; }
 .tableScroll thead { border-bottom:1px solid #3a3028; }
 .tableScroll tbody th { font-weight:700; }
@@ -214,10 +212,9 @@
   .articleSection,.judgement,.precautions{padding-top:72px;scroll-margin-top:112px}
   .sectionMarker{min-height:52px;grid-template-columns:64px minmax(0,1fr);gap:12px}
   .sectionMarker>span{font-size:52px;line-height:.9}
-  .sectionMarker>b{margin-bottom:5px;font-size:8px;letter-spacing:.26em}
+  .sectionMarker>b{margin-bottom:5px;font-size:9px;letter-spacing:.24em}
   .articleSection h2,.judgement h2,.precautions h2{margin:18px 0 26px;font-size:26px;line-height:1.5}
   .articleSection>p{margin:0 0 16px;font-size:16px;line-height:2}
-  .articleSection>.sectionLead{margin-bottom:16px}
   .reviewNotes{margin-top:40px}
   .imageOnly{width:100vw;margin:0 0 0 calc(50% - 50vw);padding-top:56px}
   .imageOnlyMedia,.imageOnlyPortrait .imageOnlyMedia{width:100%;aspect-ratio:4/5}
@@ -227,7 +224,7 @@
   .tableViewport::after,.tableHint{display:none}
   .tableScroll{width:100%;margin:0;overflow:visible}
   .tableScroll table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}
-  .tableScroll caption{margin-bottom:13px;font-size:12px}
+  .tableScroll caption{margin-bottom:13px;font-size:13px;font-weight:400}
   .tableScroll th,.tableScroll td{min-width:0;padding:12px 6px;line-height:1.5;vertical-align:top;white-space:normal;word-break:keep-all;overflow-wrap:break-word}
   .tableScroll tr{border-bottom:1px solid #ddd7ce}
   .tableScroll thead{border-bottom:1px solid #3a3028}

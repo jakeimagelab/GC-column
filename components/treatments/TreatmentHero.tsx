@@ -16,14 +16,17 @@ type TreatmentHeroProps = {
   kakaoUrl: string;
 };
 
+const HERO_CENTER_X = 1240;
+const HERO_CENTER_Y = 780;
+
 const HERO_RAYS = Array.from({ length: 70 }, (_, index) => {
   const angle = (185 + index * 1.45) * Math.PI / 180;
   const coordinate = (value: number) => Number(value.toFixed(3));
   return {
-    x1: coordinate(1700 + Math.cos(angle) * 520),
-    y1: coordinate(980 + Math.sin(angle) * 520),
-    x2: coordinate(1700 + Math.cos(angle) * 1900),
-    y2: coordinate(980 + Math.sin(angle) * 1900),
+    x1: coordinate(HERO_CENTER_X + Math.cos(angle) * 520),
+    y1: coordinate(HERO_CENTER_Y + Math.sin(angle) * 520),
+    x2: coordinate(HERO_CENTER_X + Math.cos(angle) * 1900),
+    y2: coordinate(HERO_CENTER_Y + Math.sin(angle) * 1900),
     delay: Number((.9 + index * .018).toFixed(3)),
   };
 });
@@ -79,7 +82,7 @@ export function TreatmentHero({ hero, categoryName, categoryPath, accent, accent
             <stop offset="0" stopColor={accent} />
             <stop offset="1" stopColor="#130B1D" />
           </radialGradient>
-          <radialGradient id={rayId} gradientUnits="userSpaceOnUse" cx="1700" cy="980" r="1500">
+          <radialGradient id={rayId} gradientUnits="userSpaceOnUse" cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="1500">
             <stop offset=".33" stopColor="#F3EAFF" stopOpacity=".9" />
             <stop offset="1" stopColor={accentLight} stopOpacity="0" />
           </radialGradient>
@@ -88,8 +91,8 @@ export function TreatmentHero({ hero, categoryName, categoryPath, accent, accent
           </filter>
         </defs>
         <rect width="1440" height="820" fill={`url(#${backgroundId})`} />
-        <circle className={styles.glowCircle} cx="1700" cy="980" r="520" fill="none" stroke="#EADFFB" strokeWidth="26" opacity=".45" filter={`url(#${glowId})`} pathLength="1" />
-        <circle className={styles.mainCircle} cx="1700" cy="980" r="520" fill="none" stroke="#F7F1FF" strokeWidth="3" pathLength="1" />
+        <circle className={styles.glowCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#EADFFB" strokeWidth="26" opacity=".28" filter={`url(#${glowId})`} pathLength="1" />
+        <circle className={styles.mainCircle} cx={HERO_CENTER_X} cy={HERO_CENTER_Y} r="520" fill="none" stroke="#F7F1FF" strokeWidth="1" opacity=".2" pathLength="1" />
         <g className={styles.rays}>
           {HERO_RAYS.map((ray, index) => (
             <line
@@ -100,7 +103,7 @@ export function TreatmentHero({ hero, categoryName, categoryPath, accent, accent
               y2={ray.y2}
               pathLength="1"
               stroke={`url(#${rayId})`}
-              strokeWidth="1.2"
+              strokeWidth="1"
               style={{ "--ray-delay": `${ray.delay}s` } as CSSProperties}
             />
           ))}

@@ -26,6 +26,8 @@ export type Doctor = {
 export type ColumnFaq = {
   q: string;
   a: string;
+  summary?: string;
+  summaryNeedsReview?: boolean;
   answeredAt?: string;
   needsReview?: boolean;
 };

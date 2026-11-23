@@ -4,7 +4,8 @@
 
 .paragraph mark {
   padding: 0 2px;
-  background-image: linear-gradient(transparent 58%, var(--brand-highlight, rgba(214,190,150,.55)) 58%);
+  background-color: transparent;
+  background-image: linear-gradient(transparent 58%, #fbd5cf 58%);
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: 100% 100%;

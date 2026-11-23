@@ -10,10 +10,10 @@ type ColumnNavigateDetail = { href?: string };
 type TransitionDirection = "toColumn" | "toHome";
 type TransitionPhase = "idle" | "entering" | "covered" | "leaving";
 
-const ENTER_DURATION = 1050;
-const COVER_HOLD_DURATION = 260;
-const EXIT_DURATION = 900;
-const ROUTE_TIMEOUT = 2400;
+const ENTER_DURATION = 1280;
+const COVER_HOLD_DURATION = 180;
+const EXIT_DURATION = 1080;
+const ROUTE_TIMEOUT = 2800;
 
 type ColumnTransitionOverlayProps = {
   columnLabel: string;

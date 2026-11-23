@@ -791,11 +791,11 @@
   },
   "column.cover.titleTop": {
     "type": "text",
-    "value": "Glory"
+    "value": "Glory's"
   },
   "column.cover.titleBottom": {
     "type": "text",
-    "value": "Magazine"
+    "value": "Column"
   },
   "column.cover.description": {
     "type": "text",

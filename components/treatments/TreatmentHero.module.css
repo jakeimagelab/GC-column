@@ -25,9 +25,9 @@
   stroke-dashoffset: 1;
 }
 
-.mainCircle { animation: heroDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards; }
-.glowCircle { animation: heroDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards, heroGlow 6s ease-in-out 2.2s infinite alternate; opacity: 0; }
-.rays line { animation: heroDraw 2s cubic-bezier(.2,.72,.25,1) var(--ray-delay) forwards; }
+.mainCircle { animation:heroCircleDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards; opacity:0; }
+.glowCircle { animation:heroGlowDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards, heroGlow 6s ease-in-out 2.2s infinite alternate; opacity:0; }
+.rays line { opacity:0; animation:heroRayDraw 2s cubic-bezier(.2,.72,.25,1) var(--ray-delay) forwards; }
 
 .inner {
   position: relative;
@@ -66,8 +66,10 @@
 
 .hero [data-hero-item] { opacity: 0; transform: translateY(18px); animation: heroCopyIn .72s cubic-bezier(.2,.72,.25,1) var(--hero-delay) forwards; }
 
-@keyframes heroDraw { to { stroke-dashoffset: 0; opacity: 1; } }
-@keyframes heroGlow { from { opacity: .45; } to { opacity: .25; } }
+@keyframes heroCircleDraw { to { stroke-dashoffset:0; opacity:.16; } }
+@keyframes heroGlowDraw { to { stroke-dashoffset:0; opacity:.14; } }
+@keyframes heroRayDraw { to { stroke-dashoffset:0; opacity:.18; } }
+@keyframes heroGlow { from { opacity:.14; } to { opacity:.08; } }
 @keyframes heroCopyIn { to { opacity: 1; transform: none; } }
 @keyframes heroDeviceIn { to { opacity: 1; transform: none; } }
 
@@ -107,7 +109,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pattern { transform: none!important; }
-  .mainCircle, .glowCircle, .rays line { stroke-dashoffset: 0; opacity: 1; animation: none; }
+  .mainCircle { stroke-dashoffset:0; opacity:.16; animation:none; }
+  .glowCircle { stroke-dashoffset:0; opacity:.14; animation:none; }
+  .rays line { stroke-dashoffset:0; opacity:.18; animation:none; }
   .hero [data-hero-item], .visual img { opacity: 1; transform: none; animation: none; }
   .actions a { transition: none; }
 }

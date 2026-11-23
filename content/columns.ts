@@ -33,7 +33,7 @@ export const xerfVsThermage: Column = {
   concerns: ["sagging"],
   primaryTreatment: "xerf",
   heroImage: "/uploads/glory-column-xerf-hero.jpg",
-  listImage: "/uploads/glory-column-xerf-hero.jpg",
+  listImage: "/uploads/glory-column-hero-consultation.webp",
   heroOverlay:
     "linear-gradient(90deg, rgba(20,20,20,.94) 0%, rgba(24,20,18,.82) 34%, rgba(40,22,16,.35) 58%, rgba(20,20,20,0) 76%)",
   title: "세르프(XERF)와 써마지FLX의 차이, 누구에게 맞을까요?",
@@ -152,6 +152,8 @@ export const xerfVsThermage: Column = {
   faqs: [
     {
       q: "세르프가 좋은가요, 써마지가 좋은가요?",
+      summary: "탄력만 원하면 써마지, 안쪽 리프팅까지 원하면 세르프입니다.",
+      summaryNeedsReview: true,
       a: "피부 진피층에 최대한 많은 에너지를 넣고 싶다면 써마지, 피부 탄력뿐 아니라 안쪽까지 에너지를 함께 넣어 리프팅 효과도 같이 보고 싶다면 세르프가 좋은 선택입니다.",
       answeredAt: "2026-10-16",
     },

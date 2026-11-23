@@ -28,14 +28,15 @@ export function InlineRichText({ value, showReview = false }: { value: string; s
   return <>{inlineParts(value, showReview)}</>;
 }
 
-export function HighlightedParagraph({ value, showReview = false, className }: { value: string; showReview?: boolean; className?: string }) {
+export function HighlightedParagraph({ value, lead, showReview = false, className }: { value: string; lead?: string; showReview?: boolean; className?: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const hasHighlight = value.includes("==");
+  const hasHighlight = value.includes("==") || Boolean(lead?.includes("=="));
   const options = useMemo(() => ({ threshold: 0.35, rootMargin: "0px 0px -10%", armBeforePlay: true }), []);
   useMotionOnce(ref, styles.armed, styles.playing, options);
 
   return (
     <p ref={ref} className={[hasHighlight ? styles.paragraph : "", className ?? ""].filter(Boolean).join(" ")}>
+      {lead ? <><strong>{inlineParts(lead, showReview)}</strong>{value ? " " : null}</> : null}
       {inlineParts(value, showReview)}
     </p>
   );

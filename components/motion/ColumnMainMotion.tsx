@@ -22,8 +22,11 @@ export function ColumnMainMotion() {
 
       hero.style.setProperty("--column-hero-progress", rawProgress.toFixed(4));
       hero.style.setProperty("--column-panel-clip", `${(exitEased * 32).toFixed(3)}svh`);
-      hero.style.setProperty("--column-copy-y", `${(exitEased * -16).toFixed(3)}svh`);
-      hero.style.setProperty("--column-copy-scale", (1 - exitEased * 0.16).toFixed(4));
+      hero.style.setProperty("--column-copy-y", `${(exitEased * -10).toFixed(3)}svh`);
+      hero.style.setProperty("--column-copy-scale", (1 - exitEased * 0.2).toFixed(4));
+      hero.style.setProperty("--column-copy-opacity", (1 - exitEased * 0.14).toFixed(4));
+      hero.style.setProperty("--column-search-lag", `${(exitEased * 88).toFixed(3)}px`);
+      hero.style.setProperty("--column-search-scale", (1 - exitEased * 0.035).toFixed(4));
       hero.setAttribute("data-column-hero-ready", "");
     };
 
@@ -59,6 +62,9 @@ export function ColumnMainMotion() {
         "--column-panel-clip",
         "--column-copy-y",
         "--column-copy-scale",
+        "--column-copy-opacity",
+        "--column-search-lag",
+        "--column-search-scale",
       ].forEach((property) => hero.style.removeProperty(property));
       sections.forEach((section) => {
         section.removeAttribute("data-column-motion-ready");

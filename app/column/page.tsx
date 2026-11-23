@@ -10,10 +10,11 @@ import { DevEditorMount } from "@/components/DevEditorMount";
 import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
+import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { getPublishedColumns } from "@/content/columns";
 import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
-import { getImage, getText, textEditProps } from "@/content/site-content-types";
+import { getConcernItems, getImage, getText, textEditProps } from "@/content/site-content-types";
 import { getCategory, getTreatment } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
@@ -30,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ColumnMainPage() {
   const content = await readSiteContent();
+  const showReview = process.env.NEXT_PUBLIC_SHOW_REVIEW === "true";
   const published = getPublishedColumns();
   const featureSlug = getText(content, "column.feature.slug");
   const feature = published.find((column) => column.slug === featureSlug) ?? published[0];
@@ -58,12 +60,15 @@ export default async function ColumnMainPage() {
   const latestFaqs = faqRecords
     .toSorted((a, b) => (b.answeredAt ?? "").localeCompare(a.answeredAt ?? ""))
     .slice(0, 5);
-  const questionItems: FaqListItem[] = latestFaqs.map((faq) => ({ q: faq.q, a: faq.a, href: faq.href }));
+  const questionItems: FaqListItem[] = latestFaqs.map((faq) => ({ ...faq, href: faq.href }));
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const answeredThisWeek = faqRecords.filter((faq) => faq.answeredAt && new Date(`${faq.answeredAt}T23:59:59+09:00`) >= sevenDaysAgo).length;
   const latestFaq = latestFaqs[0];
   const treatmentSlugs = [...new Set(published.flatMap((column) => column.treatmentSlugs))];
+  const concernItems = getConcernItems(content);
+  const concernKeys = ["sagging", "jawline", "pigment", "pores", "regeneration", "wrinkle"];
+  const concernNames = new Map(concernKeys.map((key, index) => [key, concernItems[index]?.name ?? ""]));
   const coverDescription = getText(content, "column.cover.description");
   const coverDescriptionBreak = coverDescription.indexOf(". ");
   const coverDescriptionLead = coverDescriptionBreak >= 0 ? coverDescription.slice(0, coverDescriptionBreak + 1) : coverDescription;
@@ -86,11 +91,12 @@ export default async function ColumnMainPage() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.heroStage} data-scroll-world-scene data-scroll-world-strength="subtle">
+      <ColumnMainMotion />
+      <div className={styles.heroStage} data-column-hero>
         <MotionGroup as="section" className={styles.cover}>
           <ColumnHeader content={content} variant="overlay" page="main" />
           <span className={styles.verticalLabel} data-motion-item {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
-          <div className={styles.coverInner} data-scroll-world-layer="copy">
+          <div className={styles.coverInner}>
             <div className={styles.coverMeta} data-motion-item>
               <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
               <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
@@ -100,8 +106,8 @@ export default async function ColumnMainPage() {
               <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
             </h1>
             <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
-              <span data-motion-item>{getText(content, "column.cover.titleTop")}&apos;s</span>
-              <span data-motion-item>Column</span>
+              <span data-motion-item {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span>
+              <span data-motion-item {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span>
             </h1>
             <p data-motion-item {...textEditProps("column.cover.description")}>
               {coverDescriptionLead}
@@ -110,7 +116,7 @@ export default async function ColumnMainPage() {
           </div>
         </MotionGroup>
 
-        <div className={styles.searchShell} data-scroll-world-layer="depth">
+        <div className={styles.searchShell}>
           <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
         </div>
       </div>
@@ -194,7 +200,7 @@ export default async function ColumnMainPage() {
               </div> : null}
             </div>
             <p className={styles.mobileQuestionStats}>지금까지 <b>{faqRecords.length}개</b> 답변 · 이번 주 <b>{answeredThisWeek || 3}개</b> 새 답변</p>
-            <FaqList items={questionItems} variant="magazine" mobileStyle="issue" firstOpen answerLabel={getText(content, "column.questions.answerLabel")} readLabel={getText(content, "column.questions.read")} />
+            <FaqList items={questionItems} variant="magazine" mobileStyle="issue" firstOpen answerLabel={getText(content, "column.questions.answerLabel")} readLabel={getText(content, "column.questions.read")} showReview={showReview} useSummary />
             <div className={styles.askRow}>
               <p {...textEditProps("column.questions.askCaption")}>{getText(content, "column.questions.askCaption")}</p>
               <Link href={`/column/${feature?.slug ?? published[0]?.slug}#ask-doctor`} {...textEditProps("column.questions.askAction")}>{getText(content, "column.questions.askAction")}</Link>
@@ -232,8 +238,11 @@ export default async function ColumnMainPage() {
         <MotionGroup className={styles.archiveList} scrollWorldLayer="depth">
           {published.map((column) => (
             <Link href={`/column/${column.slug}`} key={column.slug} data-motion-item>
-              <time dateTime={column.publishedAt}>{column.publishedAt ? formatDateKo(column.publishedAt).replaceAll(". ", ".") : ""}</time>
-              <span>{getCategory(column.categorySlug)?.name}</span>
+              <div className={styles.archiveMeta}>
+                <time dateTime={column.publishedAt}>{column.publishedAt ? formatDateKo(column.publishedAt).replaceAll(". ", ".").replace(/\.$/, "") : ""}</time>
+                <i aria-hidden="true">·</i>
+                <span>{column.concerns.map((concern) => concernNames.get(concern)).filter(Boolean).join(" · ") || getCategory(column.categorySlug)?.name}</span>
+              </div>
               <b><span className={styles.desktopArchiveTitle}>{column.title}</span><span className={styles.mobileArchiveTitle}>{column.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요?</span></> : column.title}</span></b>
               <small>READ {String(column.readMinutes).padStart(2, "0")} MIN</small>
             </Link>

@@ -19,6 +19,7 @@ type FaqListProps = {
   readLabel?: string;
   showReview?: boolean;
   mobileStyle?: "issue" | "detail";
+  useSummary?: boolean;
 };
 
 function answerParts(value: string) {
@@ -34,6 +35,7 @@ export function FaqList({
   readLabel = "전문 보기 →",
   showReview = false,
   mobileStyle = "detail",
+  useSummary = false,
 }: FaqListProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(firstOpen && items.length ? 0 : null);
 
@@ -41,7 +43,9 @@ export function FaqList({
     <div className={`${styles.list} ${variant === "magazine" ? styles.magazine : ""}`}>
       {items.map((item, index) => {
         const isOpen = openIndex === index;
-        const answer = answerParts(item.a);
+        const answer = useSummary && item.summary
+          ? { first: `${item.summary}${item.summaryNeedsReview ? " [원장 확인]" : ""}`, rest: item.a }
+          : answerParts(item.a);
         return (
           <article className={`${styles.item} ${isOpen ? styles.open : ""} ${mobileStyle === "issue" ? styles.issueItem : ""}`} id={item.id} key={`${item.q}-${index}`}>
             <button
