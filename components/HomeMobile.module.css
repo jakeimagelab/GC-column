@@ -151,45 +151,6 @@
   background: linear-gradient(180deg, rgba(30, 26, 22, .35) 0%, rgba(30, 26, 22, .2) 40%, rgba(30, 26, 22, .65) 100%);
 }
 
-.heroHeader {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px;
-  padding: 0 20px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  color: #fff;
-  font-size: 15px;
-  letter-spacing: .12em;
-}
-
-.brandMonogram {
-  margin-right: 8px;
-  font-family: var(--font-en);
-  font-weight: 400;
-}
-
-.menuLink {
-  display: flex;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-
-.menuLink svg {
-  width: 24px;
-  height: 24px;
-  stroke-width: 1.25;
-}
-
 .heroCopy {
   position: absolute;
   right: 20px;

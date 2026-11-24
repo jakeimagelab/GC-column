@@ -873,6 +873,42 @@ blocked
 
 ---
 
+# 홈 모바일 메뉴 회귀 수정 QA (2026-11-24)
+
+## 기준과 구현 증거
+
+- source visual truth: `docs/mockups/home-mobile-mockup.html`의 390px 히어로 헤더·햄버거 상태
+- implementation: `components/HomeMobile.tsx`, 공통 메뉴 `components/ColumnHeader.tsx`
+- 정적 렌더 증거: `.next/server/app/index.html`
+- viewport: 모바일 390px 기준
+- source/implementation density: 브라우저 이미지 캡처를 만들 수 없어 픽셀 밀도 비교 없음
+- state: 첫 화면 메뉴 닫힘 상태와 메뉴 버튼의 열기 경로
+
+## 발견·수정
+
+- [P1] 모바일 홈의 햄버거가 실제 메뉴 버튼이 아니라 `#mobile-finder` 앵커로 렌더되어 메뉴를 열 수 없었다.
+- 모바일 전용 히어로에 다른 페이지와 동일한 `ColumnHeader`를 연결해 로고, 검색, 햄버거 버튼, 전체 화면 모바일 메뉴, Esc·본문 스크롤 잠금 동작을 공유하도록 수정했다.
+- 기존 시안의 히어로·문구·질문 카드 구조와 하단 빠른 상담 바는 변경하지 않았다.
+
+## 자동 검증
+
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] `git diff --check` 통과
+- [x] 모바일 홈 정적 HTML 안에 `aria-label="메뉴 열기"`, 모바일 메뉴의 `피부 고민`, `aria-label="모바일 빠른 상담"` 존재
+- [x] 잘못된 `aria-label="시술 찾기로 이동"` 앵커 제거
+
+## 제한
+
+- 브라우저 호스트가 연결되지 않고 로컬 포트가 `EPERM`으로 차단되어, 390px 메뉴 열림 화면과 소스/구현 병합 비교를 새로 캡처하지 못했다.
+- 사용자의 화면에 네이티브 브라우저나 알림을 띄우지 않는 조건 때문에 기존 Chrome 창은 조작하지 않았다.
+
+## 최종 결과
+
+blocked
+
+---
+
 # 홈 모바일 전용 레이아웃 디자인 QA (2026-11-24)
 
 ## 기준과 검수 증거

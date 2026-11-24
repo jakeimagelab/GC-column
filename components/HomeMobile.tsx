@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, KeyboardEvent, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getConcernItems, getEquipmentItems, getHeroSlides, getImage, getText, getTypingExamples, getVisionPrinciples, type SiteContent } from "@/content/site-content-types";
 import { ClinicOpenStatus } from "./ClinicOpenStatus";
+import { ColumnHeader } from "./ColumnHeader";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import type { HomeSearchColumn } from "./HomeQuestionSearch";
 import styles from "./HomeMobile.module.css";
@@ -516,10 +517,7 @@ export function HomeMobile({
           <Image src={hero?.bgImage.src || "/uploads/glory-home-hero-director.jpg"} alt={hero?.bgImage.alt || "글로리의원 이호 대표원장이 고객을 진료하는 모습"} fill priority sizes="(max-width: 430px) 100vw, 430px" />
         </div>
         <div className={styles.heroOverlay} aria-hidden="true" />
-        <header className={styles.heroHeader}>
-          <Link href="/" className={styles.brand}><b className={styles.brandMonogram}>G</b>{getText(content, "common.brand.name")}</Link>
-          <a className={styles.menuLink} href="#mobile-finder" aria-label="시술 찾기로 이동"><Bars3Icon aria-hidden="true" /></a>
-        </header>
+        <ColumnHeader content={content} variant="overlay" page="home" />
         <div ref={heroCopyRef} className={styles.heroCopy} data-rv>
           <span>{hero?.eyebrow || "NATURAL · PERSONAL · BY THE DIRECTOR"}</span>
           <h1 id="mobile-home-title">{hero?.title || "자연스러운 아름다움,"}<br /><b>{hero?.titleStrong || "대표원장이 직접 진행합니다"}</b></h1>
