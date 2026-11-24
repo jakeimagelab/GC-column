@@ -274,3 +274,8 @@
   .visionBackdrop { display: none; }
   .vision[data-vision-motion-ready] .principles article { opacity: 1; transform: none; box-shadow: none; }
 }
+.desktopHome { display: contents; }
+
+@media (max-width: 767px) {
+  .desktopHome { display: none; }
+}

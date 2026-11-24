@@ -12,6 +12,7 @@ import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
 import { HomeQuestionSearch, type HomeSearchColumn } from "@/components/HomeQuestionSearch";
 import { HomeHero } from "@/components/HomeHero";
+import { HomeMobile, type MobileHomeFeature, type MobileHomeQuestion } from "@/components/HomeMobile";
 import { HomeQuestionTrigger } from "@/components/HomeQuestionTrigger";
 import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
@@ -53,6 +54,20 @@ export default async function HomePage() {
   }));
   const publishedColumns = getPublishedColumns();
   const featuredColumn = publishedColumns[0];
+  const mobileFeatureColumn = getColumns(["xerf-vs-thermage"])[0];
+  const mobileQuestionColumns = getColumns(["xerf-vs-thermage", "ulthera-low-volume-face"]);
+  const mobileFeature: MobileHomeFeature | null = mobileFeatureColumn ? {
+    slug: mobileFeatureColumn.slug,
+    category: getCategory(mobileFeatureColumn.categorySlug)?.name ?? "리프팅",
+    title: mobileFeatureColumn.title,
+    summary: columnExcerpts.home[mobileFeatureColumn.slug] ?? mobileFeatureColumn.summary,
+    image: mobileFeatureColumn.listImage ?? mobileFeatureColumn.heroImage ?? "/uploads/glory-column-xerf-hero.jpg",
+  } : null;
+  const mobileQuestions: MobileHomeQuestion[] = [
+    mobileQuestionColumns[0]?.faqs[0] ? { ...mobileQuestionColumns[0].faqs[0], href: `/column/${mobileQuestionColumns[0].slug}#faq-1` } : null,
+    mobileQuestionColumns[0]?.faqs[1] ? { ...mobileQuestionColumns[0].faqs[1], href: `/column/${mobileQuestionColumns[0].slug}#faq-2` } : null,
+    mobileQuestionColumns[1]?.faqs[0] ? { ...mobileQuestionColumns[1].faqs[0], q: "볼륨이 적은 얼굴도 울쎄라 괜찮나요?", href: `/column/${mobileQuestionColumns[1].slug}#faq-1` } : null,
+  ].filter((question): question is MobileHomeQuestion => Boolean(question));
   const answeredQuestions = publishedColumns.flatMap((column) => column.faqs.map((faq, index) => ({
     ...faq,
     columnSlug: column.slug,
@@ -81,6 +96,21 @@ export default async function HomePage() {
 
   return (
     <main className="pageFrame">
+      <HomeMobile
+        content={content}
+        columns={searchColumns}
+        feature={mobileFeature}
+        questions={mobileQuestions}
+        answerCount={answeredQuestions.length}
+        naverUrl={naverUrl}
+        kakaoMapUrl={mapKakaoUrl}
+        googleUrl={googleUrl}
+        consultKakaoUrl={consultKakaoUrl}
+        weekdayHours={weekdayHours}
+        saturdayHours={saturdayHours}
+      />
+
+      <div className={styles.desktopHome}>
       <section className={styles.hero} id="home-hero" data-scroll-world-scene>
         <HomeHero slides={slides} />
         <ColumnHeader content={content} variant="overlay" page="home" />
@@ -165,8 +195,10 @@ export default async function HomePage() {
 
       <footer className={styles.footer} data-scroll-world-scene data-scroll-world-strength="soft"><div data-scroll-world-layer="copy"><div className={styles.footerLogo}><span>G</span><b {...textEditProps("common.brand.name")}>{getText(content, "common.brand.name")}</b></div><p><EditableRichText id="home.footer.businessInfo" value={getText(content, "home.footer.businessInfo")} /></p><FooterPolicyLinks content={content} /><p {...textEditProps("home.footer.notice")}>{getText(content, "home.footer.notice")}</p></div><nav aria-label="푸터 메뉴" data-scroll-world-layer="counter"><div><Link href="/column">원장 칼럼</Link>{instagramUrl ? <a href={instagramUrl} target="_blank" rel="noopener noreferrer">인스타그램</a> : null}{youtubeUrl ? <a href={youtubeUrl} target="_blank" rel="noopener noreferrer">유튜브</a> : null}</div><div><a href="/rss.xml">RSS</a><a href="/sitemap.xml">사이트맵</a></div></nav></footer>
 
-      <JsonLd value={pageGraph} />
       <FloatingQuickMenu content={content} />
+      </div>
+
+      <JsonLd value={pageGraph} />
       <DevEditorMount page="home" content={content} />
     </main>
   );

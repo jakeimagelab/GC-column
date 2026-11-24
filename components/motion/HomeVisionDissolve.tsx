@@ -21,7 +21,7 @@ export function HomeVisionDissolve() {
   useEffect(() => {
     const section = document.querySelector<HTMLElement>("[data-home-vision]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!section) return;
+    if (!section || window.matchMedia("(max-width: 767px)").matches) return;
 
     let frame = 0;
     let targetY = window.scrollY;

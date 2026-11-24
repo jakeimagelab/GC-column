@@ -20,6 +20,7 @@ export function ScrollWorldJourney({ sceneSelector = "[data-scroll-world-scene]"
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (
       reducedMotion.matches ||
+      window.matchMedia("(max-width: 767px)").matches ||
       isVisualEditingMode() ||
       pathname === "/content-board" ||
       pathname === "/scroll-world-test" ||

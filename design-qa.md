@@ -873,6 +873,69 @@ blocked
 
 ---
 
+# 홈 모바일 전용 레이아웃 디자인 QA (2026-11-24)
+
+## 기준과 검수 증거
+
+- 기준 파일: `docs/mockups/home-mobile-mockup.html`
+- 구현: `components/HomeMobile.tsx`, `components/HomeMobile.module.css`
+- 390px 기준 캡처: `output/playwright/home-mobile-implementation-390-y0.png`, `-y400.png`, `-y1200.png`, `-y2200.png`, `-y3500-fixed.png`, `-y5000.png`, `-y7000.png`
+- 430px 기준 캡처: `output/playwright/home-mobile-implementation-430-y0.png`, `-y400.png`, `-y1200.png`, `-y2200.png`, `-y3500.png`, `-y5000.png`, `-y7000.png`
+- 기준·구현 결합 비교: `output/playwright/home-mobile-reference-vs-implementation-390.png` (왼쪽 시안 / 오른쪽 구현)
+- 스크롤 상태 GIF: `output/playwright/home-mobile-scroll-states.gif`
+- 데스크톱 회귀 캡처: `output/playwright/home-desktop-after-mobile-1440-full.png`
+- 데스크톱 기준·구현 결합 비교: `output/playwright/home-desktop-comparison.png`
+
+## 시각 정합 결과
+
+- 460px 첫 화면, -72px 질문 카드 겹침, 한 줄 질문 입력, 가로 질문 칩, 고민 칩과 네 개 시술 카테고리 카드의 위치·간격·글자 위계를 시안과 맞췄다.
+- 원장 칼럼은 실제 세르프 대표 이미지를 사용했다. 시안의 캔버스 전용 이미지 경로가 깨지는 차이는 레포의 동일 역할 이미지로 대체하라는 요구사항에 따른 의도된 차이다.
+- 원장 소개는 132px 폭 사진, 13년 카운트, 네 줄 기본 경력과 추가 경력 토글, 실제 서명 이미지 마스크 리빌로 구성했다.
+- 진료 원칙은 sticky 화면에서 01→02→03 가로 이동하고, 보유 장비는 첫 카드가 정확히 x=20px에서 시작하며 이전 카드 글자가 노출되지 않는다.
+- 시설은 3400px 구간에서 여섯 사진 이동, 외관→지도 근접 디졸브→전체 지도 순서를 사용한다. 지도는 마지막 상태에서 포인터 확대·이동을 허용한다.
+- 하단 빠른 상담 바는 1:1:1.3 비율과 56px 높이, 전화 상태·오시는길·카카오 상담 순서를 유지한다.
+
+## 수치 검증
+
+- 390×844: `scrollHeight === 8160`, `scrollWidth === 390`
+- 430×932: `scrollHeight === 8208`, `scrollWidth === 430`
+- 기준 시안 390px: `scrollHeight === 8100`; 구현과 60px 차이로 동일한 전체 리듬 범위다.
+- reduced-motion 390px: 숨은 `data-rv` 요소 0개, 원칙 sticky 해제, 지도 `pointer-events:auto`, 가로 넘침 없음.
+- 장비 첫 두 카드 시작 좌표: x=20px / x=219.45px.
+- 1440px: 모바일 루트 `display:none`, 기존 데스크톱 루트 `display:contents`, 전체 높이 기준·구현 모두 8129px, `scrollWidth === 1440`.
+
+## 모션·기능 검수
+
+- 첫 화면 사진 1→1.12 확대와 문구 0~260px 페이드, 질문 카드를 지난 뒤 54px 검색바 고정, 스크롤 방향에 따른 하단 바 숨김·복귀를 rAF에서 처리한다.
+- 등장 요소는 IntersectionObserver threshold .15에서 한 번만 노출하고 관찰을 해제한다.
+- 원칙 가로 이동 높이는 `sticky 높이 + 실제 가로 travel`로 재측정한다.
+- 시설 진행률은 실제 스크롤을 매 프레임 14% 따라가며 사진 패럴랙스·카운터·디졸브·진행 막대를 같은 값으로 갱신한다.
+- 질문 검색은 기존 칼럼/FAQ 자동완성 인덱스를 사용하며 키보드 위·아래·Esc·Enter를 지원한다.
+- 원장이 답한 질문은 `details/summary` 아코디언과 원문 칼럼 링크를 제공한다.
+- reduced-motion에서는 모든 등장 콘텐츠를 즉시 표시하고 시설·원칙을 일반 세로/가로 스크롤 배치로 바꾸며 지도를 즉시 조작 가능하게 한다.
+- 모바일에서는 기존 `ScrollWorldJourney`, `HomeVisionDissolve`를 중지해 전용 연출과 충돌하지 않는다.
+
+## 정적 품질 검증
+
+- [x] `npm run lint` 오류 0건 (수정 범위 밖 기존 경고 8건)
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] 모바일 이미지 `next/image`와 실제 레포 에셋 사용
+- [x] 링크·검색·토글·아코디언·지도 버튼에 접근 가능한 이름과 실제 동작 경로 제공
+- [x] 데스크톱 마크업은 기존 코드를 수정하지 않고 표시 분기만 추가
+
+## 차이와 판단
+
+- P0/P1/P2 이슈 없음.
+- P3: 시안의 `/_blob/` 이미지는 기준 파일에서 로드되지 않으므로 실제 병원·원장·장비·지도 이미지로 교체했다.
+- P3: 기본 노출 경력은 최신 요청에 따라 시안의 세 줄이 아니라 네 줄이다.
+- P3: 원장 질문 수는 자리표시자 `○○` 대신 현재 발행 칼럼의 실제 답변 수를 표시한다.
+
+## 최종 결과
+
+passed
+
+---
+
 # 칼럼 책갈피 회귀·홈 검색 겹침 QA (2026-11-24)
 
 ## 기준과 구현 증거
