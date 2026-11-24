@@ -97,7 +97,9 @@ export default async function ColumnMainPage() {
       <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>
         <section className={styles.cover}>
-          <span className={styles.verticalLabel} data-column-entry="meta" data-column-bookmark-fade {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          <span className={styles.verticalLabel} data-column-bookmark-fade>
+            <span data-column-entry="meta" {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          </span>
           <div className={styles.coverInner}>
             <div className={styles.coverMeta} data-column-entry="meta">
               <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
@@ -111,10 +113,12 @@ export default async function ColumnMainPage() {
               <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
               <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
             </h1>
-            <p data-column-entry="description" data-column-bookmark-fade {...textEditProps("column.cover.description")}>
-              {coverDescriptionLead}
-              {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
-            </p>
+            <div className={styles.descriptionFade} data-column-bookmark-fade>
+              <p data-column-entry="description" {...textEditProps("column.cover.description")}>
+                {coverDescriptionLead}
+                {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
+              </p>
+            </div>
           </div>
         </section>
 

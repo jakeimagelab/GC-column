@@ -871,8 +871,6 @@ passed
 
 blocked
 
----
-
 # 홈 모바일 메뉴 회귀 수정 QA (2026-11-24)
 
 ## 기준과 구현 증거
@@ -1093,6 +1091,43 @@ passed
 - 현재 실행 환경의 브라우저 호스트가 연결되지 않았고 로컬 서버 포트도 `EPERM`으로 차단되어, MotionBookmark 보드를 직접 스크롤하거나 1440px/390px 구현 화면을 캡처할 수 없었다.
 - 사용자의 화면에 브라우저 창이나 완료 알림을 띄우지 않는 조건을 지켜 별도 네이티브 브라우저 실행은 하지 않았다.
 - 따라서 요청된 1440px GIF, 패널 실동작 영상, 홈·상세·시술 1440px/390px 위치 스크린샷과 소스/구현 병합 비교는 증거가 없어 완료로 판정하지 않는다.
+
+## 최종 결과
+
+blocked
+
+---
+
+# 남은 4건 회귀 QA (2026-11-24)
+
+## 기준과 구현 증거
+
+- 기준: 이번 요청의 책갈피 120/300/600px 상태, 390px 모바일 겹침·4:5 카드, 시술 비교표 강조·고정열, 데스크톱 Q&A 아코디언 명세
+- 소스 시각 기준 경로: 별도 이미지/보드 파일이 이번 요청에 첨부되지 않아 없음
+- 구현 정적 출력: `.next/server/app/column.html`, `.next/server/app/index.html`, `.next/server/app/treatments/lifting/thermage-flx.html`
+- 구현 스크린샷 경로: 브라우저 호스트 연결 실패로 생성하지 못함
+- 목표 viewport: 1440×900, 390×844, deviceScaleFactor 1
+
+## 코드·정적 출력 검수
+
+- 책갈피 부제와 세로 라벨의 `data-column-bookmark-fade`를 진입 애니메이션이 없는 바깥 래퍼로 옮겼다. 내부 요소만 `columnEntryUp`을 유지하므로 애니메이션 fill-mode가 바깥 래퍼의 인라인 opacity를 막지 않는다.
+- 모바일 Feature 01은 고정된 `overflow:hidden` 프레임 안에서 사진 레이어만 움직이고, 프레임에 `contain:paint`를 적용했다. 시술 카드 줄은 제목 아래 24px을 확보하고 모든 이미지 프레임을 4:5·cover로 통일했다.
+- 시술 비교표의 강조 머리칸은 `.tableScroll thead th.highlightHead`로 우선순위를 높여 흰색 700을 보장한다. 760px 이하에서는 첫 머리칸과 행 머리칸이 흰 배경으로 left:0에 고정된다.
+- 홈 데스크톱 질문은 링크 대신 버튼 네 개로 정적 렌더된다. 하나의 `openId`만 유지해 한 번에 하나만 열고, 답은 summary 우선·원문 fallback이며 줄바꿈은 `white-space:pre-line`으로 보존한다. 버튼과 답 영역은 `aria-expanded`, `aria-controls`, `role=region`, `aria-labelledby`로 연결했다.
+- React 점검: 새 클라이언트 경계에는 질문 네 개의 직렬화 가능한 문자열만 전달하며, 전역 listener·effect·추가 데이터 요청이 없다.
+
+## 자동 검증
+
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] 칼럼 정적 HTML에서 페이드 래퍼와 내부 description 진입 요소 분리 확인
+- [x] 홈 정적 HTML에서 닫힌 아코디언 4개와 질문별 칼럼 링크 제거 확인
+- [x] 써마지 정적 HTML에서 공용 비교표 출력 확인
+
+## 제한과 후속 검수
+
+- Playwright CLI와 직접 Chromium 실행은 macOS Mach bootstrap 권한으로 중단됐고, 인앱 브라우저 호스트도 연결되지 않았다. 사용자의 화면에 브라우저나 시스템 알림을 띄우지 않는 조건 때문에 네이티브 브라우저 실행으로 우회하지 않았다.
+- 따라서 요청된 120/300/600px 및 390px 실제 스크린샷, Q1→Q3 실클릭 증거, 동일 상태의 시각 병합 비교는 확보하지 못했다.
 
 ## 최종 결과
 

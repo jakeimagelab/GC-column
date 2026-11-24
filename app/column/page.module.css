@@ -6,12 +6,13 @@
 .cover { position:relative; min-height:634px; padding-top:78px; background:var(--cover); color:#fff; overflow:hidden; }
 .coverInner { width:min(1070px,calc(100% - 96px)); margin:68px auto 0; }
 .verticalLabel { position:absolute; top:120px; left:42px; font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; writing-mode:vertical-rl; opacity:.72; white-space:nowrap; }
+.verticalLabel>span { display:block; }
 .coverMeta { display:flex; justify-content:space-between; align-items:center; color:rgb(255 255 255 / 72%); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.28em; text-transform:uppercase; }
 .masthead { margin:40px 0 22px; display:flex; flex-direction:column; font-family:var(--font-en); font-size:clamp(104px,10.5vw,150px); font-weight:700; letter-spacing:-.055em; line-height:.88; }
 .masthead span { white-space:nowrap; }
 .mastheadLine { padding-bottom:.16em; margin-bottom:-.16em; display:block; overflow:clip; }
 .mastheadLine>span { display:block; will-change:transform; }
-.coverInner>p { margin:0; color:rgb(255 255 255 / 72%); font-size:16px; line-height:1.8; }
+.descriptionFade>p { margin:0; color:rgb(255 255 255 / 72%); font-size:16px; line-height:1.8; }
 .searchShell { position:relative; z-index:5; width:min(1040px,calc(100% - 48px)); min-height:104px; margin:-44px auto 0; }
 
 @media(min-width:1024px){
@@ -285,13 +286,14 @@
   .mobileMasthead{display:flex;margin:27px 0 20px;flex-direction:column;font-family:var(--font-en);font-size:64px;letter-spacing:-.055em;line-height:.91}
   .mobileMasthead span:first-child{font-weight:700}
   .mobileMasthead span:last-child{font-weight:300}
-  .coverInner>p{max-width:320px;margin:0;color:#fff;font-size:14px;font-weight:500;line-height:1.65;white-space:pre-line}
+  .descriptionFade>p{max-width:320px;margin:0;color:#fff;font-size:14px;font-weight:500;line-height:1.65;white-space:pre-line}
   .searchShell{z-index:8;width:calc(100% - 44px);min-height:84px;margin:-30px 22px 0}
   .issueBar{display:none}
   .feature{padding:0;background:#fbfaf7}
   .featureMeta{position:absolute;z-index:3;top:20px;left:22px;width:auto;min-height:0;margin:0;color:#fff;font-size:8px;letter-spacing:.2em}
   .featureMeta span:last-child{display:none}
-  .featureVisual{height:460px}
+  .featureVisual{height:460px;overflow:hidden;contain:paint;isolation:isolate}
+  .featureImageParallax{inset:-48px 0}
   .featureImage img{object-position:46% center}
   .featureShade{background:linear-gradient(180deg,rgba(20,16,13,.04) 35%,rgba(24,18,14,.82) 100%)}
   .featureTitle{left:22px;bottom:76px}
@@ -324,12 +326,12 @@
   .treatments header{min-height:74px;margin:0 22px;border-bottom:0;align-items:flex-start;flex-direction:column-reverse;justify-content:flex-start;gap:11px}
   .treatments h2{font-size:29px}
   .treatments header span{padding:0;font-size:9px;letter-spacing:.28em;text-transform:uppercase}
-  .treatmentGrid{padding:0 22px 8px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;scroll-padding-left:22px}
+  .treatmentGrid{margin-top:24px;padding:0 22px 8px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;scroll-padding-left:22px}
   .treatmentGrid::-webkit-scrollbar{display:none}
-  .treatmentGrid a,.treatmentGrid a+a{position:relative;width:150px;min-width:150px;min-height:226px;padding:0 0 8px;border:0;border-top:3px solid var(--treatment-color);display:flex;gap:8px}
-  .treatmentVisual{width:150px;height:142px;background:#f3eee8;display:block;overflow:hidden}
+  .treatmentGrid a,.treatmentGrid a+a{position:relative;width:150px;min-width:150px;min-height:272px;padding:0 0 8px;border:0;border-top:3px solid var(--treatment-color);display:flex;gap:8px}
+  .treatmentVisual{width:150px;height:auto;aspect-ratio:4/5;background:#f3eee8;display:block;overflow:hidden}
   .treatmentVisual>*{width:100%!important;height:100%!important}
-  .treatmentVisual img{object-fit:contain!important}
+  .treatmentVisual img{object-fit:cover!important}
   .treatmentGrid b{font-size:14px;line-height:1.4}
   .treatmentGrid>a>span:last-child{font-size:12px;line-height:1.45}
   .archive{width:auto;margin:0;padding:20px 22px 76px;display:block}

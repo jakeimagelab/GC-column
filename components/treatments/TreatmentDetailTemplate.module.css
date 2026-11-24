@@ -155,7 +155,7 @@
 .tableScroll td { padding: 18px 20px; border: 0; text-align: left; vertical-align: middle; white-space: nowrap; }
 .tableScroll thead th { border-bottom: 1px solid var(--tx-ink); color: var(--tx-muted); font-size: 13px; font-weight: 500; }
 .tableScroll tbody th { color: var(--tx-muted); font-weight: 500; }
-.highlightHead { background: var(--tx-accent); color: #fff; }
+.tableScroll thead th.highlightHead { background: var(--tx-accent); color: #fff; font-weight: 700; }
 .highlightCell { background: var(--tx-accent-soft); color: var(--tx-accent); font-weight: 700; }
 .highlightCell .reviewMark { margin-left: 8px; }
 .textLink { margin-top: 24px; display: inline-flex; color: var(--tx-accent); font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
@@ -325,6 +325,9 @@
   .mechanismSteps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 38px 24px; }
   .mobileScrollHint { margin: 0 0 10px; display: block; color: var(--tx-muted); font-size: 11px; }
   .tableFrame::after { content: ""; position: absolute; z-index: 2; top: 0; right: 0; bottom: 0; width: 50px; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 94%)); pointer-events: none; }
+  .tableScroll thead th:first-child,
+  .tableScroll tbody th { position: sticky; z-index: 3; left: 0; background: #fff; }
+  .tableScroll thead th:first-child { z-index: 4; }
   .deviceInner { width: min(100% - 40px, 680px); padding: 84px 0; }
   .handpieceLayout { margin-top: 50px; grid-template-columns: 1fr; }
   .handpieceFeature { display: flex; flex-direction: column; align-items: center; }

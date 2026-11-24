@@ -10,6 +10,7 @@ import { EquipmentCarousel } from "@/components/EquipmentCarousel";
 import { FacilityGallery } from "@/components/FacilityGallery";
 import { FloatingQuickMenu } from "@/components/FloatingQuickMenu";
 import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
+import { HomeAnsweredQuestions } from "@/components/HomeAnsweredQuestions";
 import { HomeQuestionSearch, type HomeSearchColumn } from "@/components/HomeQuestionSearch";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeMobile, type MobileHomeFeature, type MobileHomeQuestion } from "@/components/HomeMobile";
@@ -73,6 +74,11 @@ export default async function HomePage() {
     columnSlug: column.slug,
     faqId: `faq-${index + 1}`,
   })));
+  const desktopAnsweredQuestions = answeredQuestions.slice(0, 4).map((faq) => ({
+    id: `home-answer-${faq.columnSlug}-${faq.faqId}`,
+    q: faq.q,
+    answer: faq.summary?.trim() || faq.a,
+  }));
   const slides = getHeroSlides(content);
   const equipment = getEquipmentItems(content);
   const principles = getVisionPrinciples(content);
@@ -166,9 +172,7 @@ export default async function HomePage() {
           </article> : null}
           <section className={styles.answeredQuestions} data-motion-item aria-labelledby="answered-questions-title">
             <div className={styles.questionListHeading}><h3 id="answered-questions-title" {...textEditProps("home.latest.questionsTitle")}>{getText(content, "home.latest.questionsTitle")}</h3><span><span {...textEditProps("home.latest.answerCountPrefix")}>{getText(content, "home.latest.answerCountPrefix")}</span> {answeredQuestions.length}<span {...textEditProps("home.latest.answerCountSuffix")}>{getText(content, "home.latest.answerCountSuffix")}</span></span></div>
-            <ol>
-              {answeredQuestions.slice(0, 4).map((faq, index) => <li key={`${faq.columnSlug}-${faq.faqId}`}><Link href={`/column/${faq.columnSlug}#${faq.faqId}`}><small><span {...textEditProps("home.latest.questionPrefix")}>{getText(content, "home.latest.questionPrefix")}</span>{index + 1}</small><b>{faq.q}</b><span {...textEditProps("home.latest.answerAction")}>{getText(content, "home.latest.answerAction")}</span></Link></li>)}
-            </ol>
+            <HomeAnsweredQuestions questions={desktopAnsweredQuestions} />
             <div className={styles.questionCta}><p><span {...textEditProps("home.latest.ctaLine1")}>{getText(content, "home.latest.ctaLine1")}</span><strong {...textEditProps("home.latest.ctaLine2")}>{getText(content, "home.latest.ctaLine2")}</strong></p><HomeQuestionTrigger className={styles.questionCtaButton} editId="home.latest.ctaButton" label={getText(content, "home.latest.ctaButton")} /></div>
           </section>
         </MotionGroup>
