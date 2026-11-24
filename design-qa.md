@@ -1132,3 +1132,41 @@ blocked
 ## 최종 결과
 
 blocked
+
+---
+
+# 울쎄라 300·400샷 이미지 교체 + 홈 비칼럼 링크 비활성 QA (2026-11-25)
+
+## 비교 기준
+
+- 소스 시각 기준: `/Users/jakembpm2/Downloads/01_ulthera_shots_v2.png`
+- 소스 픽셀: 3600×2200 PNG, device density 정보 없음
+- 구현 자산: `public/uploads/columns/ulthera-prime-shots/figure-1.png`
+- 대상 화면: `/column/ulthera-prime-shots`의 그림 1, 홈 데스크톱·모바일 내부 링크
+- 목표 viewport: 1440px / 390px, deviceScaleFactor 1
+- 구현 스크린샷: 브라우저 접근 호스트가 unavailable 상태라 생성하지 못함
+
+## 정적 비교와 구현 증거
+
+- 소스와 구현 자산의 SHA-256이 `2ece6678e053534564a522861e82a55de1e6be91182c251876e5a9af52fa2c93`로 동일하다. 이미지 내용·색·타이포·간격·카피는 원본과 동일하다.
+- Next Image 고유 크기를 3600×2200으로 맞췄고, 정적 HTML에서도 `width="3600"`, `height="2200"`과 새 `figure-1.png` 경로를 확인했다.
+- 홈은 같은 페이지 앵커·전화·문자·외부 링크와 `/column` 하위 경로만 허용한다. 그 외 내부 링크에는 `aria-disabled=true`, `tabindex=-1`을 동기화하고 capture 단계에서 이동을 막는다.
+- 동적으로 열리는 데스크톱·모바일 메뉴도 MutationObserver로 같은 비활성 규칙을 적용한다.
+- 글꼴·간격·색·카피는 기존 페이지 렌더링을 그대로 사용하며 이번 변경에서 시각 스타일을 수정하지 않았다.
+
+## 자동 검증
+
+- [x] 원본과 배포 자산 체크섬 일치
+- [x] `npm run build` 통과 — Next.js 16.4.5, 46개 정적 페이지 생성
+- [x] `npm run lint` 오류 0건 — 수정 범위 밖 기존 경고 8건
+- [x] `/column/ulthera-prime-shots` 정적 HTML에 새 이미지 실제 크기 반영
+- [x] 홈 정적 HTML에 링크 비활성 범위 루트 반영
+
+## 제한
+
+- 인앱 브라우저 호스트가 연결되지 않아 1440/390 브라우저 렌더 캡처, 메뉴 실클릭, 콘솔 오류 확인 및 소스·구현 병합 비교를 수행하지 못했다.
+- 따라서 동일 바이너리 자산과 정적 출력은 확인됐지만, 브라우저 렌더 증거가 필요한 디자인 QA 게이트는 통과 처리하지 않는다.
+
+## 최종 결과
+
+blocked

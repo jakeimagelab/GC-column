@@ -13,6 +13,7 @@ import { FooterPolicyLinks } from "@/components/FooterPolicyLinks";
 import { HomeAnsweredQuestions } from "@/components/HomeAnsweredQuestions";
 import { HomeQuestionSearch, type HomeSearchColumn } from "@/components/HomeQuestionSearch";
 import { HomeHero } from "@/components/HomeHero";
+import { HomeInternalLinkGate } from "@/components/HomeInternalLinkGate";
 import { HomeMobile, type MobileHomeFeature, type MobileHomeQuestion } from "@/components/HomeMobile";
 import { HomeQuestionTrigger } from "@/components/HomeQuestionTrigger";
 import { ImageSlot } from "@/components/ImageSlot";
@@ -101,7 +102,8 @@ export default async function HomePage() {
   const pageGraph = graph(content, [{ "@type": "WebPage", "@id": `${SITE_URL}/#webpage`, url: SITE_URL, name: getText(content, "seo.home.title"), description: getText(content, "seo.home.description"), inLanguage: "ko-KR", isPartOf: { "@id": `${SITE_URL}/#website` }, about: { "@id": `${SITE_URL}/#clinic` } }]);
 
   return (
-    <main className="pageFrame">
+    <main className="pageFrame" data-home-navigation-scope>
+      <HomeInternalLinkGate />
       <HomeMobile
         content={content}
         columns={searchColumns}

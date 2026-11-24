@@ -31,7 +31,7 @@ type ColumnDetailPageProps = { params: Promise<{ slug: string }> };
 
 const INLINE_FIGURE_PATTERN = /^!\[([^\]]+)]\(([^)]+)\)$/;
 const INLINE_FIGURE_SIZES: Record<string, { width: number; height: number }> = {
-  "/uploads/columns/ulthera-prime-shots/figure-1.png": { width: 500, height: 561 },
+  "/uploads/columns/ulthera-prime-shots/figure-1.png": { width: 3600, height: 2200 },
   "/uploads/columns/ulthera-low-volume-face/figure-1.png": { width: 371, height: 434 },
   "/uploads/columns/thermage-vs-ulthera/figure-1.png": { width: 500, height: 561 },
   "/uploads/columns/thermage-vs-ulthera/figure-2.png": { width: 744, height: 525 },
