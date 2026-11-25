@@ -6,6 +6,7 @@ import { useState } from "react";
 import { getConcernItems, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import type { Column } from "@/content/types";
 import { getCategory } from "@/content/treatments";
+import { getColumnCover } from "@/lib/column-cover";
 import { MotionGroup } from "./motion/MotionGroup";
 import styles from "./ColumnList.module.css";
 
@@ -18,11 +19,9 @@ function ArticleCard({ column, editorial = false }: { column: Column; editorial?
     : [column.title];
   return (
     <article className={editorial ? styles.editorialCard : styles.card} data-motion-item>
-      {column.listImage ? (
-        <Link href={`/column/${column.slug}`} className={styles.imageLink}>
-          <Image src={column.listImage} alt={`${column.title} 대표 이미지`} fill sizes={editorial ? "200px" : "(max-width: 720px) 100vw, 33vw"} />
-        </Link>
-      ) : null}
+      <Link href={`/column/${column.slug}`} className={styles.imageLink}>
+        <Image src={getColumnCover(column)} alt={`${column.title} 대표 이미지`} fill sizes={editorial ? "200px" : "(max-width: 720px) 100vw, 33vw"} />
+      </Link>
       <div className={styles.cardCopy}>
         <span className={styles.category}>{category?.name ?? "칼럼"} · 비교</span>
         <h3><Link href={`/column/${column.slug}`}><span className={styles.desktopTitle}>{column.title}</span><span className={styles.mobileTitle}>{mobileTitle.map((line) => <span key={line}>{line}</span>)}</span></Link></h3>

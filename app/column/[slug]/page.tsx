@@ -23,6 +23,7 @@ import { getImage, getText, textEditProps } from "@/content/site-content-types";
 import { SITE_URL } from "@/content/site";
 import { getCategory, getTreatment } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
+import { getColumnCover } from "@/lib/column-cover";
 import { readPublishedQuestions } from "@/lib/questionStore";
 import { articleGraph, buildMetadata, formatDateKo, sentenceDescription } from "@/lib/seo";
 import styles from "./page.module.css";
@@ -144,7 +145,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     "--brand-soft-head": column.primaryTreatment === "xerf" ? "#fce3df" : "#eee3d8",
     "--brand-soft": column.primaryTreatment === "xerf" ? "#fdf0ee" : "#f2ede6",
     "--brand-highlight": column.primaryTreatment === "xerf" ? "#fbd5cf" : "#eee3d8",
-    "--article-cover-image": `url(${JSON.stringify(column.heroImage || "/uploads/glory-column-editorial-campaign-01.png")})`,
+    "--article-cover-image": `url(${JSON.stringify(getColumnCover(column))})`,
     "--article-overlay": column.heroOverlay ?? "linear-gradient(90deg, rgba(58,48,40,.97) 0%, rgba(58,48,40,.88) 38%, rgba(58,48,40,.45) 70%, rgba(58,48,40,.3) 100%)",
   } as CSSProperties;
   const [titleLead, ...titleRest] = column.title.split(",");
@@ -289,7 +290,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                         return (
                           <div className={styles.legacyFigureObserver} key={`${section.id}-body-${bodyIndex}`} data-detail-reveal-observer>
                             <figure className={styles.legacyFigure} data-detail-reveal="figure">
-                              <div className={styles.legacyFigureMedia}>
+                              <div className={figure.src.endsWith("/director-treatment.jpg") ? `${styles.legacyFigureMedia} ${styles.directorTreatmentMedia}` : styles.legacyFigureMedia}>
                                 <Image src={figure.src} alt={figure.caption} width={size.width} height={size.height} sizes="(max-width: 640px) calc(100vw - 100px), 744px" />
                               </div>
                               <figcaption>그림 {figureNumber}. {figure.caption}</figcaption>

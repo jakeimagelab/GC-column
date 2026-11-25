@@ -45,17 +45,10 @@
 .quickCopy>span { display:inline-flex; padding:7px 11px; background:var(--cover); color:#fff; font-size:11px; font-weight:700; white-space:nowrap; }
 .quickCopy>p { margin:22px 0 28px; font-family:var(--font-magazine); font-size:22px; line-height:1.75; }
 .quickPoints { margin:24px 0 0; padding:0; list-style:none; }
-.quickPoints li { position:relative; margin:0; padding:0 0 20px 20px; font-family:var(--font-magazine); font-size:17px; line-height:1.8; white-space:pre-line; }
+.quickPoints li { position:relative; margin:0; padding:0 0 20px 20px; font-family:var(--font-sans); font-size:17px; line-height:1.8; letter-spacing:-.02em; word-break:keep-all; overflow-wrap:anywhere; text-wrap:pretty; white-space:pre-line; }
 .quickPoints li+li { padding-top:20px; border-top:1px solid var(--line); }
 .quickPoints li::before { position:absolute; top:.78em; left:0; width:5px; height:5px; border-radius:50%; background:var(--brand-strong); content:""; }
 .quickPoints li+li::before { top:calc(20px + .78em); }
-.page[data-column-slug="thermage-vs-ulthera"] .quickPoints li {
-  font-family:var(--font-sans);
-  letter-spacing:-.02em;
-  word-break:keep-all;
-  overflow-wrap:anywhere;
-  text-wrap:pretty;
-}
 .pointTable { border-top:1px solid var(--line); overflow-x:auto; }
 .pointTable>div { min-height:48px; padding:10px 0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:max-content max-content; align-items:center; gap:18px; font-size:13px; }
 .pointTable b { display:flex; align-items:center; gap:9px; white-space:nowrap; }
@@ -85,7 +78,7 @@
 .sectionMarker>span { white-space:nowrap; }
 .sectionMarker>b { margin-bottom:9px; color:var(--brand-label); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.24em; text-transform:uppercase; white-space:nowrap; justify-self:end; }
 .articleSection h2,.judgement h2,.precautions h2 { margin:16px 0 28px; font-family:var(--font-magazine); font-size:38px; font-weight:400; letter-spacing:-.04em; line-height:1.4; white-space:pre-line; }
-.articleSection>p { margin:0 0 24px; font-size:17px; line-height:2; }
+.articleSection>p { margin:0 0 24px; font-size:17px; line-height:1.85; letter-spacing:-.02em; word-break:keep-all; overflow-wrap:anywhere; }
 .page[data-column-slug="ulthera-prime-shots"] .articleSection>p {
   --column-marker-color:#f9e195;
   letter-spacing:-.025em;
@@ -110,6 +103,8 @@
 .legacyFigure { width:100%; margin:40px 0 24px; padding:28px; background:#faf8f5; }
 .legacyFigureMedia { display:flex; justify-content:center; }
 .legacyFigure img { width:auto; max-width:100%; height:auto; display:block; transform:none!important; animation:none!important; }
+.directorTreatmentMedia { aspect-ratio:16/9; overflow:hidden; }
+.directorTreatmentMedia img { width:100%; height:100%; object-fit:cover; object-position:center 60%; }
 .legacyFigure figcaption { margin-top:10px; color:#766e66; font-size:13px; line-height:1.7; }
 .reviewNotes { margin-top:26px; border:1px dashed #ddd7ce; background:#fff; }
 .reviewNotes summary { padding:14px 16px; color:var(--muted); font-size:12px; cursor:pointer; }
@@ -265,10 +260,10 @@
   .sectionMarker>span{font-size:52px;line-height:.9}
   .sectionMarker>b{margin-bottom:5px;font-size:9px;letter-spacing:.24em}
   .articleSection h2,.judgement h2,.precautions h2{margin:18px 0 26px;font-size:26px;line-height:1.5}
-  .articleSection>p{margin:0 0 16px;font-size:16px;line-height:2}
+  .articleSection>p{margin:0 0 16px;font-size:16px;line-height:1.85}
   .reviewNotes{margin-top:40px}
   .imageOnly{width:100vw;margin:0 0 0 calc(50% - 50vw);padding-top:56px}
-  .imageOnlyMedia,.imageOnlyPortrait .imageOnlyMedia{width:100%;aspect-ratio:4/5}
+  .imageOnlyMedia{width:100%;aspect-ratio:16/9}
   .imageOnly figcaption{margin:0;padding:10px 22px 0;font-size:13px;line-height:1.75}
   .imageOnlyObserver+.articleSection{padding-top:56px}
   .tableViewport{margin-top:40px}
