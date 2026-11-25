@@ -831,9 +831,9 @@
   },
   "column.feature.image": {
     "type": "image",
-    "src": "/uploads/glory-column-xerf-hero.jpg",
-    "label": "세르프 칼럼 대표 이미지",
-    "alt": "글로리의원 공간에 놓인 세르프 리프팅 장비",
+    "src": "/uploads/glory-column-feature-light.jpg",
+    "label": "칼럼 메인 특집 배경",
+    "alt": "글로리의원 인테리어의 우드 조명",
     "zoom": 100,
     "focusX": 50,
     "focusY": 50

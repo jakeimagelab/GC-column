@@ -31,10 +31,12 @@ type ColumnDetailPageProps = { params: Promise<{ slug: string }> };
 
 const INLINE_FIGURE_PATTERN = /^!\[([^\]]+)]\(([^)]+)\)$/;
 const INLINE_FIGURE_SIZES: Record<string, { width: number; height: number }> = {
+  "/uploads/columns/ulthera-prime-shots/director-treatment.jpg": { width: 1800, height: 1200 },
   "/uploads/columns/ulthera-prime-shots/figure-1.png": { width: 3600, height: 2200 },
   "/uploads/columns/ulthera-low-volume-face/figure-1.png": { width: 371, height: 434 },
   "/uploads/columns/thermage-vs-ulthera/figure-1.png": { width: 500, height: 561 },
   "/uploads/columns/thermage-vs-ulthera/figure-2.png": { width: 744, height: 525 },
+  "/uploads/columns/thermage-vs-ulthera/director-treatment.jpg": { width: 1800, height: 1200 },
   "/uploads/columns/lifting-cold-compress/figure-1.png": { width: 346, height: 372 },
 };
 
@@ -165,7 +167,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   });
 
   return (
-    <main className={styles.page} style={articleStyle} data-column-detail-page>
+    <main className={styles.page} style={articleStyle} data-column-detail-page data-column-slug={column.slug}>
       <ColumnDetailMotion />
       <ArticleProgress />
       <JsonLd value={structured} />
@@ -176,7 +178,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         <ColumnHeader content={content} variant="overlay" page="detail" />
         <div className={styles.articleCoverInner}>
           <nav className={styles.breadcrumb} aria-label="현재 위치" data-detail-entry="breadcrumb">
-            <Link href="/column">원장 칼럼</Link><span>›</span><span {...textEditProps("column.detail.breadcrumb.concern")}>{getText(content, "column.detail.breadcrumb.concern")}</span><span>›</span><span aria-current="page" {...textEditProps("column.detail.breadcrumb.title")}>{getText(content, "column.detail.breadcrumb.title")}</span>
+            <Link href="/column">원장 칼럼</Link><span>›</span><span {...textEditProps("column.detail.breadcrumb.concern")}>{getText(content, "column.detail.breadcrumb.concern")}</span><span>›</span><span aria-current="page">{column.slug === "ulthera-low-volume-face" ? "울쎄라 볼패임" : <span {...textEditProps("column.detail.breadcrumb.title")}>{getText(content, "column.detail.breadcrumb.title")}</span>}</span>
           </nav>
           <span className={styles.issueLabel} data-detail-entry="issue" {...textEditProps("column.detail.issueLabel")}>{getText(content, "column.detail.issueLabel")}</span>
           <h1 className={styles.desktopHeroTitle}>{titleRest.length ? <><span className={styles.heroTitleLine}><span data-detail-entry="title-1">{titleLead},</span></span><span className={styles.heroTitleLine}><span data-detail-entry="title-2">{titleRest.join(",").trim()}</span></span></> : <span className={styles.heroTitleLine}><span data-detail-entry="title-1">{column.title}</span></span>}</h1>
@@ -390,6 +392,9 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             <div><h2 {...textEditProps("column.detail.share.title")}>{getText(content, "column.detail.share.title")}</h2><p {...textEditProps("column.detail.share.description")}>{getText(content, "column.detail.share.description")}</p></div>
             <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
           </section>
+          <Link className={styles.columnListButton} href="/column/all">
+            <span aria-hidden="true">←</span> 전체 칼럼 보기
+          </Link>
         </article>
 
         <aside className={styles.sidebar}>

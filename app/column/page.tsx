@@ -36,10 +36,7 @@ export default async function ColumnMainPage() {
   const published = getPublishedColumns();
   const featureSlug = getText(content, "column.feature.slug");
   const feature = published.find((column) => column.slug === featureSlug) ?? published[0];
-  const featureFallback = getImage(content, "column.feature.image");
-  const featureImage = feature?.listImage
-    ? { ...featureFallback, src: feature.listImage, alt: `${feature.title} 대표 이미지` }
-    : featureFallback;
+  const featureImage = getImage(content, "column.feature.image");
   const searchColumns: SearchColumn[] = published.map((column) => ({
     slug: column.slug,
     category: getCategory(column.categorySlug)?.name ?? "",
@@ -141,7 +138,7 @@ export default async function ColumnMainPage() {
           </div>
           <div className={styles.featureVisual} data-column-reveal="feature-image">
             <div className={styles.featureImageParallax} data-column-parallax="160">
-              <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId={feature?.listImage ? undefined : "column.feature.image"} image={featureImage} priority sizes="100vw" />
+              <ImageSlot className={styles.featureImage} label="" alt={featureImage.alt} editId="column.feature.image" image={featureImage} priority sizes="100vw" />
             </div>
             <div className={styles.featureShade} aria-hidden="true" />
             <div className={styles.featureTitle} data-column-reveal="feature-title">
