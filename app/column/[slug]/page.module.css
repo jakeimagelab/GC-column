@@ -78,20 +78,15 @@
 .sectionMarker>span { white-space:nowrap; }
 .sectionMarker>b { margin-bottom:9px; color:var(--brand-label); font-family:var(--font-en); font-size:10px; font-weight:500; letter-spacing:.24em; text-transform:uppercase; white-space:nowrap; justify-self:end; }
 .articleSection h2,.judgement h2,.precautions h2 { margin:16px 0 28px; font-family:var(--font-magazine); font-size:38px; font-weight:400; letter-spacing:-.04em; line-height:1.4; white-space:pre-line; }
-.articleSection>p { margin:0 0 24px; font-size:17px; line-height:1.85; letter-spacing:-.02em; word-break:keep-all; overflow-wrap:anywhere; }
+.articleSection>p { margin:0 0 24px; font-family:var(--font-sans); font-size:17px; font-weight:400; line-height:1.85; letter-spacing:-.02em; word-break:keep-all; overflow-wrap:anywhere; }
 .page[data-column-slug="ulthera-prime-shots"] .articleSection>p {
   --column-marker-color:#f9e195;
-  letter-spacing:-.025em;
 }
 .articleSection :global(mark) { padding:0 .1em; color:inherit; }
 .legacySubheading { margin:14px 0 20px; font-family:var(--font-magazine); font-size:24px; font-weight:400; letter-spacing:-.02em; line-height:1.5; }
 .page[data-column-slug="ulthera-low-volume-face"] .articleCover h1 {
   max-width:19em;
   font-size:clamp(32px, 4vw, 56px);
-}
-.page[data-column-slug="ulthera-low-volume-face"] .articleSection>p {
-  line-height:1.85;
-  letter-spacing:-.02em;
 }
 .page[data-column-slug="ulthera-low-volume-face"] .legacySubheading {
   margin:36px 0 14px;
