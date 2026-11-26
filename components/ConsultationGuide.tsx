@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ConsultationAnswers, ConsultationTreatment } from "@/content/consultation-types";
 import { getText, type SiteContent } from "@/content/site-content-types";
 import { formatTreatmentPrice, matchConsultationTreatments } from "@/lib/consultation";
@@ -10,7 +10,6 @@ import styles from "./ConsultationGuide.module.css";
 type ConsultationGuideProps = {
   content: SiteContent;
   treatments: ConsultationTreatment[];
-  reviewRequired: boolean;
 };
 
 const initialAnswers: ConsultationAnswers = {
@@ -42,12 +41,14 @@ const preferenceOptions = [
   { value: "one-visit", label: "한 번의 내원으로 상담받고 싶어요" },
 ];
 
-export function ConsultationGuide({ content, treatments, reviewRequired }: ConsultationGuideProps) {
+export function ConsultationGuide({ content, treatments }: ConsultationGuideProps) {
   const [answers, setAnswers] = useState(initialAnswers);
   const [submitted, setSubmitted] = useState(false);
+  const resultTitle = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { if (submitted) resultTitle.current?.focus(); }, [submitted]);
   const matches = useMemo(() => matchConsultationTreatments(treatments, answers), [answers, treatments]);
   const phone = getText(content, "common.clinic.phone");
-  const kakao = getText(content, "common.quick.kakaoUrl");
+  const kakao = "https://pf.kakao.com/_xkRRPG";
   const complete = Boolean(answers.concern && answers.preference);
 
   const setAnswer = <Key extends keyof ConsultationAnswers>(key: Key, value: ConsultationAnswers[Key]) => {
@@ -57,9 +58,7 @@ export function ConsultationGuide({ content, treatments, reviewRequired }: Consu
 
   return (
     <div className={styles.guide}>
-      {reviewRequired ? <div className={styles.reviewBanner} role="status"><b>내부 검토용</b><span>가격과 시술 정보는 대표원장 검수 후 공개됩니다.</span></div> : null}
-
-      <div className={styles.layout}>
+      <div className={styles.layout} data-show-results={submitted}>
         <form
           className={styles.form}
           onSubmit={(event) => { event.preventDefault(); if (complete) setSubmitted(true); }}
@@ -97,29 +96,27 @@ export function ConsultationGuide({ content, treatments, reviewRequired }: Consu
           </div>
 
           <p className={styles.privacy}>{getText(content, "consultation.form.privacy")}</p>
-          <button className={styles.submit} type="submit" disabled={!complete}>{getText(content, "consultation.form.submit")}</button>
+          <button className={styles.submit} type="submit" disabled={!complete}>비교 정보 보기</button>
         </form>
 
-        <section className={styles.result} aria-live="polite" aria-labelledby="consultation-result-title">
+        {submitted ? <section className={styles.result} aria-live="polite" aria-labelledby="consultation-result-title">
           <div className={styles.resultHeading}>
             <span>RESULT</span>
-            <h2 id="consultation-result-title">{submitted ? getText(content, "consultation.result.title") : getText(content, "consultation.result.waitingTitle")}</h2>
-            <p>{submitted ? getText(content, "consultation.result.description") : getText(content, "consultation.result.waitingDescription")}</p>
+            <h2 id="consultation-result-title" ref={resultTitle} tabIndex={-1}>{getText(content, "consultation.result.title")}</h2>
+            <p>{getText(content, "consultation.result.description")}</p>
           </div>
 
-          {submitted ? <>
             {matches.length ? <div className={styles.cards}>{matches.map((treatment, index) => <article key={treatment.id}>
               <div><span>{String(index + 1).padStart(2, "0")}</span><small>{treatment.category}</small></div>
               <h3>{treatment.name}</h3>
-              <b className={styles.price}>{formatTreatmentPrice(treatment)}</b>
+              {treatment.priceMin !== null && treatment.priceMax !== null ? <b className={styles.price}>{formatTreatmentPrice(treatment)}</b> : null}
               <p>{treatment.effectSummary}</p>
               <dl><div><dt>함께 확인할 점</dt><dd>{treatment.limitSummary}</dd></div><div><dt>주의</dt><dd>{treatment.cautionSummary}</dd></div></dl>
               {treatment.sourceColumnSlugs[0] ? <Link href={`/column/${treatment.sourceColumnSlugs[0]}`}>근거 칼럼 읽기 →</Link> : null}
-            </article>)}</div> : <div className={styles.empty}><b>현재 조건으로 공개 가능한 정보가 부족합니다.</b><p>대표원장 상담에서 피부 탄력과 지방량을 확인해 주세요.</p></div>}
+            </article>)}</div> : <div className={styles.empty}><b>공개된 비교 정보를 준비 중입니다.</b><p>대표원장 상담에서 피부 탄력과 지방량을 확인해 주세요.</p></div>}
             <div className={styles.disclaimer}><b>{getText(content, "consultation.result.noticeTitle")}</b><p>{getText(content, "consultation.result.notice")}</p></div>
             <div className={styles.actions}><a href={`tel:${phone.replace(/[^0-9+]/g, "")}`}>전화 상담</a>{kakao ? <a href={kakao} target="_blank" rel="noopener noreferrer">카카오톡 상담</a> : null}<button type="button" onClick={() => { setAnswers(initialAnswers); setSubmitted(false); }}>다시 입력하기</button></div>
-          </> : <ol className={styles.previewSteps}><li><b>고민과 우선순위</b><span>원하는 변화와 걱정되는 부분을 정리합니다.</span></li><li><b>비교할 선택지</b><span>원장이 검수한 정보 안에서만 보여드립니다.</span></li><li><b>내원 확인</b><span>촬영·촉진·진찰 후 최종 방향이 달라질 수 있습니다.</span></li></ol>}
-        </section>
+        </section> : null}
       </div>
     </div>
   );

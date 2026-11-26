@@ -104,7 +104,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
     const target = document.getElementById(id);
     if (!target) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isVisualEditingMode();
-    const offset = mobileBar ? 127 : 24;
+    const offset = mobileBar ? 127 : 96;
     window.history.replaceState(null, "", `#${id}`);
     window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: reduceMotion ? "auto" : "smooth" });
     setActiveId(id);
@@ -117,7 +117,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
       <div className={styles.mobileToc}>
         <span className={styles.progress} aria-hidden="true"><i ref={progressRef} /></span>
         <button type="button" aria-expanded={open} aria-controls="mobile-column-toc" onClick={() => setOpen((value) => !value)}>
-          <span>목차</span><b>{activeLabel}</b><ChevronDownIcon aria-hidden="true" />
+          <span>목차 보기</span><b>{activeLabel}</b><ChevronDownIcon aria-hidden="true" />
         </button>
         <nav id="mobile-column-toc" className={open ? styles.mobileSheetOpen : styles.mobileSheet} aria-label="이 글의 목차">
           {items.map((item) => (

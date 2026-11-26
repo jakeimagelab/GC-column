@@ -156,7 +156,7 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
               <header>
                 <b>{selectedGroup.name}</b>
                 <div className={styles.panelHeaderLinks}>
-                  <Link href={getTreatmentCategoryPath(selectedGroup.slug)} onClick={closePanel}>{selectedGroup.name} 전체 보기 →</Link>
+                  <Link href={getTreatmentCategoryPath(selectedGroup.slug)} onClick={closePanel}>{selectedGroup.name} 칼럼 전체 보기 →</Link>
                   <span>{selectedGroup.nameEn}</span>
                 </div>
               </header>

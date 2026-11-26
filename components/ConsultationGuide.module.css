@@ -48,6 +48,9 @@
 .empty { margin-top: 28px; padding: 28px; background: var(--paper); }
 .empty p { margin: 5px 0 0; color: var(--muted); }
 
+
+.layout[data-show-results="false"] { grid-template-columns:minmax(0, 740px); }
+.resultHeading h2 { scroll-margin-top:100px; }
 @media (prefers-reduced-motion: reduce) { .optionGrid span { transition: none; } }
 @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } .result { position: static; min-height: 0; } }
 @media (max-width: 640px) {

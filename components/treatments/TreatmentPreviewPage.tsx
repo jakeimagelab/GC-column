@@ -36,7 +36,7 @@ export function TreatmentPreviewPage({ treatment, categoryName, content }: { tre
             <strong>{treatment.desc}</strong>
             <span>상세 시술 안내는 원장 검수 후 순차 공개됩니다.</span>
             <div className={styles.actions}>
-              <Link href="/consultation">상담 예약</Link>
+              <Link href="/consultation">내원 전 가이드</Link>
               <Link href="tel:0269587525">{phone}</Link>
             </div>
           </div>

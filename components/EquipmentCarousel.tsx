@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { getText, type EquipmentContentItem, type SiteContent } from "@/content/site-content-types";
+import { getTreatment, isTreatmentPageVisible } from "@/content/treatments";
+import { getTreatmentDetail } from "@/content/treatments/index";
 import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
@@ -13,23 +15,24 @@ type EquipmentAction = "add" | "delete" | "moveBefore" | "moveAfter";
 
 type EquipmentCardProps = {
   item: EquipmentContentItem;
-  content: SiteContent;
   duplicate?: boolean;
   editMode?: boolean;
   onEdit?: (action: EquipmentAction, itemId: string) => void;
   itemCount: number;
 };
 
-function EquipmentCard({ item, content, duplicate = false, editMode = false, onEdit, itemCount }: EquipmentCardProps) {
+function EquipmentCard({ item, duplicate = false, editMode = false, onEdit, itemCount }: EquipmentCardProps) {
   const editPrefix = `home.equipment.items.${item.id}`;
-  const detailPath = item.link.trim();
+  const treatment = getTreatment(item.id);
+  const detailPath = treatment && isTreatmentPageVisible(treatment.slug) && getTreatmentDetail(treatment.categorySlug, treatment.slug) ? treatment.detailPath : "";
+  const relatedPath = treatment ? `/column/all?treatment=${encodeURIComponent(treatment.slug)}` : "";
   const cardContent = <>
     <div className={styles.imageWrap}>
       <ImageSlot className={styles.equipmentSlot} label="" alt="" editId={duplicate ? undefined : `${editPrefix}.image`} image={item.image} />
     </div>
     <b>{duplicate ? item.name : <EditableRichText id={`${editPrefix}.name`} value={item.name} />}</b>
     <span>{duplicate ? item.desc : <EditableRichText id={`${editPrefix}.desc`} value={item.desc} />}</span>
-    {detailPath ? <small {...(!duplicate ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : {})}>{getText(content, "home.equipment.related")}</small> : null}
+    {detailPath ? <small {...(!duplicate ? { "data-edit-id": "home.equipment.related", "data-edit-type": "text" } : {})}>시술 안내 보기 →</small> : null}
   </>;
 
   return (
@@ -44,6 +47,7 @@ function EquipmentCard({ item, content, duplicate = false, editMode = false, onE
       {detailPath
         ? <Link href={detailPath} tabIndex={duplicate ? -1 : undefined}>{cardContent}</Link>
         : <div className={styles.disabledCard} role="link" aria-disabled="true">{cardContent}</div>}
+      {!duplicate && relatedPath ? <Link className={styles.relatedLink} href={relatedPath}>관련 칼럼 읽기 →</Link> : null}
       {editMode && onEdit ? (
         <div className={styles.editControls} data-dev-editor>
           <button type="button" data-edit-control onClick={() => onEdit("add", item.id)}>+ 장비 추가</button>
@@ -77,7 +81,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   const normalizedEditIndex = items.length ? ((virtualIndex % items.length) + items.length) % items.length : 0;
   const renderedEditItems = canRotate ? [items, items, items].flat() : items;
-  const renderedManualItems = canRotate ? [items, items].flat() : items;
+  const renderedManualItems = items;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -142,9 +146,9 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     const loopPosition = loopWidth > 0 ? viewport.scrollLeft % loopWidth : viewport.scrollLeft;
     const index = cardStep ? Math.round(loopPosition / cardStep) % Math.max(items.length, 1) : 0;
     setDisplayIndex((current) => current === index ? current : index);
-    setCanScrollPrev(canRotate || viewport.scrollLeft > 2);
-    setCanScrollNext(canRotate || viewport.scrollLeft < Math.max(0, viewport.scrollWidth - viewport.clientWidth) - 2);
-  }, [canRotate, editMode, items.length]);
+    setCanScrollPrev(viewport.scrollLeft > 2);
+    setCanScrollNext(viewport.scrollLeft < Math.max(0, viewport.scrollWidth - viewport.clientWidth) - 2);
+  }, [editMode, items.length]);
 
   useEffect(() => {
     if (editMode) return;
@@ -161,32 +165,6 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
       window.cancelAnimationFrame(frame);
     };
   }, [editMode, items.length, updateManualPosition]);
-
-  useEffect(() => {
-    if (editMode || reducedMotion || dragging || !canRotate) return;
-    const viewport = viewportRef.current;
-    const track = trackRef.current;
-    if (!viewport || !track) return;
-    let frame = 0;
-    let position = viewport.scrollLeft;
-    let previous = performance.now();
-    const startAt = performance.now() + 700;
-    const rotate = (time: number) => {
-      const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
-      const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
-      if (time < autoPauseUntilRef.current) {
-        position = viewport.scrollLeft;
-      } else if (time >= startAt && loopWidth > 0) {
-        position += Math.min(Math.max(time - previous, 0), 40) * 0.06;
-        if (position >= loopWidth) position %= loopWidth;
-        viewport.scrollLeft = Math.floor(position);
-      }
-      previous = time;
-      frame = window.requestAnimationFrame(rotate);
-    };
-    frame = window.requestAnimationFrame(rotate);
-    return () => window.cancelAnimationFrame(frame);
-  }, [canRotate, dragging, editMode, items.length, reducedMotion]);
 
   const moveEdit = useCallback((delta: number) => {
     if (!canRotate || transitioning) return;
@@ -285,7 +263,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         </div>
       </div>
       <div
-        className={`${styles.viewport} ${!editMode && canRotate ? styles.viewportAuto : ""} ${dragging ? styles.viewportDragging : ""}`}
+        className={`${styles.viewport} ${""} ${dragging ? styles.viewportDragging : ""}`}
         ref={viewportRef}
         data-scroll-world-layer="depth"
         onScroll={updateManualPosition}
@@ -307,12 +285,12 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
           >
             {renderedEditItems.map((item, renderedIndex) => {
               const editableCopy = !canRotate || (renderedIndex >= items.length && renderedIndex < items.length * 2);
-              return <EquipmentCard item={item} content={content} editMode={editableCopy} onEdit={editEquipment} itemCount={items.length} key={`${renderedIndex}-${item.id}`} />;
+              return <EquipmentCard item={item} editMode={editableCopy} onEdit={editEquipment} itemCount={items.length} key={`${renderedIndex}-${item.id}`} />;
             })}
           </div>
         ) : (
           <div ref={trackRef} className={`${styles.track} ${styles.manualTrack}`}>
-            {renderedManualItems.map((item, renderedIndex) => <EquipmentCard item={item} content={content} itemCount={items.length} duplicate={renderedIndex >= items.length} key={`${renderedIndex}-${item.id}`} />)}
+            {renderedManualItems.map((item, renderedIndex) => <EquipmentCard item={item} itemCount={items.length} duplicate={renderedIndex >= items.length} key={`${renderedIndex}-${item.id}`} />)}
           </div>
         )}
       </div>

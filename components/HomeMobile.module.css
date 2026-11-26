@@ -19,6 +19,8 @@
   word-break: keep-all;
 }
 
+.equipmentAction { display:flex; align-items:center; min-height:44px; font-size:13px; }
+
 .mobileHome p,
 .mobileHome h1,
 .mobileHome h2 { text-wrap: pretty; }

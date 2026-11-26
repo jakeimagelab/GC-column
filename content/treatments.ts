@@ -140,6 +140,5 @@ export function getTreatment(slug: string) {
 }
 
 export function getTreatmentCategoryPath(categorySlug: Category["slug"]) {
-  const firstSlug = megaMenuTreatmentOrder[categorySlug][0];
-  return firstSlug ? `/treatments/${categorySlug}/${firstSlug}` : `/column/category/${categorySlug}`;
+  return `/column/category/${categorySlug}`;
 }

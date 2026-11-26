@@ -22,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ConsultationPage() {
   const [content, guide] = await Promise.all([readSiteContent(), readConsultationGuide()]);
 
+  const publicTreatments = guide.status === "published"
+    ? guide.treatments.filter((treatment) => Boolean(treatment.doctorApprovedAt))
+    : [];
+
   return (
     <main className="pageFrame">
       <ColumnHeader content={content} page="detail" />
@@ -29,9 +33,9 @@ export default async function ConsultationPage() {
         <span>PRE-VISIT GUIDE</span>
         <h1>{getText(content, "consultation.hero.title")}</h1>
         <p>{getText(content, "consultation.hero.description")}</p>
-        <div><b>정보 제공</b><span>진단·처방 아님</span><span>입력 내용 저장 안 함</span></div>
+        <p>정보 제공용이며 입력 내용은 저장하지 않습니다.</p>
       </section>
-      <ConsultationGuide content={content} treatments={guide.treatments} reviewRequired={guide.status !== "published"} />
+      <ConsultationGuide content={content} treatments={publicTreatments} />
       <ColumnFooter content={content} />
       <FloatingQuickMenu content={content} compact />
     </main>

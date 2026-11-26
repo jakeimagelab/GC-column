@@ -118,7 +118,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   const hasPrecautions = column.precautions.length > 0;
   const tocItems: TocItem[] = [
     { id: "a30", label: "핵심 요약" },
-    ...(column.shortAnswer ? [{ id: "ans", label: "한 줄 답 · 차이는 깊이" }] : []),
+    ...(column.shortAnswer ? [{ id: "ans", label: column.shortAnswer.title.replace(/\n/g, " ") }] : []),
     ...column.sections.flatMap((section) => section.kind === "image"
       ? []
       : [{ id: section.id, label: `${section.no} ${section.heading.replace(/\n/g, " ")}` }]),
@@ -127,7 +127,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
     { id: "qa", label: column.faqTitle ?? "자주 묻는 질문" },
   ];
   const rawFaqItems: FaqListItem[] = [
-    ...column.faqs.flatMap((faq, index) => faq.a.trim() && (showReview || !faq.needsReview) ? [{ ...faq, id: `faq-${index + 1}` }] : []),
+    ...column.faqs.flatMap((faq, index) => faq.a.trim() && (showReview || (!faq.needsReview && !faq.a.includes('[원장 확인]'))) ? [{ ...faq, id: `faq-${index + 1}` }] : []),
     ...readerQuestions.flatMap((question) => question.answer ? [{ q: question.question, a: question.answer, id: `reader-${question.id}` }] : []),
   ];
   const seenQuestions = new Set<string>();
@@ -172,14 +172,14 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
       <ColumnDetailMotion />
       <ArticleProgress />
       <JsonLd value={structured} />
-      <ArticleToc items={tocItems} title={getText(content, "column.detail.toc.eyebrow")} mobileBar />
+      <ArticleToc items={tocItems.filter((item) => item.id !== "qa" || faqItems.length > 0)} title={getText(content, "column.detail.toc.eyebrow")} mobileBar />
 
       <section className={styles.articleCover} data-detail-hero>
         <div className={styles.articleCoverMedia} aria-hidden="true" />
         <ColumnHeader content={content} variant="overlay" page="detail" />
         <div className={styles.articleCoverInner}>
           <nav className={styles.breadcrumb} aria-label="현재 위치" data-detail-entry="breadcrumb">
-            <Link href="/column">원장 칼럼</Link><span>›</span><span {...textEditProps("column.detail.breadcrumb.concern")}>{getText(content, "column.detail.breadcrumb.concern")}</span><span>›</span><span aria-current="page">{column.slug === "ulthera-low-volume-face" ? "울쎄라 볼패임" : <span {...textEditProps("column.detail.breadcrumb.title")}>{getText(content, "column.detail.breadcrumb.title")}</span>}</span>
+            <Link href="/column">원장 칼럼</Link><span>›</span><span>{category.name}</span><span>›</span><span aria-current="page">{column.title}</span>
           </nav>
           <span className={styles.issueLabel} data-detail-entry="issue" {...textEditProps("column.detail.issueLabel")}>{getText(content, "column.detail.issueLabel")}</span>
           <h1 className={styles.desktopHeroTitle}>{titleRest.length ? <><span className={styles.heroTitleLine}><span data-detail-entry="title-1">{titleLead},</span></span><span className={styles.heroTitleLine}><span data-detail-entry="title-2">{titleRest.join(",").trim()}</span></span></> : <span className={styles.heroTitleLine}><span data-detail-entry="title-1">{column.title}</span></span>}</h1>
@@ -199,22 +199,12 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
                 </span>
               </div>
             </div>
-            <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} variant="dark" />
           </div>
         </div>
       </section>
 
       <div className={styles.bodyLayout}>
         <article className={styles.article} data-article-body>
-          <nav className={styles.depthNav} aria-label={getText(content, "column.detail.depthLabel")} data-detail-reveal="up">
-            <span {...textEditProps("column.detail.depthLabel")}>{getText(content, "column.detail.depthLabel")}</span>
-            <div>
-              <a className={styles.depthActive} href="#a30">30초 · 핵심 답</a>
-              <a href="#difference">3분 · 차이와 기준</a>
-              <a href="#xerf-alone">전체 · 원장 판단</a>
-            </div>
-          </nav>
-
           <section className={`${styles.quickAnswer} ${column.video?.src || showReview ? styles.quickAnswerWithMedia : ""}`} id="a30" data-detail-reveal="up">
             {column.video?.src ? (
               <div className={styles.videoColumn}>
@@ -374,25 +364,10 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
             </section>
           ) : null}
 
-          {readNext.length ? (
-            <section className={styles.readNext} aria-labelledby="read-next-title" data-detail-reveal="up">
-              <span>READ NEXT</span>
-              <h2 id="read-next-title">함께 읽으면 좋은 글</h2>
-              <div>
-                {readNext.map((item) => (
-                  <Link href={`/column/${item.slug}`} key={item.slug}>
-                    <small>{item.label}</small>
-                    <b>{item.title}</b>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          <section className={styles.shareBox} id="share-actions" data-detail-reveal="up">
-            <div><h2 {...textEditProps("column.detail.share.title")}>{getText(content, "column.detail.share.title")}</h2><p {...textEditProps("column.detail.share.description")}>{getText(content, "column.detail.share.description")}</p></div>
+          <details className={styles.shareDisclosure} id="share-actions">
+            <summary>공유·저장</summary>
             <ShareButtons content={content} title={column.title} summary={column.summary} url={pageUrl} image={`${pageUrl}/opengraph-image`} kakaoKey={process.env.NEXT_PUBLIC_KAKAO_JS_KEY ?? ""} />
-          </section>
+          </details>
           <Link className={styles.columnListButton} href="/column/all">
             <span aria-hidden="true">←</span> 전체 칼럼 보기
           </Link>
@@ -400,8 +375,8 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
         <aside className={styles.sidebar}>
           <div className={styles.stickySidebar}>
-            <ArticleToc items={tocItems} title={getText(content, "column.detail.toc.eyebrow")} />
-            <div id="ask-doctor"><QuestionForm content={content} columnSlug={column.slug} sidebar idSuffix="desktop" /></div>
+            <ArticleToc items={tocItems.filter((item) => item.id !== "qa" || faqItems.length > 0)} title={getText(content, "column.detail.toc.eyebrow")} />
+
           </div>
         </aside>
       </div>
@@ -416,10 +391,27 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
         </section>
       ) : null}
 
-      <section className={styles.mobileQuestionForm} id="ask-doctor-mobile">
-        <span>ASK THE DOCTOR</span>
-        <QuestionForm content={content} columnSlug={column.slug} sidebar idSuffix="mobile" />
+      <section className={styles.articleQuestionForm} id="ask-doctor">
+        <details id="ask-doctor-mobile">
+          <summary>원장에게 질문하기</summary>
+          <QuestionForm content={content} columnSlug={column.slug} idSuffix="article" />
+        </details>
       </section>
+
+      {readNext.length ? (
+        <section className={styles.readNext} aria-labelledby="read-next-title" data-detail-reveal="up">
+          <span>READ NEXT</span>
+          <h2 id="read-next-title">함께 읽으면 좋은 글</h2>
+          <div>
+            {readNext.map((item) => (
+              <Link href={`/column/${item.slug}`} key={item.slug}>
+                <small>{item.label}</small>
+                <b>{item.title}</b>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className={styles.visitPrep} data-detail-reveal="visit">
         <div className={styles.visitHeading}><span {...textEditProps("column.detail.visit.eyebrow")}>{getText(content, "column.detail.visit.eyebrow")}</span><h2 {...textEditProps("column.detail.visit.title")}>{getText(content, "column.detail.visit.title")}</h2></div>
@@ -440,14 +432,14 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
           <h2 {...textEditProps("column.detail.related.title")}>{getText(content, "column.detail.related.title")}</h2>
           <div className={styles.relatedChips}>{relatedTreatments.map((treatment) => { const color = relatedColor(treatment.slug, treatment.brandColor); return <Link href={treatment.detailPath} key={treatment.slug} style={{ borderColor: color }}><i style={{ background: color }} />{treatment.name} →</Link>; })}</div>
         </div>
-        <div className={styles.relatedConsult}><p {...textEditProps("column.detail.related.consult")}><span>{relatedConsultLead}</span>{relatedConsultRest ? <><br className={styles.mobileConsultBreak} /><span className={styles.desktopConsultSpace}> </span><span>{relatedConsultRest}</span></> : null}</p><div className={styles.relatedActions}><a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer">{getText(content, "column.consult.kakao")}</a><a href="tel:0269587525">02-6958-7525</a></div></div>
+        <div className={styles.relatedConsult}><p {...textEditProps("column.detail.related.consult")}><span>{relatedConsultLead}</span>{relatedConsultRest ? <><br className={styles.mobileConsultBreak} /><span className={styles.desktopConsultSpace}> </span><span>{relatedConsultRest}</span></> : null}</p><div className={styles.relatedActions}><a href={"https://pf.kakao.com/_xkRRPG"} target="_blank" rel="noopener noreferrer">{getText(content, "column.consult.kakao")}</a><a href="tel:0269587525">02-6958-7525</a></div></div>
       </section>
 
       <ColumnFooter content={content} legal={getText(content, "column.detail.legal")} />
       <nav className={styles.mobileBottomBar} aria-label="칼럼 빠른 메뉴" data-mobile-bottom-bar="phone">
         <a href="#share-actions">공유</a>
         <a href="#ask-doctor-mobile">질문하기</a>
-        <a href={getText(content, "home.location.kakaoUrl") || "/consultation"} target="_blank" rel="noopener noreferrer"><ChatBubbleLeftEllipsisIcon aria-hidden="true" />카카오톡 상담</a>
+        <a href={"https://pf.kakao.com/_xkRRPG"} target="_blank" rel="noopener noreferrer"><ChatBubbleLeftEllipsisIcon aria-hidden="true" />카카오톡 상담</a>
       </nav>
       <DevEditorMount page="column" content={content} />
     </main>

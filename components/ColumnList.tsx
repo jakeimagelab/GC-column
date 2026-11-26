@@ -2,15 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { getConcernItems, getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import type { Column } from "@/content/types";
 import { getCategory } from "@/content/treatments";
 import { getColumnCover } from "@/lib/column-cover";
+import { concernKeys, filterColumns } from "@/lib/column-filters";
 import { MotionGroup } from "./motion/MotionGroup";
 import styles from "./ColumnList.module.css";
-
-const concernKeys = ["sagging", "jawline", "pigment", "pores", "regeneration", "wrinkle"] as const;
 
 function ArticleCard({ column, editorial = false }: { column: Column; editorial?: boolean }) {
   const category = getCategory(column.categorySlug);
@@ -26,7 +24,7 @@ function ArticleCard({ column, editorial = false }: { column: Column; editorial?
         <span className={styles.category}>{category?.name ?? "칼럼"} · 비교</span>
         <h3><Link href={`/column/${column.slug}`}><span className={styles.desktopTitle}>{column.title}</span><span className={styles.mobileTitle}>{mobileTitle.map((line) => <span key={line}>{line}</span>)}</span></Link></h3>
         <p><b>핵심 답 —</b> {column.summary}</p>
-        <small>READ {String(column.readMinutes).padStart(2, "0")} MIN</small>
+        <small>{column.readMinutes}분 읽기</small>
       </div>
     </article>
   );
@@ -36,46 +34,44 @@ type ColumnListProps = {
   columns: Column[];
   content?: SiteContent;
   concernMode?: boolean;
+  activeConcern?: (typeof concernKeys)[number];
 };
 
-export function ColumnList({ columns, content, concernMode = false }: ColumnListProps) {
-  const [activeConcern, setActiveConcern] = useState<(typeof concernKeys)[number]>("sagging");
-  const activeColumns = columns.filter((column) => column.concerns.includes(activeConcern));
+export function ColumnList({ columns, content, concernMode = false, activeConcern = "sagging" }: ColumnListProps) {
+  const activeColumns = filterColumns(columns, "", activeConcern, "");
 
   if (concernMode && content) {
     const concerns = getConcernItems(content);
     return (
-      <section className={styles.concernExplorer} aria-labelledby="concern-list-title" data-column-section-motion="concerns">
+      <section id="concerns" className={styles.concernExplorer} aria-labelledby="concern-list-title" data-column-section-motion="concerns">
         <aside className={styles.concernRail}>
           <span className={styles.eyebrow} {...textEditProps("column.concerns.eyebrow")}>{getText(content, "column.concerns.eyebrow")}</span>
           <h2 id="concern-list-title" {...textEditProps("column.concerns.title")}>{getText(content, "column.concerns.title")}</h2>
-          <div className={styles.concernButtons} role="tablist" aria-label="피부 고민">
+          <nav className={styles.concernButtons} aria-label="피부 고민">
             {concerns.map((concern, index) => {
               const key = concernKeys[index];
               const selected = activeConcern === key;
               return (
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={selected}
+                <Link
+                  href={`/column?concern=${key}#concerns`}
+                  aria-current={selected ? "true" : undefined}
                   className={selected ? styles.activeConcern : ""}
-                  onClick={() => setActiveConcern(key)}
                   key={concern.num}
                   data-column-stagger-item
                 >
                   <span {...textEditProps(`home.concern.items.${concern.num}.num`)}>{concern.num}</span>
                   <span><b {...textEditProps(`home.concern.items.${concern.num}.name`)}>{concern.name}</b><small {...textEditProps(`home.concern.items.${concern.num}.desc`)}>{concern.desc}</small></span>
                   <i aria-hidden="true">→</i>
-                </button>
+                </Link>
               );
             })}
-          </div>
+          </nav>
         </aside>
 
-        <div className={styles.concernResults} role="tabpanel">
+        <div className={styles.concernResults}>
           <header>
-            <b>{concerns[concernKeys.indexOf(activeConcern)]?.name} 칼럼</b>
-            <Link href={concerns[concernKeys.indexOf(activeConcern)]?.link || "/column"}>고민 페이지 →</Link>
+            <b>{concerns[concernKeys.indexOf(activeConcern)]?.name} 칼럼 · {activeColumns.length}건</b>
+            <Link href={activeColumns.length ? `/column/all?${new URLSearchParams({ concern: activeConcern, label: concerns[concernKeys.indexOf(activeConcern)]?.name ?? "" })}` : "/column/all"}>{activeColumns.length ? "이 고민의 칼럼 전체 보기 →" : "전체 칼럼 보기 →"}</Link>
           </header>
           {activeColumns.length ? (
             <MotionGroup className={styles.editorialList} scrollWorldLayer="depth">

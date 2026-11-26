@@ -122,7 +122,7 @@ export function TreatmentHero({ hero, categoryName, categoryPath, accent, accent
             {chips.map((chip) => <span key={chip.label}><b>{chip.label}</b>{chip.needsReview ? <i>[원장 확인]</i> : <i>{chip.value}</i>}</span>)}
           </div> : null}
           <div className={styles.actions} data-hero-item style={{ "--hero-delay": ".64s" } as CSSProperties}>
-            <Link href="/consultation">원장 1:1 상담 예약</Link>
+            <Link href="/consultation">내원 전 가이드</Link>
             <a href={kakaoUrl} target="_blank" rel="noreferrer">카카오톡 상담</a>
           </div>
         </div>

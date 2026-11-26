@@ -16,6 +16,10 @@
 .mobileTitle { display: none; }
 .mobileTitle > span { display: block; }
 
+
+.card .imageLink,.editorialCard .imageLink { min-height:0; height:auto; aspect-ratio:16/9; }
+.card h3,.editorialCard h3,.card p,.editorialCard p { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.card h3,.editorialCard h3 { font-size:clamp(17px,2vw,22px); line-height:1.45; }
 .concernExplorer {
   width: min(1180px, calc(100% - 48px));
   margin: 0 auto;
@@ -28,9 +32,9 @@
 .eyebrow { color: #766e66; font-family: var(--font-en); font-size: 10px; font-weight: 500; letter-spacing: .28em; white-space: nowrap; }
 .concernRail h2 { margin: 14px 0 34px; font-family: var(--font-magazine); font-size: 38px; font-weight: 400; letter-spacing: -.03em; line-height: 1.25; }
 .concernButtons { border-top: 1px solid #ddd7ce; }
-.concernButtons button { width: 100%; min-height: 78px; padding: 13px 12px; border: 0; border-bottom: 1px solid #ddd7ce; background: transparent; color: #3a3028; display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 8px; text-align: left; cursor: pointer; }
-.concernButtons button > span:first-child { color: #8c7b6b; font-family: var(--font-en); font-size: 11px; }
-.concernButtons button > span:nth-child(2) { display: flex; flex-direction: column; gap: 3px; }
+.concernButtons a { width: 100%; min-height: 78px; padding: 13px 12px; border: 0; border-bottom: 1px solid #ddd7ce; background: transparent; color: #3a3028; display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 8px; text-align: left; cursor: pointer; }
+.concernButtons a > span:first-child { color: #8c7b6b; font-family: var(--font-en); font-size: 11px; }
+.concernButtons a > span:nth-child(2) { display: flex; flex-direction: column; gap: 3px; }
 .concernButtons b { font-size: 15px; font-weight: 700; }
 .concernButtons small { color: #766e66; font-size: 11px; }
 .concernButtons i { font-style: normal; }
@@ -52,14 +56,14 @@
   .grid { grid-template-columns: 1fr 1fr; }
   .concernExplorer { grid-template-columns: 1fr; gap: 42px; }
   .concernButtons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .concernButtons button:nth-child(odd) { border-right: 1px solid #ddd7ce; }
+  .concernButtons a:nth-child(odd) { border-right: 1px solid #ddd7ce; }
 }
 
 @media (max-width: 640px) {
   .grid { grid-template-columns: 1fr; }
   .concernExplorer { width: calc(100% - 40px); padding: 72px 0 82px; }
   .concernRail h2 { margin-bottom: 24px; font-size: 34px; }
-  .concernButtons button { min-height: 92px; grid-template-columns: 28px 1fr; }
+  .concernButtons a { min-height: 92px; grid-template-columns: 28px 1fr; }
   .concernButtons i { display: none; }
   .concernButtons small { font-size: 10px; line-height: 1.45; }
   .editorialCard { grid-template-columns: 112px minmax(0, 1fr); gap: 16px; }
@@ -76,10 +80,10 @@
   .eyebrow { color: rgba(255, 255, 255, .62); font-size: 9px; letter-spacing: .3em; }
   .concernRail h2 { margin: 14px 0 26px; color: #fff; font-size: 30px; }
   .concernButtons { border-top-color: rgba(255, 255, 255, .2); }
-  .concernButtons button { min-height: 73px; padding: 11px 10px; border-bottom-color: rgba(255, 255, 255, .2); color: #fff; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; }
-  .concernButtons button:nth-child(odd) { border-right-color: rgba(255, 255, 255, .2); }
-  .concernButtons button > span:first-child { color: rgba(255, 255, 255, .62); font-family: Georgia, serif; font-size: 11px; line-height: 1; }
-  .concernButtons button > span:nth-child(2) { gap: 2px; }
+  .concernButtons a { min-height: 73px; padding: 11px 10px; border-bottom-color: rgba(255, 255, 255, .2); color: #fff; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; }
+  .concernButtons a:nth-child(odd) { border-right-color: rgba(255, 255, 255, .2); }
+  .concernButtons a > span:first-child { color: rgba(255, 255, 255, .62); font-family: Georgia, serif; font-size: 11px; line-height: 1; }
+  .concernButtons a > span:nth-child(2) { gap: 2px; }
   .concernButtons b { font-size: 13px; font-weight: 500; }
   .concernButtons small { color: rgba(255, 255, 255, .62); font-size: 10px; line-height: 1.35; }
   .concernButtons .activeConcern { background: rgba(255, 255, 255, .08); }
@@ -129,3 +133,5 @@
   .concernExplorer[data-column-motion-ready] [data-column-stagger-item] { opacity:1; transform:none; transition:none; }
 }
 :global(body.devEditActive) .concernExplorer[data-column-motion-ready] * { opacity:1!important; transform:none!important; transition:none!important; }
+
+.concernExplorer { scroll-margin-top: 110px; }

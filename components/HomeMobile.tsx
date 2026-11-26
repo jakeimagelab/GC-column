@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { FormEvent, KeyboardEvent, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getConcernItems, getEquipmentItems, getHeroSlides, getImage, getText, getTypingExamples, getVisionPrinciples, type SiteContent } from "@/content/site-content-types";
+import { getTreatment, isTreatmentPageVisible } from "@/content/treatments";
+import { getTreatmentDetail } from "@/content/treatments/index";
 import { ClinicOpenStatus } from "./ClinicOpenStatus";
+import { FooterPolicyLinks } from "./FooterPolicyLinks";
 import { ColumnHeader } from "./ColumnHeader";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
 import type { HomeSearchColumn } from "./HomeQuestionSearch";
@@ -614,10 +617,16 @@ export function HomeMobile({
       <section className={styles.section} id="mobile-equipment">
         <div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Equipment</span><h2 className={styles.sectionTitle}>글로리의원 <b>보유 장비</b></h2></div><span className={styles.equipmentHint}>옆으로 넘겨보세요 →</span></div>
         <div className={`${styles.horizontalRow} ${styles.equipmentRow}`}>
-          {equipment.map((item, index) => <Link className={styles.equipmentCard} href={item.link} data-rv style={delay(index * .05)} key={item.id}>
-            <span className={styles.equipmentImage}><Image src={item.image.src || `/uploads/glory-equipment-${item.id}.png`} alt={item.image.alt || item.name} fill sizes="42vw" /></span>
-            <b>{item.name}</b><span>{item.desc}</span>
-          </Link>)}
+          {equipment.map((item, index) => {
+            const treatment = getTreatment(item.id);
+            const detail = treatment && isTreatmentPageVisible(treatment.slug) && getTreatmentDetail(treatment.categorySlug, treatment.slug);
+            return <article className={styles.equipmentCard} data-rv style={delay(index * .05)} key={item.id}>
+              <span className={styles.equipmentImage}><Image src={item.image.src || `/uploads/glory-equipment-${item.id}.png`} alt={item.image.alt || item.name} fill sizes="42vw" /></span>
+              <b>{item.name}</b><span>{item.desc}</span>
+              {treatment && detail ? <Link className={styles.equipmentAction} href={treatment.detailPath}>시술 안내 보기 →</Link> : null}
+              {treatment ? <Link className={styles.equipmentAction} href={`/column/all?treatment=${treatment.slug}`}>관련 칼럼 읽기 →</Link> : null}
+            </article>;
+          })}
         </div>
       </section>
 
@@ -653,20 +662,20 @@ export function HomeMobile({
         </dl>
         <div className={styles.mapButtons}><a className={styles.outlineButton} href={naverUrl} target="_blank" rel="noopener noreferrer">네이버 지도</a><a className={styles.outlineButton} href={kakaoMapUrl} target="_blank" rel="noopener noreferrer">카카오맵</a><a className={styles.outlineButton} href={googleUrl} target="_blank" rel="noopener noreferrer">구글 지도</a></div>
         <p className={styles.consultPromise}>상담부터 시술까지,<br /><b>대표원장이 직접 진행합니다</b></p>
-        {consultKakaoUrl ? <a className={`${styles.primaryButton} ${styles.consultButton}`} href={consultKakaoUrl} target="_blank" rel="noopener noreferrer">카카오톡으로 상담하기</a> : null}
+        {consultKakaoUrl ? <a className={`${styles.primaryButton} ${styles.consultButton}`} href={consultKakaoUrl} target="_blank" rel="noopener noreferrer">카카오톡 상담</a> : null}
       </section>
 
       <footer className={styles.footer}>
         <b>G 글로리의원</b>
         <p>서울 강남구 봉은사로 207, KJ빌딩 3층 · 대표원장 이호 · {phone}</p>
-        <p><Link href="/privacy">개인정보처리방침</Link> · <Link href="/non-covered">비급여 진료비 안내</Link> · <Link href="/column">원장 칼럼</Link></p>
+        <FooterPolicyLinks content={content} /><p><Link href="/column">원장 칼럼</Link></p>
         <p className={styles.notice}>시술 결과는 개인에 따라 다를 수 있으며,<br />부작용이 발생할 수 있습니다.</p>
       </footer>
 
       <nav ref={bottomBarRef} className={`${styles.fixedBar} ${styles.bottomBar}`} aria-label="모바일 빠른 상담" data-mobile-bottom-bar="phone">
         <a className={styles.phoneLink} href={phoneHref}><ClinicOpenStatus content={content} /><b>전화</b></a>
         <a href="#mobile-location">오시는길</a>
-        {consultKakaoUrl ? <a href={consultKakaoUrl} target="_blank" rel="noopener noreferrer">카톡 상담</a> : <a href="#mobile-question">질문하기</a>}
+        {consultKakaoUrl ? <a href={consultKakaoUrl} target="_blank" rel="noopener noreferrer">카카오톡 상담</a> : <a href="#mobile-question">질문하기</a>}
       </nav>
     </div>
   );

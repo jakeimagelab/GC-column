@@ -75,7 +75,7 @@ function SectionHeading({ eyebrow, title, description }: { eyebrow: string; titl
 }
 
 function VisibleFaqs({ faqs }: { faqs: TreatmentFaq[] }) {
-  const visibleFaqs = faqs.filter((faq) => showReview || !faq.needsReview);
+  const visibleFaqs = faqs.filter((faq) => showReview || (!faq.needsReview && !faq.a.includes("[원장 확인]")));
   if (!visibleFaqs.length) return null;
   return (
     <div className={styles.faqList}>
@@ -135,7 +135,7 @@ function InjectionSections({ treatment }: { treatment: Extract<TreatmentDetail, 
 export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: { treatment: TreatmentDetail; content: SiteContent; relatedColumns: RelatedTreatmentColumn[] }) {
   const categoryName = getCategory(treatment.category)?.name ?? treatment.category;
   const categoryPath = getTreatmentCategoryPath(treatment.category);
-  const kakaoUrl = getText(content, "common.quick.kakaoUrl");
+  const kakaoUrl = "https://pf.kakao.com/_xkRRPG";
   const phone = getText(content, "common.clinic.phone");
   const address = getText(content, "common.clinic.address");
   const businessNumber = getText(content, "common.clinic.businessNumber");
@@ -286,9 +286,9 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
         </section>
       </TreatmentReveal> : null}
 
-      {treatment.faq.some((faq) => showReview || !faq.needsReview) ? <TreatmentReveal className={styles.section}>
+      {treatment.faq.some((faq) => showReview || (!faq.needsReview && !faq.a.includes("[원장 확인]"))) ? <TreatmentReveal className={styles.section}>
         <section className={styles.sectionRow} aria-labelledby="faq-title">
-          <SectionHeading eyebrow="FAQ" title={<>{treatment.name},<br /><b>자주 묻는 질문</b></>} description="답변이 있는 질문만 노출합니다." />
+          <SectionHeading eyebrow="FAQ" title={<>{treatment.name},<br /><b>자주 묻는 질문</b></>} />
           <div id="faq-title"><VisibleFaqs faqs={treatment.faq} /></div>
         </section>
       </TreatmentReveal> : null}

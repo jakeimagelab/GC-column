@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getText, textEditProps, type SiteContent } from "@/content/site-content-types";
 import { getSuggestions, SearchAutocomplete, type SearchSuggestion } from "./SearchAutocomplete";
+import { getLegacyConcern } from "@/lib/column-filters";
 import styles from "./ColumnSearch.module.css";
 
 export type SearchColumn = {
@@ -14,6 +15,8 @@ export type SearchColumn = {
   title: string;
   answer: string;
   keywords: string[];
+  summary: string;
+  concerns: string[];
 };
 
 type SearchFaq = { q: string; keywords: string[]; slug: string; id: string };
@@ -93,12 +96,15 @@ export function ColumnSearch({
 
   const results = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    const hit = (keywords: string[], title: string) => q.length > 0 && (
-      keywords.some((keyword) => keyword.toLowerCase().includes(q) || q.includes(keyword.toLowerCase())) ||
-      title.toLowerCase().includes(q)
-    );
-    const matchedColumns = columns.filter((column) => hit(column.keywords, column.title));
-    const faqs = faqIndex.filter((faq) => hit(faq.keywords, faq.q));
+    const concern = getLegacyConcern(q);
+    const hit = (value: string) => q.length > 0 && value.toLowerCase().includes(q);
+    const faqHits = faqIndex.filter((faq) => hit(faq.q));
+    const faqSlugs = new Set(faqHits.map((faq) => faq.slug));
+    const matchedColumns = columns.filter((column) => concern
+      ? column.concerns.includes(concern)
+      : [column.title, column.summary, ...column.keywords].some(hit) || faqSlugs.has(column.slug));
+    const matchingSlugs = new Set(matchedColumns.map((column) => column.slug));
+    const faqs = faqHits.filter((faq) => matchingSlugs.has(faq.slug));
     const matchedTreatments = treatments.filter((treatment) =>
       treatment.toLowerCase().includes(q) ||
       (q.length > 1 && matchedColumns.some((column) => column.keywords.some((keyword) => treatment.includes(keyword)))),
@@ -183,6 +189,7 @@ export function ColumnSearch({
                       <small>{column.category}</small><strong>{column.title}</strong><span>{column.answer}</span>
                     </Link>
                   ))}
+                  {results.matchedColumns.length > 3 ? <Link href={`/column/all?${new URLSearchParams({ q: searchQuery })}`}>검색 결과 전체 보기 →</Link> : null}
                 </div>
                 <div className={styles.faqResults}>
                   <b><span {...editableProps("column.search.relatedQuestions")}>{getText(content, "column.search.relatedQuestions")}</span> {results.faqs.length}</b>
@@ -193,8 +200,8 @@ export function ColumnSearch({
             </div>
           ) : (
             <div className={styles.empty}>
-              <div><b><span {...editableProps("column.search.emptyPrefix")}>{getText(content, "column.search.emptyPrefix")}</span> &apos;{searchQuery}&apos;<span {...editableProps("column.search.emptySuffix")}>{getText(content, "column.search.emptySuffix")}</span></b><span {...editableProps("column.search.emptyDescription")}>{getText(content, "column.search.emptyDescription")}</span></div>
-              <button type="button" data-edit-control>{getText(content, "column.search.emptyAction")}</button>
+              <div><b><span {...editableProps("column.search.emptyPrefix")}>{getText(content, "column.search.emptyPrefix")}</span> &apos;{searchQuery}&apos; · 0건 <span {...editableProps("column.search.emptySuffix")}>{getText(content, "column.search.emptySuffix")}</span></b><span {...editableProps("column.search.emptyDescription")}>{getText(content, "column.search.emptyDescription")}</span></div>
+              <Link href="/column/all">전체 칼럼 보기 →</Link>
             </div>
           )}
         </div>

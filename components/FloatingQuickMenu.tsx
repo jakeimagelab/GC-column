@@ -10,7 +10,7 @@ type FloatingQuickMenuProps = { compact?: boolean; content: SiteContent };
 export function FloatingQuickMenu({ content, compact = false }: FloatingQuickMenuProps) {
   const phone = getText(content, "common.clinic.phone");
   const phoneHref = `tel:${phone.replace(/[^0-9+]/g, "")}`;
-  const kakaoUrl = getText(content, "common.quick.kakaoUrl") || getText(content, "home.location.kakaoUrl");
+  const kakaoUrl = "https://pf.kakao.com/_xkRRPG";
   const reserveUrl = getText(content, "common.quick.reserveUrl");
 
   return (

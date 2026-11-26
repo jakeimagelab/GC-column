@@ -20,6 +20,10 @@
 .magazine .number { color: transparent; font-size: 64px; -webkit-text-stroke: 1px rgb(255 255 255 / 48%); }
 .magazine .open .number { color: #fff; -webkit-text-stroke: 0; }
 .magazine .question { font-size: 32px; }
+.magazine .issueItem .summary { min-height: 96px; grid-template-columns: 72px minmax(0, 1fr) 44px; }
+.magazine .issueItem .number { font-size: 40px; }
+.magazine .issueItem .question { font-size: 23px; word-break: keep-all; overflow-wrap: anywhere; }
+.magazine .issueItem .answerWrap { padding-left: 90px; }
 .magazine .toggle { width: 44px; height: 44px; border-color: rgb(255 255 255 / 60%); }
 .magazine .answerWrap { padding-left:144px; padding-right:72px; }
 .magazine .open .answerWrap { padding-bottom:40px; }

@@ -51,7 +51,7 @@
   --vision-card-3-opacity: 1;
   --vision-card-3-y: 0px;
   position: relative;
-  height: 260vh;
+  height: 170vh;
   overflow: clip;
   background: var(--paper);
 }

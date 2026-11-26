@@ -24,7 +24,7 @@ import { HomeVisionDissolve } from "@/components/motion/HomeVisionDissolve";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
-import { getColumns, getPublishedColumns, homeSearchSlugs } from "@/content/columns";
+import { getColumns, getPublishedColumns } from "@/content/columns";
 import { getEquipmentItems, getHeroSlides, getImage, getText, getVisionPrinciples, textEditProps } from "@/content/site-content-types";
 import { columnExcerpts, SITE_URL } from "@/content/site";
 import { getCategory } from "@/content/treatments";
@@ -46,13 +46,13 @@ function primaryHours(value: string) {
 
 export default async function HomePage() {
   const content = await readSiteContent();
-  const searchColumns: HomeSearchColumn[] = getColumns(homeSearchSlugs).map((column) => ({
+  const searchColumns: HomeSearchColumn[] = getPublishedColumns().map((column) => ({
     slug: column.slug,
     category: getCategory(column.categorySlug)?.name ?? "",
     title: column.title,
     answer: columnExcerpts.home[column.slug] ?? column.summary,
     keywords: column.keywords,
-    faqs: column.faqs.map((faq, index) => ({ q: faq.q, id: `faq-${index + 1}` })),
+    faqs: column.faqs.flatMap((faq, index) => faq.a.trim() && !faq.needsReview && !faq.a.includes("[원장 확인]") ? [{ q: faq.q, id: `faq-${index + 1}` }] : []),
   }));
   const publishedColumns = getPublishedColumns();
   const featuredColumn = publishedColumns[0];
@@ -69,12 +69,12 @@ export default async function HomePage() {
     mobileQuestionColumns[0]?.faqs[0] ? { ...mobileQuestionColumns[0].faqs[0], href: `/column/${mobileQuestionColumns[0].slug}#faq-1` } : null,
     mobileQuestionColumns[0]?.faqs[1] ? { ...mobileQuestionColumns[0].faqs[1], href: `/column/${mobileQuestionColumns[0].slug}#faq-2` } : null,
     mobileQuestionColumns[1]?.faqs[0] ? { ...mobileQuestionColumns[1].faqs[0], q: "볼륨이 적은 얼굴도 울쎄라 괜찮나요?", href: `/column/${mobileQuestionColumns[1].slug}#faq-1` } : null,
-  ].filter((question): question is MobileHomeQuestion => Boolean(question));
+  ].filter((question): question is MobileHomeQuestion => Boolean(question?.a.trim() && !question.needsReview && !question.a.includes("[원장 확인]")));
   const answeredQuestions = publishedColumns.flatMap((column) => column.faqs.map((faq, index) => ({
     ...faq,
     columnSlug: column.slug,
     faqId: `faq-${index + 1}`,
-  })));
+  }))).filter((faq) => faq.a.trim() && !faq.needsReview && !faq.a.includes("[원장 확인]"));
   const desktopAnsweredQuestions = answeredQuestions.slice(0, 4).map((faq) => ({
     id: `home-answer-${faq.columnSlug}-${faq.faqId}`,
     q: faq.q,
@@ -90,7 +90,7 @@ export default async function HomePage() {
   const { naver: naverUrl, kakao: mapKakaoUrl, google: googleUrl } = getMapUrls(content);
   const instagramUrl = getText(content, "clinic.sameAs.instagram");
   const youtubeUrl = getText(content, "clinic.sameAs.youtube");
-  const consultKakaoUrl = getText(content, "common.quick.kakaoUrl") || getText(content, "home.location.kakaoUrl");
+  const consultKakaoUrl = "https://pf.kakao.com/_xkRRPG";
   const featuredOverride = getImage(content, "home.latest.featureImage");
   const featuredImage = featuredOverride.src
     ? featuredOverride

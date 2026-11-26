@@ -93,7 +93,7 @@ export default async function TreatmentPage({ params }: TreatmentPageProps) {
   const treatment = withSummaryAccent(detail);
   const url = `${SITE_URL}/treatments/${treatment.category}/${treatment.slug}`;
   const relatedColumns = relatedColumnsFor(treatment);
-  const faqEntities = treatment.faq.flatMap((faq, index) => faq.needsReview ? [] : [{
+  const faqEntities = treatment.faq.flatMap((faq, index) => (faq.needsReview || faq.a.includes("[원장 확인]")) ? [] : [{
     "@type": "Question",
     "@id": `${url}#faq-${index + 1}`,
     name: faq.q,

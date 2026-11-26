@@ -18,6 +18,7 @@ function shouldDisable(anchor: HTMLAnchorElement) {
   }
 
   if (url.origin !== window.location.origin) return false;
+  if (url.pathname === "/consultation" || url.pathname.startsWith("/treatments/") || url.pathname === "/doctor/lee-ho") return false;
   if (url.pathname === "/column" || url.pathname.startsWith("/column/")) return false;
   if (url.pathname === window.location.pathname && url.hash) return false;
   return true;

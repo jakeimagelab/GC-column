@@ -57,7 +57,7 @@
   },
   "common.quick.kakao": {
     "type": "text",
-    "value": "카톡상담"
+    "value": "카카오톡 상담"
   },
   "common.quick.blog": {
     "type": "text",
@@ -1577,7 +1577,7 @@
   },
   "common.quick.phone": {
     "type": "text",
-    "value": "전화"
+    "value": "전화 상담"
   },
   "common.quick.reserve": {
     "type": "text",
