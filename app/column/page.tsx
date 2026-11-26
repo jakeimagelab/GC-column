@@ -10,6 +10,7 @@ import { DevEditorMount } from "@/components/DevEditorMount";
 import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
+import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { getPublishedColumns } from "@/content/columns";
 import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
@@ -63,6 +64,10 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const answeredThisWeek = faqRecords.filter((faq) => faq.answeredAt && new Date(`${faq.answeredAt}T23:59:59+09:00`) >= sevenDaysAgo).length;
   const latestFaq = latestFaqs[0];
+  const coverDescription = getText(content, "column.cover.description");
+  const coverDescriptionBreak = coverDescription.indexOf(". ");
+  const coverDescriptionLead = coverDescriptionBreak >= 0 ? coverDescription.slice(0, coverDescriptionBreak + 1) : coverDescription;
+  const coverDescriptionRest = coverDescriptionBreak >= 0 ? coverDescription.slice(coverDescriptionBreak + 2) : "";
   const consultTitle = getText(content, "column.consult.title");
   const consultLocation = consultTitle.split("·").slice(1).join("·").trim();
   const mobileConsultTitle = getText(content, "column.detail.related.consult");
@@ -81,12 +86,45 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
 
   return (
     <main className={styles.page} data-column-page>
-      <ColumnHeader content={content} page="main" />
-      <section className={styles.compactIntro}>
-        <span>Glory&apos;s Column</span>
-        <h1>진료실 질문에 원장이 직접 답합니다</h1>
-        <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
-      </section>
+      <ColumnMainMotion />
+      <ColumnHeader content={content} variant="overlay" page="main" />
+      <div className={styles.heroStage} data-column-hero>
+        <section className={styles.cover}>
+          <span className={styles.verticalLabel} data-column-bookmark-fade>
+            <span data-column-entry="meta" {...textEditProps("column.cover.vertical")}>{getText(content, "column.cover.vertical")}</span>
+          </span>
+          <div className={styles.coverInner}>
+            <div className={styles.coverMeta} data-column-entry="meta">
+              <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
+              <span {...textEditProps("column.cover.issue")}>{getText(content, "column.cover.issue")}</span>
+            </div>
+            <h1 className={`${styles.masthead} ${styles.desktopMasthead}`} data-column-bookmark-title>
+              <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
+            </h1>
+            <h1 className={styles.mobileMasthead} aria-label="Glory's Column">
+              <span className={styles.mastheadLine}><span data-column-entry="title-top" {...textEditProps("column.cover.titleTop")}>{getText(content, "column.cover.titleTop")}</span></span>
+              <span className={styles.mastheadLine}><span data-column-entry="title-bottom" {...textEditProps("column.cover.titleBottom")}>{getText(content, "column.cover.titleBottom")}</span></span>
+            </h1>
+            <div className={styles.descriptionFade} data-column-bookmark-fade>
+              <p data-column-entry="description" {...textEditProps("column.cover.description")}>
+                {coverDescriptionLead}
+                {coverDescriptionRest ? <><br className={styles.mobileBreak} /><span className={styles.desktopSpace}> </span>{coverDescriptionRest}</> : null}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className={styles.searchShell} data-column-entry="search" data-column-bookmark-search>
+          <ColumnSearch columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
+        </div>
+      </div>
+
+      <div className={styles.issueBar} aria-label="발행 정보" data-column-section-motion="issue">
+        <span {...textEditProps("column.cover.issueShort")}>{getText(content, "column.cover.issueShort")}</span>
+        <i aria-hidden="true" />
+        <span {...textEditProps("column.cover.kicker")}>{getText(content, "column.cover.kicker")}</span>
+      </div>
 
       {feature ? (
         <section className={styles.feature} aria-labelledby="feature-heading" data-column-section-motion="feature">

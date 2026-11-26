@@ -81,7 +81,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   const normalizedEditIndex = items.length ? ((virtualIndex % items.length) + items.length) % items.length : 0;
   const renderedEditItems = canRotate ? [items, items, items].flat() : items;
-  const renderedManualItems = items;
+  const renderedManualItems = canRotate ? [items, items].flat() : items;
 
   useEffect(() => {
     const editing = isVisualEditingMode();
@@ -146,9 +146,9 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     const loopPosition = loopWidth > 0 ? viewport.scrollLeft % loopWidth : viewport.scrollLeft;
     const index = cardStep ? Math.round(loopPosition / cardStep) % Math.max(items.length, 1) : 0;
     setDisplayIndex((current) => current === index ? current : index);
-    setCanScrollPrev(viewport.scrollLeft > 2);
-    setCanScrollNext(viewport.scrollLeft < Math.max(0, viewport.scrollWidth - viewport.clientWidth) - 2);
-  }, [editMode, items.length]);
+    setCanScrollPrev(canRotate || viewport.scrollLeft > 2);
+    setCanScrollNext(canRotate || viewport.scrollLeft < Math.max(0, viewport.scrollWidth - viewport.clientWidth) - 2);
+  }, [canRotate, editMode, items.length]);
 
   useEffect(() => {
     if (editMode) return;
@@ -165,6 +165,32 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
       window.cancelAnimationFrame(frame);
     };
   }, [editMode, items.length, updateManualPosition]);
+
+  useEffect(() => {
+    if (editMode || reducedMotion || dragging || !canRotate) return;
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+    let frame = 0;
+    let position = viewport.scrollLeft;
+    let previous = performance.now();
+    const startAt = performance.now() + 700;
+    const rotate = (time: number) => {
+      const cards = track.querySelectorAll<HTMLElement>("[data-carousel-card]");
+      const loopWidth = cards.length > items.length ? cards[items.length].offsetLeft - cards[0].offsetLeft : 0;
+      if (time < autoPauseUntilRef.current) {
+        position = viewport.scrollLeft;
+      } else if (time >= startAt && loopWidth > 0) {
+        position += Math.min(Math.max(time - previous, 0), 40) * 0.06;
+        if (position >= loopWidth) position %= loopWidth;
+        viewport.scrollLeft = Math.floor(position);
+      }
+      previous = time;
+      frame = window.requestAnimationFrame(rotate);
+    };
+    frame = window.requestAnimationFrame(rotate);
+    return () => window.cancelAnimationFrame(frame);
+  }, [canRotate, dragging, editMode, items.length, reducedMotion]);
 
   const moveEdit = useCallback((delta: number) => {
     if (!canRotate || transitioning) return;
@@ -263,7 +289,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
         </div>
       </div>
       <div
-        className={`${styles.viewport} ${""} ${dragging ? styles.viewportDragging : ""}`}
+        className={`${styles.viewport} ${!editMode && canRotate ? styles.viewportAuto : ""} ${dragging ? styles.viewportDragging : ""}`}
         ref={viewportRef}
         data-scroll-world-layer="depth"
         onScroll={updateManualPosition}

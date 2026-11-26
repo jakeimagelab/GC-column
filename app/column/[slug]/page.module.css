@@ -364,8 +364,6 @@
 .page [data-detail-reveal-active][data-detail-reveal="section"] .sectionMarker { animation:detailDraw 1.3s cubic-bezier(.77,0,.18,1) both; }
 .page [data-detail-reveal-active][data-detail-reveal="section"]>h2 { animation:detailRevealUp .85s .15s cubic-bezier(.2,.8,.2,1) both; }
 
-.page [data-detail-reveal-ready][data-detail-reveal="figure"] { clip-path:inset(0 0 100% 0); }
-.page [data-detail-reveal-ready][data-detail-reveal="figure"] img { transform:scale(1.08); }
 .page [data-detail-reveal-active][data-detail-reveal="figure"] { animation:detailFigureClip 1.3s cubic-bezier(.77,0,.18,1) both; }
 .page [data-detail-reveal-active][data-detail-reveal="figure"] img { animation:detailFigureImage 1.8s cubic-bezier(.2,.8,.2,1) both; }
 .figureMotion { margin:0; }
