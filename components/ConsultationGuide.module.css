@@ -1,9 +1,9 @@
-.guide { padding: 0 var(--column-gutter) 110px; background: var(--paper); }
+.guide { padding: 0 var(--column-gutter) var(--section-space); background: var(--paper); }
 .reviewBanner { padding: 13px 18px; border: 1px solid #c9b9a8; background: #fff; display: flex; align-items: center; gap: 12px; color: var(--brown); font-size: 13px; }
 .reviewBanner b { color: var(--ink); }
 .layout { margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: start; gap: 24px; }
-.form, .result { min-width: 0; padding: clamp(28px, 3.5vw, 52px); background: #fff; }
-.form { display: flex; flex-direction: column; gap: 36px; }
+.form, .result { min-width: 0; padding: clamp(20px, 3vw, 38px); background: #fff; }
+.form { display: flex; flex-direction: column; gap: 28px; }
 .formHeading, .resultHeading { display: flex; flex-direction: column; gap: 8px; }
 .formHeading > span, .resultHeading > span { color: var(--brown); font-family: var(--font-en); font-size: 12px; letter-spacing: 3px; }
 .formHeading h2, .resultHeading h2 { margin: 0; font-size: clamp(26px, 2.4vw, 36px); font-weight: 400; line-height: 1.35; }
@@ -14,7 +14,7 @@
 .optionGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .optionGrid label { position: relative; cursor: pointer; }
 .optionGrid input { position: absolute; opacity: 0; pointer-events: none; }
-.optionGrid span { min-height: 52px; padding: 13px 15px; border: 1px solid var(--line); display: flex; align-items: center; color: var(--muted); font-size: 14px; transition: border-color .2s ease, background .2s ease, color .2s ease; }
+.optionGrid span { min-height: var(--control-height); padding: 13px 15px; border: 1px solid var(--line); display: flex; align-items: center; color: var(--muted); font-size: 14px; transition: border-color .2s ease, background .2s ease, color .2s ease; }
 .optionGrid input:checked + span { border-color: var(--dark-taupe); background: var(--dark-taupe); color: #fff; }
 .optionGrid input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
 .optionalGroup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -24,7 +24,7 @@
 .privacy { margin: -16px 0 0; color: var(--muted-2); font-size: 12px; line-height: 1.7; }
 .submit { min-height: 54px; border: 0; background: var(--ink); color: #fff; cursor: pointer; font-weight: 700; }
 .submit:disabled { cursor: not-allowed; opacity: .35; }
-.result { position: sticky; top: 92px; min-height: 680px; border: 1px solid var(--line); }
+.result { position: sticky; top: 92px; border: 1px solid var(--line); }
 .cards { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
 .cards article { padding: 22px; background: var(--paper); display: flex; flex-direction: column; gap: 10px; }
 .cards article > div:first-child { display: flex; align-items: center; justify-content: space-between; color: var(--brown); font-family: var(--font-en); }

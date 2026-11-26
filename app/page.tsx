@@ -20,7 +20,6 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { KakaoMap } from "@/components/KakaoMap";
 import { JsonLd } from "@/components/JsonLd";
 import { DoctorReveal } from "@/components/motion/DoctorReveal";
-import { HomeVisionDissolve } from "@/components/motion/HomeVisionDissolve";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { OutlineWord } from "@/components/motion/OutlineWord";
 import { SignatureMotion } from "@/components/motion/SignatureMotion";
@@ -31,6 +30,7 @@ import { getCategory } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, formatDateKo, graph } from "@/lib/seo";
 import { getClinicAddress, getDisplayedHours, getMapUrls } from "@/lib/site-info";
+import { byPublication } from "@/lib/column-filters";
 import { extractFirstNumber } from "@/lib/motion";
 import { nanumPenScript } from "./fonts";
 import styles from "./page.module.css";
@@ -54,7 +54,7 @@ export default async function HomePage() {
     keywords: column.keywords,
     faqs: column.faqs.flatMap((faq, index) => faq.a.trim() && !faq.needsReview && !faq.a.includes("[원장 확인]") ? [{ q: faq.q, id: `faq-${index + 1}` }] : []),
   }));
-  const publishedColumns = getPublishedColumns();
+  const publishedColumns = getPublishedColumns().sort(byPublication);
   const featuredColumn = publishedColumns[0];
   const mobileFeatureColumn = getColumns(["xerf-vs-thermage"])[0];
   const mobileQuestionColumns = getColumns(["xerf-vs-thermage", "ulthera-low-volume-face"]);
@@ -102,7 +102,8 @@ export default async function HomePage() {
   const pageGraph = graph(content, [{ "@type": "WebPage", "@id": `${SITE_URL}/#webpage`, url: SITE_URL, name: getText(content, "seo.home.title"), description: getText(content, "seo.home.description"), inLanguage: "ko-KR", isPartOf: { "@id": `${SITE_URL}/#website` }, about: { "@id": `${SITE_URL}/#clinic` } }]);
 
   return (
-    <main className="pageFrame" data-home-navigation-scope>
+    <main className={`pageFrame ${styles.page}`} data-home-navigation-scope>
+      <ColumnHeader content={content} variant="overlay" page="home" />
       <HomeInternalLinkGate />
       <HomeMobile
         content={content}
@@ -121,7 +122,6 @@ export default async function HomePage() {
       <div className={styles.desktopHome}>
       <section className={styles.hero} id="home-hero" data-scroll-world-scene>
         <HomeHero slides={slides} />
-        <ColumnHeader content={content} variant="overlay" page="home" />
       </section>
 
       <HomeQuestionSearch columns={searchColumns} content={content} />
@@ -138,7 +138,6 @@ export default async function HomePage() {
       </DoctorReveal>
 
       <section className={styles.vision} id="vision" data-home-vision data-scroll-world-scene>
-        <HomeVisionDissolve />
         <div className={styles.visionSticky}>
           <div className={styles.visionBackdrop} aria-hidden="true">
             <Image src="/uploads/glory-treatment-pigment-1.webp" alt="" fill sizes="100vw" />

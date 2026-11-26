@@ -1,5 +1,5 @@
-.section { padding: 28px 32px; border: 1px solid var(--line); background: #fff; display: flex; flex-direction: column; gap: 20px; }
-.heading h2 { margin: 0; font-size: 23px; }
+.section { padding: clamp(18px, 3vw, 28px); border: 1px solid var(--line); background: #fff; display: flex; flex-direction: column; gap: 20px; }
+.heading h2 { margin: 0; font-size: clamp(20px, 2.1vw, 24px); }
 .heading p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 .section form { position: relative; display: flex; flex-direction: column; gap: 12px; }
 .section textarea { width: 100%; min-height: 150px; padding: 16px 18px 34px; border: 1px solid var(--line); resize: vertical; color: var(--ink); line-height: 1.65; }
@@ -9,7 +9,7 @@
 .check input { margin-top: 4px; accent-color: var(--taupe); }
 .check b { color: var(--brown); }
 .actions { display: flex; align-items: center; gap: 14px; }
-.actions button { min-height: 46px; padding: 10px 22px; border: 0; background: var(--taupe); color: #fff; }
+.actions button { min-height: 46px; padding: 10px 22px; border: 0; background: #3a3028; color: #fff; }
 .actions button:disabled { opacity: .45; }
 .actions span { font-size: 13px; }
 .success { color: #3e6c45; }

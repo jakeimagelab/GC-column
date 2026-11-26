@@ -25,9 +25,9 @@
   stroke-dashoffset: 1;
 }
 
-.mainCircle { animation:heroCircleDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards; opacity:0; }
-.glowCircle { animation:heroGlowDraw 1.6s cubic-bezier(.2,.72,.25,1) .2s forwards, heroGlow 6s ease-in-out 2.2s infinite alternate; opacity:0; }
-.rays line { opacity:0; animation:heroRayDraw 2s cubic-bezier(.2,.72,.25,1) var(--ray-delay) forwards; }
+.mainCircle { stroke-dashoffset:0; opacity:.12; }
+.glowCircle { stroke-dashoffset:0; opacity:.1; }
+.rays line { stroke-dashoffset:0; opacity:.14; }
 
 .inner {
   position: relative;
@@ -61,17 +61,10 @@
 .actions a:hover { border-color: var(--hero-accent-light); background: var(--hero-accent-light); color: #201428; }
 
 .visual { position: relative; height: 690px; display: flex; align-items: flex-end; justify-content: center; }
-.visual img { position: relative; z-index: 1; width: auto; height: min(600px, 100%); object-fit: contain; filter: drop-shadow(0 30px 40px rgb(10 4 20 / 55%)); opacity: 0; transform: translateY(28px) scale(.97); animation: heroDeviceIn 1s cubic-bezier(.2,.72,.25,1) .5s forwards; }
+.visual img { position: relative; z-index: 1; width: auto; height: min(600px, 100%); object-fit: contain; filter: drop-shadow(0 30px 40px rgb(10 4 20 / 55%)); }
 .floorShadow { position: absolute; z-index: 0; left: 50%; bottom: 12px; width: 420px; height: 46px; transform: translateX(-50%); background: radial-gradient(ellipse, rgb(4 2 8 / 54%) 0%, transparent 70%); filter: blur(3px); }
 
-.hero [data-hero-item] { opacity: 0; transform: translateY(18px); animation: heroCopyIn .72s cubic-bezier(.2,.72,.25,1) var(--hero-delay) forwards; }
 
-@keyframes heroCircleDraw { to { stroke-dashoffset:0; opacity:.12; } }
-@keyframes heroGlowDraw { to { stroke-dashoffset:0; opacity:.1; } }
-@keyframes heroRayDraw { to { stroke-dashoffset:0; opacity:.14; } }
-@keyframes heroGlow { from { opacity:.1; } to { opacity:.05; } }
-@keyframes heroCopyIn { to { opacity: 1; transform: none; } }
-@keyframes heroDeviceIn { to { opacity: 1; transform: none; } }
 
 @media (max-width: 1024px) {
   .inner { width: min(100% - 56px, 960px); grid-template-columns: minmax(0, 1fr) minmax(330px, .8fr); gap: 30px; }

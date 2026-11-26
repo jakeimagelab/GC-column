@@ -33,7 +33,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
@@ -383,4 +383,9 @@ svg {
     transform: scale(var(--image-mobile-scale));
     transform-origin: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
   }
+}
+
+:root {
+  --section-space: clamp(44px, 6vw, 88px);
+  --control-height: 44px;
 }

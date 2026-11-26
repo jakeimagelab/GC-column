@@ -5,36 +5,6 @@
   pointer-events: none;
 }
 
-.titleClone,
-.searchClone {
-  position: fixed;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  color: #fff;
-  opacity: 0;
-  transform-origin: 0 0;
-  pointer-events: none;
-  will-change: transform, opacity;
-}
-
-.titleClone > :global(*),
-.searchClone > :global(*) { margin: 0 !important; }
-.searchClone > :global(*) {
-  position: static !important;
-  inset: auto !important;
-  width: 100% !important;
-  transform: none !important;
-}
-.titleClone :global(*),
-.searchClone :global(*) {
-  transform: none !important;
-  animation: none !important;
-  opacity: 1 !important;
-  clip-path: none !important;
-  visibility: visible !important;
-}
-
 .bookmark {
   --bookmark-icon-opacity: 0;
   position: fixed;
@@ -70,8 +40,6 @@
 
 .bookmark:disabled { pointer-events: none; cursor: default; }
 .bookmark:not(:disabled):hover { transform: translateY(10px); background: #3a3028; }
-.layer:has(.bookmark:not(:disabled):hover) .titleClone,
-.layer:has(.bookmark:not(:disabled):hover) .searchClone { translate: 0 10px; }
 
 .bookmark:focus-visible {
   outline: 2px solid #fff;
@@ -156,11 +124,21 @@
 @media (max-width: 1023px) { .layer { display: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .titleClone,
-  .searchClone { display: none; }
   .bookmark { transition: opacity .2s ease; }
   .panel { transition: opacity .2s ease, visibility 0s linear .2s; clip-path: none; }
   .panelOpen { transition-delay: 0s; }
 }
 
 :global(body.devEditActive) .layer { display: none; }
+
+.bookmark {
+  left: 8px;
+  width: 44px;
+  height: 54px;
+  opacity: 1;
+  will-change: auto;
+}
+.bookmark:not(:disabled):hover { transform: none; background: #56473b; }
+.bookmark::before { height: 3px; }
+.searchDisc { inset: 0; width: 100%; height: 100%; border: 0; opacity: 1; }
+.panel { left: 62px; max-height: calc(100dvh - 126px); overflow-y: auto; }

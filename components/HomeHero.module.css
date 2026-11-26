@@ -11,10 +11,6 @@
 .heroCopy p { margin: 0; color: #ede7e0; font-size: 18px; font-weight: 300; }
 .titleLine { display: block; overflow: hidden; }
 .titleLine > span, .titleLine > b { display: inline-block; }
-.motionReady .heroCopy .titleLine:first-child > .scriptTitle { animation: heroHandwrite 1.65s .05s cubic-bezier(.22,.61,.36,1) both; }
-.motionReady .heroCopy .titleLine > b { animation: heroTitleUp .9s cubic-bezier(.22,.61,.36,1) both; }
-.motionReady .heroCopy .titleLine:nth-child(2) > b { animation-delay: .15s; }
-.motionReady .heroCopy > p { animation: heroSubtitle .8s .5s cubic-bezier(.22,.61,.36,1) both; }
 .heroPager { position: absolute; z-index: 3; left: var(--home-gutter); bottom: 150px; display: flex; align-items: center; gap: 16px; color: #e3dcd3; font-family: var(--font-en); font-size: 13px; }
 .heroPager > button { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .heroPager > button:first-child { color: #fff; }
@@ -24,28 +20,14 @@
 .slideTargets { position: absolute; inset: -8px 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
 .slideTargets button { padding: 0; border: 0; background: transparent; cursor: pointer; }
 .pauseButton { min-width: 24px; color: #fff !important; font-size: 11px !important; }
-
-@keyframes heroTitleUp { from { transform: translateY(105%); } to { transform: none; } }
-@keyframes heroHandwrite {
-  0% { clip-path: inset(0 100% 0 0); transform: translate3d(-5px, 2px, 0); }
-  72% { clip-path: inset(0 6% 0 0); }
-  100% { clip-path: inset(0); transform: none; }
-}
-@keyframes heroSubtitle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes heroProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes heroZoomOut { from { transform: scale(1.08); } to { transform: scale(1); } }
-.zoomMedia { animation: heroZoomOut 9s cubic-bezier(.22,.61,.36,1) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .heroMedia, .heroPager i { transition: none; }
-  .motionReady .heroCopy .titleLine > span, .motionReady .heroCopy .titleLine > b, .motionReady .heroCopy > p, .progressFill, .zoomMedia { animation: none; clip-path: none; transform: none; opacity: 1; }
+  .progressFill { animation: none; clip-path: none; transform: none; opacity: 1; }
 }
 
-:global(.devEditActive) .motionReady .heroCopy .titleLine > span,
-:global(.devEditActive) .motionReady .heroCopy .titleLine > b,
-:global(.devEditActive) .motionReady .heroCopy > p,
-:global(.devEditActive) .progressFill,
-:global(.devEditActive) .zoomMedia { animation: none; transform: none; opacity: 1; }
+:global(.devEditActive) .progressFill { animation: none; transform: none; opacity: 1; }
 
 @media (max-width: 640px) {
   .heroCopy { width: auto; padding: 130px 24px 0; }

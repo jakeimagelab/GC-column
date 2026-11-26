@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { byPublication, concernKeys } from "@/lib/column-filters";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,12 +12,11 @@ import { DevEditorMount } from "@/components/DevEditorMount";
 import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
-import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { getPublishedColumns } from "@/content/columns";
 import { columnExcerpts, columnTreatmentSearchNames } from "@/content/site";
-import { getImage, getText, textEditProps } from "@/content/site-content-types";
-import { getCategory, getTreatment } from "@/content/treatments";
+import { getConcernItems, getImage, getText, textEditProps } from "@/content/site-content-types";
+import { getCategory, getTreatment, isTreatmentPageVisible } from "@/content/treatments";
 import { readSiteContent } from "@/lib/contentStore";
 import { buildMetadata, collectionNodes, formatDateKo, graph } from "@/lib/seo";
 import styles from "./page.module.css";
@@ -69,6 +69,9 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
   const coverDescriptionBreak = coverDescription.indexOf(". ");
   const coverDescriptionLead = coverDescriptionBreak >= 0 ? coverDescription.slice(0, coverDescriptionBreak + 1) : coverDescription;
   const coverDescriptionRest = coverDescriptionBreak >= 0 ? coverDescription.slice(coverDescriptionBreak + 2) : "";
+  const treatmentSlugs = [...new Set(published.flatMap((column) => column.treatmentSlugs))];
+  const concernItems = getConcernItems(content);
+  const concernNames = new Map<string, string>(concernKeys.map((key, index) => [key, concernItems[index]?.name ?? ""]));
   const consultTitle = getText(content, "column.consult.title");
   const consultLocation = consultTitle.split("·").slice(1).join("·").trim();
   const mobileConsultTitle = getText(content, "column.detail.related.consult");
@@ -87,7 +90,6 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
 
   return (
     <main className={styles.page} data-column-page>
-      <ColumnMainMotion />
       <ColumnBookmark columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
       <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>
@@ -211,8 +213,7 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
               </div> : null}
             </div>
             <p className={styles.mobileQuestionStats}>지금까지 <b>{faqRecords.length}개</b> 답변 · 이번 주 <b>{answeredThisWeek}개</b> 새 답변</p>
-            <FaqList items={questionItems.slice(0, 3)} variant="magazine" mobileStyle="issue" firstOpen answerLabel={getText(content, "column.questions.answerLabel")} readLabel={getText(content, "column.questions.read")} showReview={showReview} useSummary />
-            {questionItems.length > 3 ? <details className={styles.moreQuestions}><summary>질문 더 보기</summary><FaqList items={questionItems.slice(3)} variant="magazine" /></details> : null}
+            <FaqList items={questionItems} variant="magazine" mobileStyle="issue" firstOpen answerLabel={getText(content, "column.questions.answerLabel")} readLabel={getText(content, "column.questions.read")} showReview={showReview} useSummary />
             <div className={styles.askRow}>
               <p {...textEditProps("column.questions.askCaption")}>{getText(content, "column.questions.askCaption")}</p>
               <Link href={`/column/${feature?.slug ?? published[0]?.slug}#ask-doctor`} {...textEditProps("column.questions.askAction")}>{getText(content, "column.questions.askAction")}</Link>
@@ -220,6 +221,47 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
           </div>
         </section>
       ) : null}
+
+      {treatmentSlugs.length ? (
+        <section className={styles.treatments} aria-labelledby="treatments-heading" data-column-section-motion="treatments">
+          <header>
+            <h2 id="treatments-heading" {...textEditProps("column.treatments.sectionTitle")}>{getText(content, "column.treatments.sectionTitle")}</h2>
+            <span {...textEditProps("column.treatments.eyebrow")}>{getText(content, "column.treatments.eyebrow")}</span>
+          </header>
+          <MotionGroup className={styles.treatmentGrid} scrollWorldLayer="copy" stagger={0.1}>
+            {treatmentSlugs.flatMap((slug) => {
+              const treatment = getTreatment(slug);
+              if (!treatment || !isTreatmentPageVisible(slug)) return [];
+              const thumbnail = getImage(content, `treatments.${slug}.thumbnail`);
+              const hasLocalThumbnail = thumbnail.src?.startsWith("/uploads/");
+              return [<Link href={treatment.detailPath} key={slug} data-motion-item style={{ "--treatment-color": treatment.brandColor ?? "#8c7b6b" } as CSSProperties}>
+                <span className={styles.treatmentVisual}>{hasLocalThumbnail ? <ImageSlot label="" alt={thumbnail.alt} image={thumbnail} sizes="150px" unoptimized priority /> : null}</span>
+                <b>{treatment.name} →</b><span>{treatment.desc}</span>
+              </Link>];
+            })}
+          </MotionGroup>
+        </section>
+      ) : null}
+
+      <section className={styles.archive} aria-labelledby="archive-heading" data-column-section-motion="archive">
+        <header>
+          <h2 id="archive-heading" {...textEditProps("column.archive.title")}>{getText(content, "column.archive.title")}</h2>
+          <span {...textEditProps("column.archive.eyebrow")}>{getText(content, "column.archive.eyebrow")}</span>
+        </header>
+        <MotionGroup className={styles.archiveList} scrollWorldLayer="depth" stagger={0.1}>
+          {published.map((column) => (
+            <Link href={`/column/${column.slug}`} key={column.slug} data-motion-item>
+              <div className={styles.archiveMeta}>
+                <time dateTime={column.publishedAt}>{column.publishedAt ? formatDateKo(column.publishedAt).replaceAll(". ", ".").replace(/\.$/, "") : ""}</time>
+                <i aria-hidden="true">·</i>
+                <span>{column.concerns.map((concern) => concernNames.get(concern)).filter(Boolean).join(" · ") || getCategory(column.categorySlug)?.name}</span>
+              </div>
+              <b><span className={styles.desktopArchiveTitle}>{column.title}</span><span className={styles.mobileArchiveTitle}>{column.slug === "xerf-vs-thermage" ? <><span>세르프(XERF)와</span><span>써마지FLX의 차이,</span><span>누구에게 맞을까요?</span></> : column.title}</span></b>
+              <small>READ {String(column.readMinutes).padStart(2, "0")} MIN</small>
+            </Link>
+          ))}
+        </MotionGroup>
+      </section>
 
       <section className={styles.consult} data-column-section-motion="consult">
         <div>

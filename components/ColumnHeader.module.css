@@ -7,7 +7,6 @@
 .surface.scrolled.open { background:#fff; color:#3a3028; }
 .header { width:min(1240px,calc(100% - 72px)); height:72px; margin:0 auto; display:grid; grid-template-columns:220px minmax(0,1fr) 120px; align-items:center; gap:28px; border-bottom:1px solid rgb(255 255 255 / 16%); }
 .main .surface { background:#3a3028; color:#fff; box-shadow:0 8px 24px rgb(31 24 19 / var(--column-main-header-shadow-opacity,0)); transition:background-color .2s ease,color .2s ease; }
-:global(html[data-column-bookmark-started]) .main .surface { position:fixed; inset:0 0 auto; }
 .main .surface.open { background:#fff; color:#3a3028; }
 .main .header { height:var(--column-main-header-height,72px); border-bottom-color:rgb(255 255 255 / var(--column-main-header-border-opacity,.22)); }
 .main .open .header { border-bottom-color:#e5ded5; }

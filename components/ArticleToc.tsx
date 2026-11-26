@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { isVisualEditingMode } from "@/lib/motion";
 import styles from "./ArticleToc.module.css";
 
 export type TocItem = { id: string; label: string };
@@ -99,14 +98,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
     return () => window.removeEventListener("keydown", close);
   }, [open]);
 
-  const jumpTo = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
-    event.preventDefault();
-    const target = document.getElementById(id);
-    if (!target) return;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isVisualEditingMode();
-    const offset = mobileBar ? 127 : 96;
-    window.history.replaceState(null, "", `#${id}`);
-    window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: reduceMotion ? "auto" : "smooth" });
+  const selectSection = (id: string) => {
     setActiveId(id);
     setOpen(false);
   };
@@ -125,7 +117,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
               href={`#${item.id}`}
               key={item.id}
               className={activeId === item.id ? styles.active : ""}
-              onClick={(event) => jumpTo(event, item.id)}
+              onClick={() => selectSection(item.id)}
             >
               {item.label}
             </a>
@@ -143,7 +135,7 @@ export function ArticleToc({ items, title, compact = false, mobileBar = false }:
           href={`#${item.id}`}
           key={item.id}
           className={activeId === item.id ? styles.active : ""}
-          onClick={(event) => jumpTo(event, item.id)}
+          onClick={() => selectSection(item.id)}
         >
           {item.label}
         </a>

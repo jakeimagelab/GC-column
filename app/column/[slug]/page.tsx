@@ -13,7 +13,6 @@ import { FaqList, type FaqListItem } from "@/components/FaqList";
 import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { LayerDiagram } from "@/components/LayerDiagram";
-import { ColumnDetailMotion } from "@/components/motion/ColumnDetailMotion";
 import { HighlightedParagraph, InlineRichText } from "@/components/motion/HighlightedText";
 import { MotionGroup } from "@/components/motion/MotionGroup";
 import { QuestionForm } from "@/components/QuestionForm";
@@ -169,14 +168,13 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
   return (
     <main className={styles.page} style={articleStyle} data-column-detail-page data-column-slug={column.slug}>
-      <ColumnDetailMotion />
+      <ColumnHeader content={content} variant="overlay" page="detail" />
       <ArticleProgress />
       <JsonLd value={structured} />
       <ArticleToc items={tocItems.filter((item) => item.id !== "qa" || faqItems.length > 0)} title={getText(content, "column.detail.toc.eyebrow")} mobileBar />
 
       <section className={styles.articleCover} data-detail-hero>
         <div className={styles.articleCoverMedia} aria-hidden="true" />
-        <ColumnHeader content={content} variant="overlay" page="detail" />
         <div className={styles.articleCoverInner}>
           <nav className={styles.breadcrumb} aria-label="현재 위치" data-detail-entry="breadcrumb">
             <Link href="/column">원장 칼럼</Link><span>›</span><span>{category.name}</span><span>›</span><span aria-current="page">{column.title}</span>
@@ -205,6 +203,15 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
 
       <div className={styles.bodyLayout}>
         <article className={styles.article} data-article-body>
+          <nav className={styles.depthNav} aria-label={getText(content, "column.detail.depthLabel")}>
+            <span>{getText(content, "column.detail.depthLabel")}</span>
+            <div>
+              <a className={styles.depthActive} href="#a30">30초 · 핵심 답</a>
+              <a href={`#${tocItems.find((item) => item.id === "difference")?.id ?? column.sections.find((section) => section.kind !== "image")?.id ?? "a30"}`}>3분 · 차이와 기준</a>
+              <a href={`#${tocItems.find((item) => item.id === "xerf-alone")?.id ?? (hasJudgement ? "judgement" : tocItems.filter((item) => item.id !== "qa").at(-1)?.id ?? "a30")}`}>전체 · 원장 판단</a>
+            </div>
+          </nav>
+
           <section className={`${styles.quickAnswer} ${column.video?.src || showReview ? styles.quickAnswerWithMedia : ""}`} id="a30" data-detail-reveal="up">
             {column.video?.src ? (
               <div className={styles.videoColumn}>

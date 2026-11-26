@@ -1,4 +1,5 @@
 .page {
+  position: relative;
   --tx-accent: #4b2d73;
   --tx-accent-soft: #f3eff8;
   --tx-accent-light: #c9b6e4;
@@ -32,7 +33,7 @@
 .sectionRow {
   width: min(100% - 80px, 1240px);
   margin-inline: auto;
-  padding: 120px 0;
+  padding: var(--section-space) 0;
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   align-items: start;
@@ -40,8 +41,6 @@
 }
 
 .sectionHeading {
-  position: sticky;
-  top: 96px;
   align-self: start;
 }
 
@@ -269,17 +268,8 @@
 .lineList p { margin: 0; color: var(--tx-muted); font-size: 14px; line-height: 1.7; }
 .largeAnswer { font-size: 28px; font-weight: 300; line-height: 1.7; }
 
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity .78s cubic-bezier(.2,.72,.25,1) var(--d, 0s), transform .78s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
-.revealVisible { opacity: 1; transform: none; }
-.reveal[data-reveal="line"] { opacity: 1; transform: scaleX(0); transform-origin: left; transition: transform 1.6s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
-.revealVisible[data-reveal="line"] { transform: scaleX(1); }
-.reveal[data-reveal="zoom"] { opacity: 1; transform: none; clip-path: inset(12%); transition: clip-path 1.4s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
-.revealVisible[data-reveal="zoom"] { clip-path: inset(0); }
-.reveal[data-reveal="clip"] { opacity: 1; transform: translateY(22px); clip-path: inset(100% 0 0); transition: clip-path 1s cubic-bezier(.2,.72,.25,1) var(--d, 0s), transform 1s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
-.revealVisible[data-reveal="clip"] { transform: none; clip-path: inset(0); }
-
 /* Kept for the lightweight treatment preview pages. */
-.siteHeader { position: relative; z-index: 40; border-bottom: 1px solid #e4ded6; background: #fff; color: #231f1c; }
+.siteHeader { position: sticky; top: 0; z-index: 1200; border-bottom: 1px solid #e4ded6; background: #fff; color: #231f1c; }
 .headerInner { width: min(100% - 64px, 1180px); height: 78px; margin-inline: auto; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px; }
 .headerBrand { justify-self: start; color: #231f1c; }
 .headerNav { display: flex; align-items: center; gap: 34px; font-size: 13px; }
@@ -393,9 +383,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .revealVisible,
-  .reveal[data-reveal] { opacity: 1; transform: none; clip-path: none; transition: none; }
   .faqToggle,
   .mobileNav { transition: none; }
 }

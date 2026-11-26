@@ -29,7 +29,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     frame: 0,
   });
   const suppressStageClick = useRef(false);
-  const bandRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLElement>(null);
   const roomName = (roomIndex: number) => getText(content, `home.gallery.room.${roomKeys[roomIndex]}`);
   const roomImage = (roomIndex: number) => getImage(content, `home.gallery.${roomKeys[roomIndex]}`);
@@ -51,31 +50,6 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
     const timer = window.setInterval(() => setIndex((current) => (current + 1) % roomKeys.length), 2200);
     return () => window.clearInterval(timer);
   }, [rotating]);
-
-  useEffect(() => {
-    if (editMode || reducedMotion) return;
-    const gallery = galleryRef.current;
-    const band = bandRef.current;
-    if (!gallery || !band) return;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const rect = gallery.getBoundingClientRect();
-      const distance = rect.top + rect.height / 2 - window.innerHeight / 2;
-      band.style.transform = `translate3d(0,${(distance * -0.12).toFixed(1)}px,0)`;
-    };
-    const scroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", scroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", scroll);
-      if (frame) cancelAnimationFrame(frame);
-      band.style.transform = "";
-    };
-  }, [editMode, reducedMotion]);
 
   const nextAvailable = (from: number, delta: number) => {
     for (let offset = 1; offset <= roomKeys.length; offset += 1) {
@@ -158,7 +132,7 @@ export function FacilityGallery({ content }: FacilityGalleryProps) {
       onFocusCapture={() => setRotationActive(true)}
       onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setRotationActive(false); }}
     >
-      <div ref={bandRef} className={styles.leftBand} />
+      <div className={styles.leftBand} />
       <ImageSlot className={styles.blurBackground} label="" alt="" editId="home.gallery.background" image={getImage(content, "home.gallery.background")} />
       <div className={styles.heading} data-scroll-world-layer="copy"><span {...textEditProps("home.gallery.eyebrow")}>{getText(content, "home.gallery.eyebrow")}</span><h2><EditableRichText id="home.gallery.title" value={getText(content, "home.gallery.title")} /></h2></div>
 

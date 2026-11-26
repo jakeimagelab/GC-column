@@ -11,3 +11,7 @@
 .hero div > * { padding: 7px 11px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 12px; }
 .hero div b { border-color: var(--taupe); background: var(--taupe); color: #fff; }
 @media (max-width: 640px) { .hero { padding: 62px 24px 44px; } .hero h1 { font-size: 38px; } .hero p { font-size: 15px; } }
+
+.hero { padding-block: clamp(28px, 4vw, 52px) 24px; }
+.hero h1 { font-size: clamp(30px, 4vw, 48px); margin-block: 10px 12px; }
+.hero p { color: #5e554d; }

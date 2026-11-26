@@ -1,8 +1,8 @@
-.hero { padding: 64px var(--column-gutter) 70px; background: var(--paper); }
+.hero { padding: var(--section-space) var(--column-gutter); background: var(--paper); }
 .eyebrow { color: var(--brown); font-family: var(--font-en); font-size: 13px; letter-spacing: 3px; }
 .hero h1 { max-width: 920px; margin: 12px 0 14px; font-size: clamp(36px, 4vw, 58px); line-height: 1.25; }
 .hero p { max-width: 780px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.8; }
-.content { padding: 76px var(--column-gutter) 100px; display: flex; flex-direction: column; gap: 74px; }
+.content { padding: var(--section-space) var(--column-gutter); display: flex; flex-direction: column; gap: var(--section-space); }
 .content section { display: flex; flex-direction: column; gap: 22px; }
 .content h2 { margin: 0; font-size: 30px; }
 .profile { display: grid !important; grid-template-columns: minmax(300px, 440px) minmax(0, 1fr); gap: clamp(40px, 6vw, 86px); align-items: start; }

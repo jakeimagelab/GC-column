@@ -13,7 +13,7 @@ export function HomeQuestionTrigger({ className, editId, label }: HomeQuestionTr
     window.dispatchEvent(new Event("glory:open-home-question"));
     window.requestAnimationFrame(() => {
       document.querySelector<HTMLElement>("#question")?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        behavior: "auto",
         block: "center",
       });
     });

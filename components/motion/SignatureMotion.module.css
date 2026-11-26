@@ -14,69 +14,10 @@
   transform-origin: var(--image-focus-x) var(--image-focus-y);
 }
 
-.inlineSvg,
-.inlineSvg svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.armed.rasterSignature.hasImage {
-  clip-path: inset(0 100% 0 0);
-}
-
-.playing.rasterSignature.hasImage {
-  animation: signatureReveal 1.2s cubic-bezier(.22,.61,.36,1) both;
-}
-
-.armed.svgSignature .inlineSvg path {
-  stroke-dasharray: var(--signature-length);
-  stroke-dashoffset: var(--signature-length);
-}
-
-.playing.svgSignature .inlineSvg path {
-  animation: signatureDraw var(--signature-duration, .6s) cubic-bezier(.22,.61,.36,1) var(--signature-delay, 0s) both;
-}
-
-@keyframes signatureReveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0); }
-}
-
-@keyframes signatureDraw {
-  from { stroke-dashoffset: var(--signature-length); }
-  to { stroke-dashoffset: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .armed.rasterSignature.hasImage,
-  .playing.rasterSignature.hasImage {
-    clip-path: none;
-    animation: none;
-  }
-  .armed.svgSignature .inlineSvg path,
-  .playing.svgSignature .inlineSvg path {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-}
-
 @media (max-width: 640px) {
   .signature img {
     object-position: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
     transform: scale(var(--image-mobile-scale));
     transform-origin: var(--image-mobile-focus-x) var(--image-mobile-focus-y);
   }
-}
-
-:global(.devEditActive) .armed,
-:global(.devEditActive) .playing {
-  clip-path: none;
-  animation: none;
-}
-
-:global(.devEditActive) .armed .inlineSvg path,
-:global(.devEditActive) .playing .inlineSvg path {
-  stroke-dashoffset: 0;
-  animation: none;
 }

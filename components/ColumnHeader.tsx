@@ -39,15 +39,11 @@ export function ColumnHeader({ content, variant = "taupe", page = "detail" }: Co
   const concerns = getConcernItems(content);
 
   useEffect(() => {
-    if (isColumnMain) {
-      setScrolled(false);
-      return;
-    }
-    const onScroll = () => setScrolled(window.scrollY > 80);
+    const onScroll = () => setScrolled(window.scrollY > 0);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [isColumnMain]);
+  }, []);
 
   useEffect(() => {
     const closeOnOutsidePress = (event: PointerEvent) => {

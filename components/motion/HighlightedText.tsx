@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment, type ReactNode, useMemo, useRef } from "react";
-import { useMotionOnce } from "./useMotionOnce";
+import { Fragment, type ReactNode } from "react";
 import styles from "./HighlightedText.module.css";
 
 const INLINE_TOKEN = /(==[^=\n]+==|\*\*[^*\n]+\*\*|\[(?:광고 검토|원장 확인)\])/g;
@@ -47,13 +46,10 @@ export function InlineRichText({ value, showReview = false, desktopBreaks = fals
 }
 
 export function HighlightedParagraph({ value, lead, showReview = false, desktopBreaks = false, className }: { value: string; lead?: string; showReview?: boolean; desktopBreaks?: boolean; className?: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
   const hasHighlight = value.includes("==") || Boolean(lead?.includes("=="));
-  const options = useMemo(() => ({ threshold: 0.06, rootMargin: "0px 0px -6% 0px", armBeforePlay: true }), []);
-  useMotionOnce(ref, styles.armed, styles.playing, options);
 
   return (
-    <p ref={ref} className={[hasHighlight ? styles.paragraph : "", desktopBreaks ? styles.desktopBreakParagraph : "", className ?? ""].filter(Boolean).join(" ")}>
+    <p className={[hasHighlight ? styles.paragraph : "", desktopBreaks ? styles.desktopBreakParagraph : "", className ?? ""].filter(Boolean).join(" ")}>
       {lead ? <><strong>{inlineParts(lead, showReview, desktopBreaks)}</strong>{value ? " " : null}</> : null}
       {inlineParts(value, showReview, desktopBreaks)}
     </p>

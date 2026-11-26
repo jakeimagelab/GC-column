@@ -10,7 +10,6 @@ import { getCategory, getTreatmentCategoryPath } from "@/content/treatments";
 import type { ReviewableValue, TreatmentDetail, TreatmentFaq } from "@/content/treatments/types";
 import { getDisplayedHours } from "@/lib/site-info";
 import { TreatmentHero } from "./TreatmentHero";
-import { TreatmentReveal } from "./TreatmentReveal";
 import styles from "./TreatmentDetailTemplate.module.css";
 
 export type RelatedTreatmentColumn = Pick<Column, "slug" | "categorySlug" | "title" | "publishedAt" | "updatedAt">;
@@ -125,9 +124,9 @@ function InjectionSections({ treatment }: { treatment: Extract<TreatmentDetail, 
   const showDuration = treatment.duration && (showReview || !treatment.duration.needsReview);
   return (
     <>
-      {products.length ? <TreatmentReveal className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="PRODUCTS" title={<>어떤 <b>제품을 쓰나요?</b></>} /><div className={styles.lineList}>{products.map((item) => <article key={item.name}><b>{item.name}</b><p>{cleanReviewText(item.desc)}</p>{item.needsReview ? <ReviewMark /> : null}</article>)}</div></section></TreatmentReveal> : null}
-      {areas.length ? <TreatmentReveal className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="AREAS · AMOUNT" title={<>어디에, <b>얼마나 넣나요?</b></>} /><div className={styles.lineList}>{areas.map((item) => <article key={item.area}><b>{item.area}</b><p>{cleanReviewText(item.note)}</p>{item.needsReview ? <ReviewMark /> : null}</article>)}</div></section></TreatmentReveal> : null}
-      {showDuration && treatment.duration ? <TreatmentReveal className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="DURATION" title={<>효과는 <b>얼마나 유지되나요?</b></>} /><div className={styles.largeAnswer}><ReviewValue item={treatment.duration} /></div></section></TreatmentReveal> : null}
+      {products.length ? <div className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="PRODUCTS" title={<>어떤 <b>제품을 쓰나요?</b></>} /><div className={styles.lineList}>{products.map((item) => <article key={item.name}><b>{item.name}</b><p>{cleanReviewText(item.desc)}</p>{item.needsReview ? <ReviewMark /> : null}</article>)}</div></section></div> : null}
+      {areas.length ? <div className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="AREAS · AMOUNT" title={<>어디에, <b>얼마나 넣나요?</b></>} /><div className={styles.lineList}>{areas.map((item) => <article key={item.area}><b>{item.area}</b><p>{cleanReviewText(item.note)}</p>{item.needsReview ? <ReviewMark /> : null}</article>)}</div></section></div> : null}
+      {showDuration && treatment.duration ? <div className={styles.section}><section className={styles.sectionRow}><SectionHeading eyebrow="DURATION" title={<>효과는 <b>얼마나 유지되나요?</b></>} /><div className={styles.largeAnswer}><ReviewValue item={treatment.duration} /></div></section></div> : null}
     </>
   );
 }
@@ -170,12 +169,12 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
 
   return (
     <main className={styles.page} style={theme}>
+      <ColumnHeader content={content} variant="overlay" page="home" />
       <div className={styles.heroFrame}>
-        <ColumnHeader content={content} variant="overlay" page="home" />
         <TreatmentHero hero={hero} categoryName={categoryName} categoryPath={categoryPath} accent={treatment.accent} accentLight={treatment.accentLight} showReview={showReview} kakaoUrl={kakaoUrl} />
       </div>
 
-      <TreatmentReveal className={styles.section}>
+      <div className={styles.section}>
         <section className={`${styles.sectionRow} ${styles.glanceSection}`} aria-labelledby="glance-title">
           <SectionHeading eyebrow="AT A GLANCE" title={<>{treatment.name},<br /><b>한눈에 보기</b></>} description={"결론부터 읽고,\n필요한 만큼 내려가 보세요."} />
           <div className={`${styles.glanceBody} ${showGlanceVideo ? styles.glanceBodyWithVideo : ""}`}>
@@ -191,9 +190,9 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             </div> : null}
           </div>
         </section>
-      </TreatmentReveal>
+      </div>
 
-      {showForYou && treatment.forYou ? <TreatmentReveal className={`${styles.section} ${styles.softSection}`}>
+      {showForYou && treatment.forYou ? <div className={`${styles.section} ${styles.softSection}`}>
         <section className={styles.sectionRow} aria-labelledby="for-you-title">
           <SectionHeading eyebrow="FOR YOU" title={<>어떤 분께<br /><b>맞나요?</b></>} />
           <div className={styles.forYouGrid} id="for-you-title">
@@ -201,27 +200,27 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             <div><h3>이런 경우는 먼저 상담합니다</h3><ul className={`${styles.dotList} ${styles.hollowList}`}>{treatment.forYou.consultFirst.map((item, index) => <li key={`${item}-${index}`}>{cleanReviewText(item)}{treatment.forYou?.needsReview ? <ReviewMark /> : null}</li>)}</ul></div>
           </div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
-      {device && mechanism ? <TreatmentReveal className={styles.section}>
+      {device && mechanism ? <div className={styles.section}>
         <section className={styles.sectionRow} aria-labelledby="mechanism-title">
           <SectionHeading eyebrow="HOW IT WORKS" title={<>{treatment.name}는<br /><b>어떻게 작용하나요?</b></>} description={mechanism.lead} />
           <div className={styles.mechanismContent} id="mechanism-title">
-            <TreatmentReveal mode="line" className={styles.mechanismLine}><span /></TreatmentReveal>
+            <div className={styles.mechanismLine}><span /></div>
             <ol className={styles.mechanismSteps}>{mechanism.steps.map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, "0")}</span><p><Lines text={step} /></p>{mechanism.needsReview ? <ReviewMark /> : null}</li>)}</ol>
-            {mechanism.illustration.src ? <TreatmentReveal mode="zoom" className={styles.mechanismVisual}><Image src={mechanism.illustration.src} alt={mechanism.illustration.alt} fill sizes="(max-width: 760px) 100vw, 68vw" /></TreatmentReveal> : showReview ? <TreatmentReveal mode="zoom" className={`${styles.mechanismVisual} ${styles.mechanismPlaceholder}`}>
+            {mechanism.illustration.src ? <div className={styles.mechanismVisual}><Image src={mechanism.illustration.src} alt={mechanism.illustration.alt} fill sizes="(max-width: 760px) 100vw, 68vw" /></div> : showReview ? <div className={`${styles.mechanismVisual} ${styles.mechanismPlaceholder}`}>
               <p>[일러스트] 피부 단면 · 표면 쿨링 + 진피층 가열 <ReviewMark /></p>
-            </TreatmentReveal> : null}
+            </div> : null}
           </div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
-      {device?.compare && compareRows.length ? <TreatmentReveal className={styles.section}>
+      {device?.compare && compareRows.length ? <div className={styles.section}>
         <section className={styles.sectionRow} aria-labelledby="compare-title">
           <SectionHeading eyebrow="COMPARE" title={<>다른 리프팅 장비와<br /><b>무엇이 다른가요?</b></>} />
           <div id="compare-title"><CompareTable treatment={device} />{device.compare.columnLink ? <Link className={styles.textLink} href={device.compare.columnLink.href}>{device.compare.columnLink.label}</Link> : null}</div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
       {treatment.kind === "injection" ? <InjectionSections treatment={treatment} /> : null}
 
@@ -234,20 +233,20 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             {device.handpieceTips ? <p className={styles.deviceIntro}>써마지FLX는 핸드피스 하나로 얼굴부터 바디까지 시술하고,<br />부위에 따라 크기가 다른 일회용 팁을 끼워 사용합니다.</p> : null}
           </div>
           {device.handpieceTips ? <div className={styles.handpieceLayout}>
-            <TreatmentReveal mode="clip" className={styles.handpieceFeature}>
+            <div className={styles.handpieceFeature}>
               <div className={styles.handpieceGlow}>{device.handpieceTips.handpiece.src ? <Image src={device.handpieceTips.handpiece.src} alt={device.handpieceTips.handpiece.alt} width={230} height={355} /> : null}</div>
               <h3>{device.handpieceTips.handpiece.title}</h3><p><Lines text={device.handpieceTips.handpiece.desc} /></p>
-            </TreatmentReveal>
-            <div className={styles.tipGrid}>{device.handpieceTips.tips.map((tip, index) => <TreatmentReveal mode="clip" delay={index * .08} className={styles.tipCard} key={`${tip.name}-${tip.size}`}>
+            </div>
+            <div className={styles.tipGrid}>{device.handpieceTips.tips.map((tip) => <div className={styles.tipCard} key={`${tip.name}-${tip.size}`}>
               <div>{tip.src ? <Image src={tip.src} alt={`${tip.name} ${tip.size}`} width={210} height={190} /> : null}</div><h3>{tip.name}</h3><b>{tip.size}</b><p>{tip.area}</p>
-            </TreatmentReveal>)}</div>
+            </div>)}</div>
           </div> : null}
           {device.handpieceTips?.note && (showReview || !device.handpieceTips.noteNeedsReview) ? <p className={styles.deviceNote}>{cleanReviewText(device.handpieceTips.note)}{device.handpieceTips.noteNeedsReview ? <ReviewMark dark /> : null}</p> : null}
           {genuine.length ? <div className={styles.genuineGrid}>{genuine.map(({ item, index }) => <article key={item.title}><small>{["GENUINE", "ONE TIP", "CERTIFICATE"][index] ?? `CHECK ${index + 1}`}</small><h3>{item.title}</h3><p>{cleanReviewText(item.desc)}</p>{item.needsReview ? <ReviewMark dark /> : null}</article>)}</div> : null}
         </div>
       </section> : null}
 
-      <TreatmentReveal className={styles.section}>
+      <div className={styles.section}>
         <section className={styles.sectionRow} aria-labelledby="process-title">
           <SectionHeading eyebrow="PROCESS" title={<>시술은<br /><b>어떻게 진행되나요?</b></>} />
           <div className={styles.processContent} id="process-title">
@@ -255,9 +254,9 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             <ol className={styles.processTimeline}>{treatment.process.map((step) => <li className={step.step === 1 || step.step === 4 ? styles.activeStep : ""} key={step.step}><i /><span>{String(step.step).padStart(2, "0")}</span><b>{step.title}</b></li>)}</ol>
           </div>
         </section>
-      </TreatmentReveal>
+      </div>
 
-      {showPainResult && treatment.painResult ? <TreatmentReveal className={`${styles.section} ${styles.softSection}`}>
+      {showPainResult && treatment.painResult ? <div className={`${styles.section} ${styles.softSection}`}>
         <section className={styles.sectionRow} aria-labelledby="pain-title">
           <SectionHeading eyebrow="PAIN · RESULT" title={<>가장 많이<br /><b>묻는 두 가지</b></>} />
           <div className={styles.painGrid} id="pain-title">
@@ -265,18 +264,18 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             {visibleResult ? <article><h3><Lines text={treatment.painResult.result.label} /></h3><p><ReviewValue item={treatment.painResult.result} /></p></article> : null}
           </div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
-      <TreatmentReveal className={styles.promiseSection}>
+      <div className={styles.promiseSection}>
         <section className={styles.promiseInner} aria-labelledby="promise-title">
           <span className={styles.quoteMark} aria-hidden="true">“</span>
           <h2 id="promise-title"><PromiseQuote text={treatment.promise.quote} /></h2>
           <p>{treatment.promise.signature}</p>
           <div className={styles.promiseGrid}>{treatment.promise.items.map((item, index) => <article key={item}><small>PROMISE {String(index + 1).padStart(2, "0")}</small><p><Lines text={item} /></p></article>)}</div>
         </section>
-      </TreatmentReveal>
+      </div>
 
-      {showCare && treatment.care ? <TreatmentReveal className={`${styles.section} ${styles.softSection}`}>
+      {showCare && treatment.care ? <div className={`${styles.section} ${styles.softSection}`}>
         <section className={styles.sectionRow} aria-labelledby="care-title">
           <SectionHeading eyebrow="BEFORE · AFTER" title={<>시술 전후,<br /><b>무엇을 지켜야 하나요?</b></>} />
           <div className={styles.careGrid} id="care-title">
@@ -284,14 +283,14 @@ export function TreatmentDetailTemplate({ treatment, content, relatedColumns }: 
             <div><h3>시술 후</h3><ul className={styles.dotList}>{treatment.care.after.map((item, index) => <li key={`${item}-${index}`}>{cleanReviewText(item)}{treatment.care?.needsReview ? <ReviewMark /> : null}</li>)}</ul></div>
           </div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
-      {treatment.faq.some((faq) => showReview || (!faq.needsReview && !faq.a.includes("[원장 확인]"))) ? <TreatmentReveal className={styles.section}>
+      {treatment.faq.some((faq) => showReview || (!faq.needsReview && !faq.a.includes("[원장 확인]"))) ? <div className={styles.section}>
         <section className={styles.sectionRow} aria-labelledby="faq-title">
           <SectionHeading eyebrow="FAQ" title={<>{treatment.name},<br /><b>자주 묻는 질문</b></>} />
           <div id="faq-title"><VisibleFaqs faqs={treatment.faq} /></div>
         </section>
-      </TreatmentReveal> : null}
+      </div> : null}
 
       {(relatedColumn || treatment.relatedConcerns.length) ? <section className={styles.relatedSection}>
         <div className={styles.relatedInner}>

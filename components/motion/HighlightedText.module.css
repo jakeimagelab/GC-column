@@ -38,37 +38,6 @@
   white-space: nowrap;
 }
 
-.armed mark {
-  background-size: 0 100%;
-}
-
-.playing mark {
-  background-size: 100% 100%;
-  transition: background-size 1.3s cubic-bezier(.77,0,.18,1) .25s;
-}
-
-.playing mark:nth-of-type(2) {
-  transition-delay: .35s;
-}
-
-.playing mark:nth-of-type(3) {
-  transition-delay: .45s;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .armed mark,
-  .playing mark {
-    background-size: 100% 100%;
-    transition: none;
-  }
-}
-
-:global(.devEditActive) .armed mark,
-:global(.devEditActive) .playing mark {
-  background-size: 100% 100%;
-  transition: none;
-}
-
 @media (min-width: 1024px) {
   :global(.br-d) {
     display: inline;

@@ -128,7 +128,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
       {activeSlides.map((slide, slideIndex) => (
         <ImageSlot
           key={slide.id}
-          className={`${styles.heroMedia} ${slideIndex === index ? styles.activeMedia : ""} ${slideIndex === index && motionReady ? styles.zoomMedia : ""}`}
+          className={`${styles.heroMedia} ${slideIndex === index ? styles.activeMedia : ""}`}
           label=""
           alt=""
           variant="dark"

@@ -1,9 +1,9 @@
-.page { --cover:#3a3028; --questions:#6e6157; --paper:#fbfaf7; --line:#ddd7ce; --muted:#766e66; min-height:100vh; background:var(--paper); color:#3a3028; word-break:keep-all; overflow-wrap:break-word; }
+.page { position:relative; --cover:#3a3028; --questions:#6e6157; --paper:#fbfaf7; --line:#ddd7ce; --muted:#766e66; min-height:100vh; background:var(--paper); color:#3a3028; word-break:keep-all; overflow-wrap:break-word; }
 .page h1,.page h2,.page h3,.page p { text-wrap:pretty; }
 .mobileHeroTitle,.mobileTranscript,.mobileQuestionForm,.mobileCareer,.mobileBottomBar,.mobileConsultBreak { display:none; }
 .desktopConsultSpace { display:inline; }
 .articleCover { position:relative; min-height:540px; padding-top:72px; background:var(--cover); color:#fff; overflow:hidden; }
-.articleCoverMedia { position:absolute; z-index:0; inset:0; background:var(--article-overlay),var(--article-cover-image) 70% 42% / cover no-repeat,var(--cover); transform-origin:center; will-change:transform; }
+.articleCoverMedia { position:absolute; z-index:0; inset:0; background:var(--article-overlay),var(--article-cover-image) 70% 42% / cover no-repeat,var(--cover); transform-origin:center; }
 .articleCover>header,.articleCoverInner { position:relative; z-index:1; }
 .articleCoverInner { width:min(1180px,calc(100% - 72px)); margin:0 auto; padding:44px 0 32px; }
 .breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:8px; color:rgb(255 255 255 / 58%); font-size:12px; }
@@ -161,7 +161,7 @@
 .sidebar { min-width:0; align-self:stretch; }
 .stickySidebar { position:sticky; top:96px; display:flex; flex-direction:column; gap:18px; }
 .faqBand { position:relative; background:var(--questions); color:#fff; overflow:hidden; scroll-margin-top:80px; }
-.faqDecoration { position:absolute; z-index:0; top:-110px; right:-20px; color:rgb(255 255 255 / 5%); font-family:var(--font-en); font-size:340px; font-weight:700; line-height:1; pointer-events:none; transform:translate3d(0,var(--detail-parallax-y,0),0); will-change:transform; }
+.faqDecoration { position:absolute; z-index:0; top:-110px; right:-20px; color:rgb(255 255 255 / 5%); font-family:var(--font-en); font-size:340px; font-weight:700; line-height:1; pointer-events:none; }
 .faqBandInner { position:relative; z-index:1; width:min(1180px,calc(100% - 72px)); margin:0 auto; padding:100px 0 96px; }
 .faqBand header { margin-bottom:56px; display:flex; align-items:flex-end; justify-content:space-between; gap:32px; }
 .faqBand header span { color:rgb(255 255 255 / 62%); font-family:var(--font-en); font-size:10px; letter-spacing:.28em; }
@@ -343,104 +343,19 @@
 
 /* Detail-page entrance and once-only scroll reveals. Paragraphs retain their
    position; only editorial headings, media, cards, tables and rules move. */
-.articleCover[data-detail-entry-armed] .articleCoverMedia { transform:scale(1.14); }
-.articleCover[data-detail-entry-armed] [data-detail-entry="breadcrumb"],
-.articleCover[data-detail-entry-armed] [data-detail-entry="issue"],
-.articleCover[data-detail-entry-armed] [data-detail-entry="byline"] { opacity:0; transform:translateY(16px); }
-.articleCover[data-detail-entry-armed] [data-detail-entry^="title-"] { transform:translateY(110%); }
-.articleCover[data-detail-entry-ready] .articleCoverMedia { animation:detailHeroSettle 2.4s cubic-bezier(.2,.7,.2,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="breadcrumb"] { animation:detailHeroCopy .75s .15s cubic-bezier(.2,.8,.2,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="issue"] { animation:detailHeroCopy .75s .25s cubic-bezier(.2,.8,.2,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="title-1"] { animation:detailTitleLine 1.1s .35s cubic-bezier(.77,0,.18,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="title-2"] { animation:detailTitleLine 1.1s .47s cubic-bezier(.77,0,.18,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="title-3"] { animation:detailTitleLine 1.1s .59s cubic-bezier(.77,0,.18,1) both; }
-.articleCover[data-detail-entry-ready] [data-detail-entry="byline"] { animation:detailHeroCopy .8s .85s cubic-bezier(.2,.8,.2,1) both; }
-
-.page [data-detail-reveal-ready][data-detail-reveal="up"] { opacity:0; transform:translateY(32px); }
-.page [data-detail-reveal-active][data-detail-reveal="up"] { animation:detailRevealUp .9s cubic-bezier(.2,.8,.2,1) both; }
-
-.page [data-detail-reveal-ready][data-detail-reveal="section"] .sectionMarker { clip-path:inset(0 100% 0 0); }
-.page [data-detail-reveal-ready][data-detail-reveal="section"]>h2 { opacity:0; transform:translateY(30px); }
-.page [data-detail-reveal-active][data-detail-reveal="section"] .sectionMarker { animation:detailDraw 1.3s cubic-bezier(.77,0,.18,1) both; }
-.page [data-detail-reveal-active][data-detail-reveal="section"]>h2 { animation:detailRevealUp .85s .15s cubic-bezier(.2,.8,.2,1) both; }
-
-.page [data-detail-reveal-active][data-detail-reveal="figure"] { animation:detailFigureClip 1.3s cubic-bezier(.77,0,.18,1) both; }
-.page [data-detail-reveal-active][data-detail-reveal="figure"] img { animation:detailFigureImage 1.8s cubic-bezier(.2,.8,.2,1) both; }
 .figureMotion { margin:0; }
 
-.page [data-detail-reveal-ready][data-detail-reveal="table"] tbody tr { opacity:0; transform:translateY(12px); }
-.page [data-detail-reveal-active][data-detail-reveal="table"] tbody tr { animation:detailTableRow .72s var(--detail-delay,0s) cubic-bezier(.2,.8,.2,1) both; }
-.page [data-detail-reveal-ready][data-detail-reveal="table"] .primaryCell { background-color:transparent; }
-.page [data-detail-reveal-active][data-detail-reveal="table"] thead .primaryCell { animation:detailTableHeadFill 1s .7s ease both; }
-.page [data-detail-reveal-active][data-detail-reveal="table"] tbody .primaryCell { animation:detailTableCellFill 1s .7s ease both; }
-
-.faqBand[data-detail-reveal-ready] header,
-.faqBand[data-detail-reveal-ready] :global([data-faq-item]) { opacity:0; transform:translateY(26px); }
-.faqBand[data-detail-reveal-active] header { animation:detailRevealUp .85s cubic-bezier(.2,.8,.2,1) both; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]) { animation:detailRevealUp .72s var(--detail-delay,0s) cubic-bezier(.2,.8,.2,1) both; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(2)) { animation-delay:.07s; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(3)) { animation-delay:.14s; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(4)) { animation-delay:.21s; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(5)) { animation-delay:.28s; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(6)) { animation-delay:.35s; }
-.faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(7)) { animation-delay:.42s; }
-
-.visitPrep[data-detail-reveal-ready] .visitHeading,
-.visitPrep[data-detail-reveal-ready] .visitGrid>div { opacity:0; transform:translateY(28px); }
-.visitPrep[data-detail-reveal-active] .visitHeading { animation:detailRevealUp .8s cubic-bezier(.2,.8,.2,1) both; }
-.visitPrep[data-detail-reveal-active] .visitGrid>div { animation:detailRevealUp .8s cubic-bezier(.2,.8,.2,1) both; }
-.visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(1) { animation-delay:.12s; }
-.visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(2) { animation-delay:.24s; }
-.visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(3) { animation-delay:.36s; }
-
-@keyframes detailHeroSettle { from { transform:scale(1.14); } to { transform:scale(1); } }
-@keyframes detailHeroCopy { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-@keyframes detailTitleLine { from { transform:translateY(110%); } to { transform:none; } }
-@keyframes detailRevealUp { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:none; } }
-@keyframes detailDraw { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0); } }
-@keyframes detailFigureClip { from { clip-path:inset(0 0 100% 0); } to { clip-path:inset(0); } }
-@keyframes detailFigureImage { from { transform:scale(1.08); } to { transform:none; } }
-@keyframes detailTableRow { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
-@keyframes detailTableHeadFill { from { background-color:transparent; } to { background-color:var(--brand-soft-head,var(--brand-soft)); } }
-@keyframes detailTableCellFill { from { background-color:transparent; } to { background-color:var(--brand-soft); } }
-
-@media(max-width:640px) {
-  .page [data-detail-reveal-ready][data-detail-reveal="up"] { transform:translateY(16px); }
-  .page [data-detail-reveal-active][data-detail-reveal="up"] { animation-duration:.675s; }
-  .page [data-detail-reveal-ready][data-detail-reveal="section"]>h2 { transform:translateY(15px); }
-  .page [data-detail-reveal-active][data-detail-reveal="section"] .sectionMarker,
-  .page [data-detail-reveal-active][data-detail-reveal="figure"] { animation-duration:.975s; }
-  .page [data-detail-reveal-active][data-detail-reveal="figure"] img { animation-duration:1.35s; }
-  .page [data-detail-reveal-active][data-detail-reveal="section"]>h2 { animation-duration:.6375s; animation-delay:.1125s; }
-  .page [data-detail-reveal-active][data-detail-reveal="table"] tbody tr { animation-duration:.54s; }
-  .page [data-detail-reveal-active][data-detail-reveal="table"] thead .primaryCell,
-  .page [data-detail-reveal-active][data-detail-reveal="table"] tbody .primaryCell { animation-duration:.75s; animation-delay:.525s; }
-  .faqBand[data-detail-reveal-active] header { animation-duration:.6375s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]) { animation-duration:.54s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(2)) { animation-delay:.0525s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(3)) { animation-delay:.105s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(4)) { animation-delay:.1575s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(5)) { animation-delay:.21s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(6)) { animation-delay:.2625s; }
-  .faqBand[data-detail-reveal-active] :global([data-faq-item]:nth-child(7)) { animation-delay:.315s; }
-  .visitPrep[data-detail-reveal-active] .visitHeading,
-  .visitPrep[data-detail-reveal-active] .visitGrid>div { animation-duration:.6s; }
-  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(1) { animation-delay:.09s; }
-  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(2) { animation-delay:.18s; }
-  .visitPrep[data-detail-reveal-active] .visitGrid>div:nth-child(3) { animation-delay:.27s; }
-  .articleCover[data-detail-entry-ready] .articleCoverMedia { animation-duration:1.8s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="breadcrumb"] { animation-duration:.5625s; animation-delay:.1125s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="issue"] { animation-duration:.5625s; animation-delay:.1875s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="title-1"] { animation-duration:.825s; animation-delay:.2625s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="title-2"] { animation-duration:.825s; animation-delay:.3525s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="title-3"] { animation-duration:.825s; animation-delay:.4425s; }
-  .articleCover[data-detail-entry-ready] [data-detail-entry="byline"] { animation-duration:.6s; animation-delay:.6375s; }
-}
-
 @media(prefers-reduced-motion:reduce) {
-  .page [data-detail-entry],.page [data-detail-reveal],.page [data-detail-reveal] *,.articleCoverMedia { opacity:1!important; transform:none!important; clip-path:none!important; animation:none!important; transition:none!important; }
+  .articleCoverMedia { opacity:1!important; transform:none!important; clip-path:none!important; animation:none!important; transition:none!important; }
 }
-:global(body.devEditActive) .page [data-detail-entry],
-:global(body.devEditActive) .page [data-detail-reveal],
-:global(body.devEditActive) .page [data-detail-reveal] *,
 :global(body.devEditActive) .articleCoverMedia { opacity:1!important; transform:none!important; clip-path:none!important; animation:none!important; transition:none!important; }
+
+.article [id], .faqBand [id], .faqBand { scroll-margin-top: 112px; }
+.articleCover h1 { font-size: clamp(32px, 4.2vw, 56px); }
+.articleSection, .judgement, .precautions { padding-top: var(--section-space); }
+.depthNav { gap: 16px; }
+.depthNav > div { flex-wrap: wrap; }
+.depthNav a { min-height: var(--control-height); }
+.depthNav .depthActive { color: var(--cover); border-color: var(--line); background: transparent; }
+
+.shareDisclosure summary { background: transparent; color: var(--cover); border: 1px solid var(--line); }
