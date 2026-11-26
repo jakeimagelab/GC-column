@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { ColumnFooter } from "@/components/ColumnFooter";
+import { ColumnBookmark } from "@/components/ColumnBookmark";
 import { ColumnHeader } from "@/components/ColumnHeader";
 import { ColumnList } from "@/components/ColumnList";
 import { ColumnSearch, type SearchColumn } from "@/components/ColumnSearch";
@@ -87,6 +88,7 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
   return (
     <main className={styles.page} data-column-page>
       <ColumnMainMotion />
+      <ColumnBookmark columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
       <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>
         <section className={styles.cover}>
