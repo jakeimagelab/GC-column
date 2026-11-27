@@ -8,6 +8,7 @@ import { getTreatmentDetail } from "@/content/treatments/index";
 import { isVisualEditingMode } from "@/lib/motion";
 import { EditableRichText } from "./EditableRichText";
 import { ImageSlot } from "./ImageSlot";
+import { useDesktopMotion } from "./motion/useDesktopMotion";
 import styles from "./EquipmentCarousel.module.css";
 
 type EquipmentCarouselProps = { items: EquipmentContentItem[]; content: SiteContent };
@@ -63,6 +64,7 @@ function EquipmentCard({ item, duplicate = false, editMode = false, onEdit, item
 export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const [editMode, setEditMode] = useState(false);
   const canRotate = items.length > 5;
+  const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const autoPauseUntilRef = useRef(0);
@@ -72,6 +74,7 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
   const [step, setStep] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [revealing, setRevealing] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -91,7 +94,27 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
     return () => query.removeEventListener("change", update);
   }, []);
 
-
+  const desktop = useDesktopMotion();
+  useEffect(() => {
+    if (editMode || reducedMotion || !desktop) {
+      setRevealing(false);
+      return;
+    }
+    const section = sectionRef.current;
+    if (!section) return;
+    const play = () => setRevealing(true);
+    if (!("IntersectionObserver" in window)) {
+      play();
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      play();
+    }, { threshold: 0.18 });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [desktop, editMode, reducedMotion]);
 
   useEffect(() => {
     setTransitioning(false);
@@ -250,9 +273,10 @@ export function EquipmentCarousel({ items, content }: EquipmentCarouselProps) {
 
   return (
     <section
+      ref={sectionRef}
       id="equipment"
       data-scroll-world-scene
-      className={styles.section}
+      className={`${styles.section} ${revealing ? styles.revealing : ""}`}
     >
       <div className={styles.band} data-scroll-world-layer="counter" />
       <div className={styles.heading} data-scroll-world-layer="copy">

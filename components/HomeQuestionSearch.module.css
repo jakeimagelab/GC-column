@@ -83,3 +83,30 @@
   .results { grid-template-columns: 1fr; }
   .empty { align-items: stretch; flex-direction: column; }
 }
+
+@media (min-width: 1024px) {
+.unfoldArmed { opacity: 0; transform: translateY(-24px) scaleY(.04); transform-origin: top center; }
+.unfoldPlaying { animation: questionUnfold 1s cubic-bezier(.22,.61,.36,1) both; will-change: opacity, transform; }
+
+@keyframes typingCaret { 50% { opacity: 0; } }
+@keyframes questionUnfold {
+  from { opacity: 0; transform: translateY(-24px) scaleY(.04); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typingGhost { display: none; }
+  .typing input::placeholder { color: #9c938b; }
+  .unfoldArmed, .unfoldPlaying { opacity: 1; transform: none; animation: none; }
+}
+
+:global(.devEditActive) .unfoldArmed,
+:global(.devEditActive) .unfoldPlaying { opacity: 1; transform: none; animation: none; }
+
+@media (max-width: 1024px) {
+  .panel { padding-inline: 36px; }
+  .heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .concernGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+}

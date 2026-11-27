@@ -1,3 +1,4 @@
+import { ColumnMainMotion } from "@/components/motion/ColumnMainMotion";
 import type { CSSProperties } from "react";
 import { byPublication, concernKeys } from "@/lib/column-filters";
 import type { Metadata } from "next";
@@ -90,6 +91,7 @@ export default async function ColumnMainPage({ searchParams }: { searchParams: P
 
   return (
     <main className={styles.page} data-column-page>
+      <ColumnMainMotion />
       <ColumnBookmark columns={searchColumns} content={content} faqIndex={faqIndex} treatments={columnTreatmentSearchNames} />
       <ColumnHeader content={content} variant="overlay" page="main" />
       <div className={styles.heroStage} data-column-hero>

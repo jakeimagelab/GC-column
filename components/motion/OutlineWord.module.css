@@ -27,6 +27,53 @@
 .maskCutout { fill: #000; stroke: none; }
 .outerStrokeText { fill: none; }
 
+.armed .svg {
+  clip-path: inset(0 100% 0 0);
+}
+
+.playing .svg {
+  animation: outlineReveal 1.6s cubic-bezier(.22,.61,.36,1) both;
+  will-change: clip-path;
+}
+
 .tracking { --outline-tracking-start: clamp(12px, 2.35vw, 34px); }
 .tracking .svg { clip-path: none; }
 .tracking .text { letter-spacing: -2px; }
+.tracking.armed .svg { clip-path: none; }
+.tracking.playing .svg { animation: none; }
+.tracking.armed .text { letter-spacing: var(--outline-tracking-start); }
+.tracking.playing .text { animation: outlineTracking 1.35s cubic-bezier(.22,.61,.36,1) both; will-change: letter-spacing; }
+
+@keyframes outlineReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes outlineTracking {
+  from { letter-spacing: var(--outline-tracking-start); }
+  to { letter-spacing: -2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .armed .svg,
+  .playing .svg {
+    clip-path: inset(0);
+    animation: none;
+  }
+  .tracking.armed .svg,
+  .tracking.playing .svg { clip-path: none; }
+  .tracking.armed .text,
+  .tracking.playing .text { letter-spacing: -2px; animation: none; }
+}
+
+:global(.devEditActive) .armed .svg,
+:global(.devEditActive) .playing .svg {
+  clip-path: inset(0);
+  animation: none;
+}
+
+:global(.devEditActive) .tracking.armed .svg,
+:global(.devEditActive) .tracking.playing .svg { clip-path: none; }
+
+:global(.devEditActive) .tracking.armed .text,
+:global(.devEditActive) .tracking.playing .text { letter-spacing: -2px; animation: none; }

@@ -1,3 +1,4 @@
+import { ColumnDetailMotion } from "@/components/motion/ColumnDetailMotion";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -169,6 +170,7 @@ export default async function ColumnDetailPage({ params }: ColumnDetailPageProps
   return (
     <main className={styles.page} style={articleStyle} data-column-detail-page data-column-slug={column.slug}>
       <ColumnHeader content={content} variant="overlay" page="detail" />
+      <ColumnDetailMotion />
       <ArticleProgress />
       <JsonLd value={structured} />
       <ArticleToc items={tocItems.filter((item) => item.id !== "qa" || faqItems.length > 0)} title={getText(content, "column.detail.toc.eyebrow")} mobileBar />

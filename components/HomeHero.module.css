@@ -36,3 +36,33 @@
   .heroCopy h1 .scriptTitle { font-size: 1.22em; }
   .heroPager { left: 24px; bottom: 110px; }
 }
+
+@media (min-width: 1024px) {
+.motionReady .heroCopy .titleLine:first-child > .scriptTitle { animation: heroHandwrite 1.65s .05s cubic-bezier(.22,.61,.36,1) both; }
+.motionReady .heroCopy .titleLine > b { animation: heroTitleUp .9s cubic-bezier(.22,.61,.36,1) both; }
+.motionReady .heroCopy .titleLine:nth-child(2) > b { animation-delay: .15s; }
+.motionReady .heroCopy > p { animation: heroSubtitle .8s .5s cubic-bezier(.22,.61,.36,1) both; }
+
+@keyframes heroTitleUp { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes heroHandwrite {
+  0% { clip-path: inset(0 100% 0 0); transform: translate3d(-5px, 2px, 0); }
+  72% { clip-path: inset(0 6% 0 0); }
+  100% { clip-path: inset(0); transform: none; }
+}
+@keyframes heroSubtitle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes heroProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes heroZoomOut { from { transform: scale(1.08); } to { transform: scale(1); } }
+.zoomMedia { animation: heroZoomOut 9s cubic-bezier(.22,.61,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .heroMedia, .heroPager i { transition: none; }
+  .motionReady .heroCopy .titleLine > span, .motionReady .heroCopy .titleLine > b, .motionReady .heroCopy > p, .progressFill, .zoomMedia { animation: none; clip-path: none; transform: none; opacity: 1; }
+}
+
+:global(.devEditActive) .motionReady .heroCopy .titleLine > span,
+:global(.devEditActive) .motionReady .heroCopy .titleLine > b,
+:global(.devEditActive) .motionReady .heroCopy > p,
+:global(.devEditActive) .progressFill,
+:global(.devEditActive) .zoomMedia { animation: none; transform: none; opacity: 1; }
+
+}

@@ -270,3 +270,100 @@
 .visionBackdrop i { background: rgb(243 240 235 / 40%); }
 .visionOutline { font-size: clamp(58px, 10vw, 132px); }
 .principles article { padding: clamp(18px, 2.2vw, 30px); background: rgb(255 255 255 / 92%); backdrop-filter: none; }
+
+@media (min-width: 1024px) {
+.hero { position: relative; height: 820px; overflow: hidden; background: var(--dark-brown); color: #fff; }
+
+.vision {
+  --vision-photo-opacity: 0;
+  --vision-photo-scale: 1.08;
+  --vision-title-color: #2b2b2b;
+  --vision-body-color: #5e5e5e;
+  --vision-label-color: #6e6052;
+  --vision-outline-color: #cdbead;
+  --vision-outline-opacity: 1;
+  --vision-card-1-opacity: 1;
+  --vision-card-1-y: 0px;
+  --vision-card-2-opacity: 1;
+  --vision-card-2-y: 0px;
+  --vision-card-3-opacity: 1;
+  --vision-card-3-y: 0px;
+  position: relative;
+  height: 260vh;
+  overflow: clip;
+  background: var(--paper);
+}
+.visionSticky {
+  position: sticky;
+  top: 72px;
+  height: calc(100svh - 72px);
+  padding: clamp(52px, 6.5vh, 82px) var(--home-gutter) clamp(42px, 5.5vh, 70px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+.visionBackdrop { position: absolute; inset: 0; z-index: -2; opacity: 0; pointer-events: none; }
+.visionBackdrop img { object-fit: cover; transform: scale(var(--vision-photo-scale)); transform-origin: center; }
+.visionBackdrop i { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(28,22,18,.72) 0%, rgba(28,22,18,.6) 45%, rgba(28,22,18,.74) 100%); }
+.vision[data-vision-motion-ready] .visionBackdrop { opacity: var(--vision-photo-opacity); }
+.visionOutline {
+  --outline-fill: transparent !important;
+  --outline-stroke: var(--vision-outline-color) !important;
+  --outline-stroke-width: 2px;
+  position: absolute;
+  top: 24%;
+  left: 50%;
+  z-index: -1;
+  opacity: var(--vision-outline-opacity);
+  transform: translate(-50%, -50%);
+  font-size: clamp(110px, 11.8056vw, 170px);
+  letter-spacing: 6px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.principles article {
+  min-width: 0;
+  padding: 36px 32px 32px;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(255,255,255,.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  word-break: keep-all;
+}
+.vision[data-vision-motion-ready] .principles article { box-shadow: 0 22px 52px rgba(28,22,18,.16); will-change: opacity, transform; }
+.vision[data-vision-motion-ready] .principles article:nth-child(1) { opacity: var(--vision-card-1-opacity); transform: translate3d(0,var(--vision-card-1-y),0); }
+.vision[data-vision-motion-ready] .principles article:nth-child(2) { opacity: var(--vision-card-2-opacity); transform: translate3d(0,var(--vision-card-2-y),0); }
+.vision[data-vision-motion-ready] .principles article:nth-child(3) { opacity: var(--vision-card-3-opacity); transform: translate3d(0,var(--vision-card-3-y),0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .latestPhoto img, .principles article { transition: none; }
+  .vision { height: auto; overflow: hidden; }
+  .visionSticky { position: relative; top: auto; height: auto; min-height: 0; padding: 130px var(--home-gutter) 120px; }
+  .visionBackdrop { display: none; }
+  .visionOutline { opacity: 1; }
+  .vision[data-vision-motion-ready] .principles article { opacity: 1; transform: none; box-shadow: none; }
+}
+
+:global(.devEditActive) .vision { height: auto; overflow: hidden; }
+:global(.devEditActive) .visionSticky { position: relative; top: auto; height: auto; min-height: 0; padding: 130px var(--home-gutter) 120px; }
+:global(.devEditActive) .visionBackdrop { display: none; }
+:global(.devEditActive) .visionOutline { opacity: 1; }
+:global(.devEditActive) .vision .principles article { opacity: 1; transform: none; box-shadow: none; }
+
+@media (max-width: 1180px) { .header nav { gap: 24px; } }
+@media (max-width: 1024px) {
+  .header nav { display: none; }
+  .heroCopy { width: auto; }
+  .doctorPhotoWrap { width: 42%; }
+  .directorOutline { font-size: 110px; }
+  .visionSticky { top: 64px; height: calc(100svh - 64px); }
+  .latestGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .location { grid-template-columns: 1fr; }
+}
+
+}

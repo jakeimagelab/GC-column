@@ -64,3 +64,33 @@
   .equipmentSlot { width: 100% !important; }
   .page { right: 24px; }
 }
+
+@media (min-width: 1024px) {
+.card > a, .disabledCard { color: #fff; display: flex; flex-direction: column; gap: 12px; }
+.card > a, .disabledCard { cursor: inherit; }
+.revealing .manualTrack .card { animation: equipmentRise .72s cubic-bezier(.22,.61,.36,1) both; }
+.revealing .manualTrack .card:nth-child(2) { animation-delay: .12s; }
+.revealing .manualTrack .card:nth-child(3) { animation-delay: .24s; }
+.revealing .manualTrack .card:nth-child(4) { animation-delay: .36s; }
+.revealing .manualTrack .card:nth-child(5) { animation-delay: .48s; }
+.revealing .manualTrack .card:nth-child(n+6) { animation-delay: .60s; }
+@keyframes equipmentRise { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport { scroll-behavior: auto; }
+  .moving, .equipmentSlot { transition: none; }
+  .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
+}
+
+:global(.devEditActive) .revealing .manualTrack .card { animation: none; opacity: 1; transform: none; }
+
+@media (max-width: 1024px) {
+  .section { height: auto; padding-bottom: 70px; background: linear-gradient(to bottom, #fff 280px, var(--taupe-band) 280px); }
+  .band { display: none; }
+  .heading { padding: 0 var(--home-gutter); }
+  .heading > div:last-child > span { display: none; }
+  .viewport { position: relative; inset: auto; margin: 40px var(--home-gutter) 0; }
+  .card { width: calc((100vw - var(--home-gutter) - var(--home-gutter) - (var(--equipment-gap) * 2)) / 3); }
+}
+
+}

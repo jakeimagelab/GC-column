@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+import { ColumnTransitionOverlay } from "@/components/ColumnTransitionOverlay";
+import { ScrollWorldJourney } from "@/components/motion/ScrollWorldJourney";
 import type { Metadata } from "next";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
 import { ContentBoardPreviewBridge } from "@/components/ContentBoardPreviewBridge";
@@ -19,6 +22,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ko" className={`${notoSansKr.variable} ${montserrat.variable} ${nanumPenScript.variable} ${notoSerifKr.variable} ${cormorantGaramond.variable}`}>
       <body>
         {children}
+        <Suspense fallback={null}><ColumnTransitionOverlay /></Suspense>
+        <ScrollWorldJourney />
         <ScrollToTopButton />
         {process.env.NODE_ENV === "development" ? <ContentBoardPreviewBridge /> : null}
         {process.env.NEXT_PUBLIC_GA_ID ? <SiteAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} /> : null}

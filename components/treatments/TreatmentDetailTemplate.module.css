@@ -386,3 +386,62 @@
   .faqToggle,
   .mobileNav { transition: none; }
 }
+
+@media (min-width: 1024px) {
+
+.sectionRow {
+  width: min(100% - 80px, 1240px);
+  margin-inline: auto;
+  padding: 120px 0;
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  align-items: start;
+  gap: 80px;
+}
+
+.sectionHeading {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .78s cubic-bezier(.2,.72,.25,1) var(--d, 0s), transform .78s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
+.revealVisible { opacity: 1; transform: none; }
+.reveal[data-reveal="line"] { opacity: 1; transform: scaleX(0); transform-origin: left; transition: transform 1.6s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
+.revealVisible[data-reveal="line"] { transform: scaleX(1); }
+.reveal[data-reveal="zoom"] { opacity: 1; transform: none; clip-path: inset(12%); transition: clip-path 1.4s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
+.revealVisible[data-reveal="zoom"] { clip-path: inset(0); }
+.reveal[data-reveal="clip"] { opacity: 1; transform: translateY(22px); clip-path: inset(100% 0 0); transition: clip-path 1s cubic-bezier(.2,.72,.25,1) var(--d, 0s), transform 1s cubic-bezier(.2,.72,.25,1) var(--d, 0s); }
+.revealVisible[data-reveal="clip"] { transform: none; clip-path: inset(0); }
+
+/* Kept for the lightweight treatment preview pages. */
+
+@media (max-width: 1024px) {
+  .sectionRow { width: min(100% - 56px, 960px); padding: 96px 0; grid-template-columns: 280px minmax(0, 1fr); gap: 48px; }
+  .glanceSection { grid-template-columns: 280px minmax(0, 1fr); gap: 48px; }
+  .glanceBodyWithVideo { grid-template-columns: minmax(0, 1fr) 230px; gap: 34px; }
+  .videoCard { width: 230px; }
+  .glanceLead { font-size: 22px; }
+  .deviceInner,
+  .relatedInner,
+  .consultBand > div,
+  .footerInner { width: min(100% - 56px, 960px); }
+  .handpieceLayout { grid-template-columns: 290px minmax(0, 1fr); gap: 38px; }
+  .handpieceGlow { width: 290px; height: 360px; }
+  .handpieceGlow img { height: 300px; }
+  .tipGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tipCard:nth-child(3) { border-left: 1px solid rgb(201 182 228 / 22%); }
+  .tipCard:nth-child(n+3) { border-top: 0; }
+  .deviceNote { margin-left: 328px; }
+  .relatedInner { grid-template-columns: 1fr; gap: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .revealVisible,
+  .reveal[data-reveal] { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .faqToggle,
+  .mobileNav { transition: none; }
+}
+
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, type CSSProperties } from "react";
+import { useId, useMemo, useRef, type CSSProperties } from "react";
+import { useMotionOnce } from "./useMotionOnce";
 import styles from "./OutlineWord.module.css";
 
 type OutlineWordProps = {
@@ -16,7 +17,17 @@ type OutlineWordProps = {
 const widths = { DIRECTOR: 880, VISION: 610, GLORY: 610, COLUMN: 720 } as const;
 
 export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3", scrollWorldLayer, trackingMotion = false, outerStroke = false }: OutlineWordProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const maskId = `outline-mask-${useId().replaceAll(":", "")}`;
+  const options = useMemo(() => ({
+    threshold: 0.22,
+    onPlay: (element: HTMLDivElement) => {
+      window.setTimeout(() => {
+        element.classList.remove(styles.armed, styles.playing);
+      }, 1_700);
+    },
+  }), []);
+  useMotionOnce(ref, styles.armed, styles.playing, options);
   const viewWidth = widths[text];
   const style = {
     "--outline-ratio": viewWidth / 170,
@@ -27,7 +38,7 @@ export function OutlineWord({ text, className = "", fill, stroke = "#cfc2b3", sc
   const textAnchor = trackingMotion ? "middle" : undefined;
 
   return (
-    <div className={`${styles.root} ${trackingMotion ? styles.tracking : ""} ${className}`} style={style} aria-hidden="true" data-scroll-world-layer={scrollWorldLayer}>
+    <div ref={ref} className={`${styles.root} ${trackingMotion ? styles.tracking : ""} ${className}`} style={style} aria-hidden="true" data-scroll-world-layer={scrollWorldLayer}>
       <svg className={styles.svg} viewBox={`0 0 ${viewWidth} 170`} focusable="false">
         {outerStroke ? (
           <defs>

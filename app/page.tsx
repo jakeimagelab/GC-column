@@ -1,3 +1,4 @@
+import { HomeVisionDissolve } from "@/components/motion/HomeVisionDissolve";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -138,6 +139,7 @@ export default async function HomePage() {
       </DoctorReveal>
 
       <section className={styles.vision} id="vision" data-home-vision data-scroll-world-scene>
+        <HomeVisionDissolve />
         <div className={styles.visionSticky}>
           <div className={styles.visionBackdrop} aria-hidden="true">
             <Image src="/uploads/glory-treatment-pigment-1.webp" alt="" fill sizes="100vw" />
